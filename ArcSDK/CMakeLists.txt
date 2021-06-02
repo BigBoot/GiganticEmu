@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.10)
+project(ArcSDK)
+
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS src/*.h src/*.hpp)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.c src/*.cpp)
+set(FILES ${HEADERS} ${SOURCES})
+
+add_library(${PROJECT_NAME} SHARED ${FILES})
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)

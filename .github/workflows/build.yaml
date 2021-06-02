@@ -1,0 +1,49 @@
+name: build
+
+on:
+  push:
+    branches:
+      - "master"
+    tags:
+      - "**"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.8.0
+        with:
+          dotnet-version: 5.0.x
+
+      - name: Setup msvc
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build
+        run: pwsh dist.ps1
+
+      - name: Set Version
+        id: version
+        shell: bash
+        run: |
+          if [ "$(git describe --tags --abbrev=0)" == "$(git describe --tags)" ]; then
+            echo "::set-output name=is_release::true"
+            echo "::set-output name=version::$(git describe --tags)"
+          else
+            echo "::set-output name=is_release::false"
+            echo "::set-output name=version::$(git describe --tags --abbrev=0)~$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count)"
+          fi
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          name: ${{ steps.version.outputs.version }}
+          artifacts: dist/GiganticEmu.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit: ${{ github.sha }}
+          tag: ${{ steps.version.outputs.version }}
+          prerelease: ${{ steps.version.outputs.is_release != 'true' }}
