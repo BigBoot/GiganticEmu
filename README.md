@@ -5,9 +5,13 @@
 
 # GiganticEmu
 
+![Emu](https://repository-images.githubusercontent.com/373163363/488c5b80-c7b8-11eb-9a78-306e77d8ccf4)
+
 Basically this is a hacked together Emulator for the Gigantic Backend Server.
 By using this emulator you will be able to press the Start button on the Login screen.
 It will also allow you to set your username and allow you to save your settings.
+
+
 
 ## Instructions
 * Download and extract the [latest release](https://github.com/BigBoot/GiganticEmu/releases/latest) into your Binaries\Win64 folder. it should ask you if you want to replace the ArcSDK.dll file -> confirm.
