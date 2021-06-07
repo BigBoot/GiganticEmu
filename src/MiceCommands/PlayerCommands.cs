@@ -1,11 +1,11 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
 
 public static class PlayerCommands
 {
-
     [MiceCommand("player.getservertime")]
     public static async Task<object> GetServerTime(dynamic payload) => new
     {
@@ -16,6 +16,7 @@ public static class PlayerCommands
     public static async Task<object> SetInfo(dynamic payload)
     {
         await File.WriteAllTextAsync(Path.Join(AppDomain.CurrentDomain.BaseDirectory, "profilesettings.json"), ((object)payload.profilesettings).ToJson());
+        await File.WriteAllTextAsync(Path.Join(AppDomain.CurrentDomain.BaseDirectory, "savedloadouts.json"), ((object)payload.savedLoadouts).ToJson());
         return null;
     }
 
@@ -24,37 +25,13 @@ public static class PlayerCommands
     {
         player = new
         {
-            savedLoadouts = new[] {
-                new { guardianLoadout = new[] { "EntWinter", "CyclopsAdult", "DragonAdult", "EntBaby_Winter", "CyclopsBaby", "DragonBaby" } },
-                new { guardianLoadout = new[] { "EntWinter", "CyclopsAdult", "DragonAdult", "EntBaby_Winter", "CyclopsBaby", "DragonBaby" } },
-                new { guardianLoadout = new[] { "EntWinter", "CyclopsAdult", "DragonAdult", "EntBaby_Winter", "CyclopsBaby", "DragonBaby" } },
-            },
+            savedLoadouts = File.Exists(Path.Join(AppDomain.CurrentDomain.BaseDirectory, "savedloadouts.json")) ? (await File.ReadAllTextAsync(Path.Join(AppDomain.CurrentDomain.BaseDirectory, "profilesettings.json"))).FromJsonTo<dynamic>() : new object[] { },
             profilesettings = File.Exists(Path.Join(AppDomain.CurrentDomain.BaseDirectory, "profilesettings.json")) ? (await File.ReadAllTextAsync(Path.Join(AppDomain.CurrentDomain.BaseDirectory, "profilesettings.json"))).FromJsonTo<dynamic>() : new { },
             instanceid = "instanceStr",
             penaltyHistory = new { },
             moid = 2,
-            inventory = new[] {
-                  new { quantity = 1, resource_id = "Adept", origins = new[]{"owned", "flagged"} },
-                  new { quantity = 1, resource_id = "Alchemist", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Angel", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Assault", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Aura", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Blade", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Bombard", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Despair", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Frosty", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Judo", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Machine", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Minotaur", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Planter", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Quarrel", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Rogue", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Swift", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Tank", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Warden", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Zap", origins = new[]{"owned", "flagged"}},
-                  new { quantity = 1, resource_id = "Glyph", origins = new[]{"owned", "owned"}},
-            },
+            inventory = new[] { Heroes.RESOURCE_IDS, Skins.RESOURCE_IDS, Creatures.RESOURCE_IDS }
+                .SelectMany(ids => ids.Select(id => new { quantity = 1, resource_id = id, origins = new[] { "owned", "flagged" } })),
             preview_matches_left = new
             {
                 keyStr = "valueStr"
