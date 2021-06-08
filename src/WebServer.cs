@@ -30,9 +30,9 @@ class HttpServer
 
             Console.Out.WriteLine("Serving file: '{0}'", ctx.Request.Url);
 
-            Func<HttpListenerContext, Task<string>> handler = null;
+            Func<HttpListenerContext, Task<string>>? handler = null;
 
-            switch (ctx.Request.Url.AbsolutePath)
+            switch (ctx.Request.Url?.AbsolutePath)
             {
                 case "/auth/0.0/arc/auth":
                     handler = Auth;
@@ -113,9 +113,9 @@ class HttpServer
     {
         ctx.Response.Headers.Add("content-type: application/json");
 
-        var assembly = Assembly.GetEntryAssembly();
+        var assembly = Assembly.GetEntryAssembly()!;
 
-        using (var input = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.resources.cdn.json"))
+        using (var input = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.resources.cdn.json")!)
         {
             var buffer = new byte[input.Length];
             await input.ReadAsync(buffer, 0, (int)input.Length);

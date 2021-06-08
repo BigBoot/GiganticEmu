@@ -11,6 +11,7 @@ using Fetchgoods.Text.Json.Extensions;
 
 public class MiceClient
 {
+    public static MiceClient INSTANCE = null!;
     const int MIN_BUFFER_SIZE = 512;
     const int MAX_LENGTH_BYTES = sizeof(long) + 1;
     private TcpClient _tcp;
@@ -18,11 +19,12 @@ public class MiceClient
     private Pipe _pipe = new Pipe();
     private bool _authenticated = false;
     private bool _closed = false;
-    private static Dictionary<String, Func<dynamic, Task<object>>> HANDLERS = Assembly.GetEntryAssembly()
+    private static Dictionary<String, Func<dynamic, Task<object>>> HANDLERS = Assembly.GetEntryAssembly()?
             .GetTypes()
             .SelectMany(t => t.GetMethods())
             .Where(m => m.GetCustomAttributes<MiceCommandAttribute>(false).Any())
-            .ToDictionary(m => m.GetCustomAttribute<MiceCommandAttribute>(false).Command, m => (Func<dynamic, Task<object>>)Delegate.CreateDelegate(typeof(Func<dynamic, Task<object>>), null, m));
+            .ToDictionary(m => m.GetCustomAttribute<MiceCommandAttribute>(false)!.Command, m => (Func<dynamic, Task<object>>)Delegate.CreateDelegate(typeof(Func<dynamic, Task<object>>), null, m))
+            ?? new Dictionary<String, Func<dynamic, Task<object>>>();
 
     private CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -40,37 +42,14 @@ public class MiceClient
         _salsaOut = new Salsa("bbbbbbbbbbbbbbbb", 16);
 
         _username = username;
+
+        INSTANCE = this;
     }
 
     public async Task Run()
     {
         Task receiving = ReceiveTask();
         Task reading = ReadTask();
-        // Task match = Task.Delay(5000).ContinueWith(async _ =>
-        // {
-        //     Console.WriteLine("Sending [match.ready]");
-        //     var ck2 = Convert.ToBase64String(Encoding.UTF8.GetBytes("imagoodcipherkey"));
-        //     var ck = Convert.ToBase64String(Encoding.UTF8.GetBytes("amotigadeveloper"));
-        //     var bcryptHmac = Convert.ToBase64String(Encoding.UTF8.GetBytes("totsagoodsuperlonghmacsecretkeys"));
-        //     var msg = new object[] { "match.ready", new
-        //     {
-        //         matchinfo = new
-        //         {
-        //             server = new
-        //             {
-        //                 connstr = "127.0.0.1:7777",
-        //                 map = "lv_canyon",
-        //             },
-        //             instanceid = "12",
-        //             token = ck + ck2 + bcryptHmac,
-        //             meta = new
-        //             {
-        //                 moid = 2,
-        //             },
-        //         },
-        //     }}.ToJson();
-        //     await SendResponse(msg);
-        // });
 
         await Task.WhenAll(reading, receiving);
         _tcp.Close();
@@ -179,7 +158,7 @@ public class MiceClient
         _tcpStream.Dispose();
     }
 
-    private async Task SendResponse(string response)
+    public async Task SendResponse(string response)
     {
         var encrypted = _salsaOut.Encrypt(response);
         var length = EncodeSize(encrypted.Length);
@@ -244,6 +223,7 @@ public class MiceClient
         if (HANDLERS.ContainsKey(cmd))
         {
             Console.WriteLine($"Received handled command: {cmd}");
+            Console.WriteLine(((Object)payload).ToJson());
             try
             {
                 var response = await HANDLERS[cmd](payload);

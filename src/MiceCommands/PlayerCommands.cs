@@ -7,13 +7,13 @@ using Fetchgoods.Text.Json.Extensions;
 public static class PlayerCommands
 {
     [MiceCommand("player.getservertime")]
-    public static async Task<object> GetServerTime(dynamic payload) => new
+    public static async Task<object?> GetServerTime(dynamic payload) => new
     {
         datetime = DateTime.Now.ToString("yyyy.MM.dd-HH:mm:ss")
     };
 
     [MiceCommand("player.setinfo")]
-    public static async Task<object> SetInfo(dynamic payload)
+    public static async Task<object?> SetInfo(dynamic payload)
     {
         await File.WriteAllTextAsync(Path.Join(AppDomain.CurrentDomain.BaseDirectory, "profilesettings.json"), ((object)payload.profilesettings).ToJson());
         await File.WriteAllTextAsync(Path.Join(AppDomain.CurrentDomain.BaseDirectory, "savedloadouts.json"), ((object)payload.savedLoadouts).ToJson());
@@ -21,7 +21,7 @@ public static class PlayerCommands
     }
 
     [MiceCommand("player.getinfo")]
-    public static async Task<object> GetInfo(dynamic payload) => new
+    public static async Task<object?> GetInfo(dynamic payload) => new
     {
         player = new
         {

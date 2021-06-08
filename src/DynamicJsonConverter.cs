@@ -4,10 +4,11 @@ using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.CSharp.RuntimeBinder;
 
 public class DynamicJsonConverter : JsonConverter<dynamic>
 {
-    public override dynamic Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override dynamic? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         => reader.TokenType switch
         {
             JsonTokenType.True => true,
@@ -22,17 +23,19 @@ public class DynamicJsonConverter : JsonConverter<dynamic>
 
     private object ReadObject(JsonElement jsonElement)
     {
-        IDictionary<string, object> expandoObject = new ExpandoObject();
+        IDictionary<string, object> expandoObject = new ExpandoObject()!;
         foreach (var obj in jsonElement.EnumerateObject())
         {
             var k = obj.Name;
-            var value = ReadValue(obj.Value);
-            expandoObject[k] = value;
+            if (ReadValue(obj.Value) is object value)
+            {
+                expandoObject[k] = value;
+            }
         }
         return expandoObject;
     }
 
-    private object ReadValue(JsonElement jsonElement)
+    private object? ReadValue(JsonElement jsonElement)
         =>
          jsonElement.ValueKind switch
          {
@@ -47,10 +50,15 @@ public class DynamicJsonConverter : JsonConverter<dynamic>
              _ => throw new ArgumentOutOfRangeException()
          };
 
-    private object ReadList(JsonElement jsonElement)
+    private object? ReadList(JsonElement jsonElement)
     {
         var list = new List<object>();
-        jsonElement.EnumerateArray().ToList().ForEach(j => list.Add(ReadValue(j)));
+        jsonElement.EnumerateArray()
+            .Select(e => ReadValue(e))
+            .OfType<object>()
+            .ToList()
+            .ForEach(o => list.Add(o));
+
         return list.Count == 0 ? null : list;
     }
 
@@ -59,5 +67,17 @@ public class DynamicJsonConverter : JsonConverter<dynamic>
         JsonSerializerOptions options)
     {
         JsonSerializer.Serialize(writer, value, value.GetType(), options);
+    }
+
+    public static T? GetProperty<T>(Func<T> getter)
+    {
+        try
+        {
+            return getter();
+        }
+        catch (RuntimeBinderException)
+        {
+            return default(T);
+        }
     }
 }

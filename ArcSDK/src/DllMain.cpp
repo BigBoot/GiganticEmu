@@ -175,7 +175,7 @@ EXTERN_DLL_EXPORT int64_t CC_LaunchClient(const wchar_t *arg1, int arg2, int64_t
     For some reason, the "Gigantic-Core_de" build returns 0 instead
     return 0;
     */
-    return 0;
+    return 0xE0000019;
 }
 
 /*
