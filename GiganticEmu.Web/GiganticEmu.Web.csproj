@@ -9,14 +9,21 @@
 
   <ItemGroup>
     <EmbeddedResource Include="resources/**/*.*">
-      <Link>resources\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <Link>Resources\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Fetchgoods.Text.Json.Extensions" Version="0.1.0" />
+    <PackageReference Include="Microsoft.Tye.Extensions.Configuration" Version="0.7.0-alpha.21279.2" />
     <PackageReference Include="System.IO.Pipelines" Version="4.7.2" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GiganticEmu.Shared\GiganticEmu.Shared.csproj" />
+    <ProjectReference Include="..\GiganticEmu.Shared.Backend\GiganticEmu.Shared.Backend.csproj" />
   </ItemGroup>
 
 </Project>

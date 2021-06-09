@@ -9,7 +9,7 @@ public static class PartyCommands
     private static dynamic member_settings = new { };
 
     [MiceCommand("party.create")]
-    public static async Task<object> Create(dynamic payload)
+    public static async Task<object> Create(dynamic payload, MiceClient client)
     {
         session_settings = payload.session_settings;
         configuration = payload.configuration;
@@ -34,7 +34,7 @@ public static class PartyCommands
     }
 
     [MiceCommand("party.update")]
-    public static async Task<object> Update(dynamic payload)
+    public static async Task<object> Update(dynamic payload, MiceClient client)
     {
         if (DynamicJsonConverter.GetProperty<dynamic>(() => payload.session_settings) is object session_settings)
         {

@@ -8,46 +8,41 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
+using Microsoft.Extensions.Logging;
 
 public class MiceClient
 {
-    public static MiceClient INSTANCE = null!;
     const int MIN_BUFFER_SIZE = 512;
     const int MAX_LENGTH_BYTES = sizeof(long) + 1;
-    private TcpClient _tcp;
-    private NetworkStream _tcpStream;
+    private TcpClient _tcp = null!;
+    private NetworkStream _tcpStream = null!;
     private Pipe _pipe = new Pipe();
     private bool _authenticated = false;
     private bool _closed = false;
-    private static Dictionary<String, Func<dynamic, Task<object>>> HANDLERS = Assembly.GetEntryAssembly()?
-            .GetTypes()
-            .SelectMany(t => t.GetMethods())
-            .Where(m => m.GetCustomAttributes<MiceCommandAttribute>(false).Any())
-            .ToDictionary(m => m.GetCustomAttribute<MiceCommandAttribute>(false)!.Command, m => (Func<dynamic, Task<object>>)Delegate.CreateDelegate(typeof(Func<dynamic, Task<object>>), null, m))
-            ?? new Dictionary<String, Func<dynamic, Task<object>>>();
+    private CancellationTokenSource _cts = null!;
+    private Salsa _salsaIn = null!;
+    private Salsa _salsaOut = null!;
+    private ILogger<MiceClient> _logger;
+    private MiceCommandHandler _commandHandler;
+    private Guid id = Guid.NewGuid();
 
-    private CancellationTokenSource _cts = new CancellationTokenSource();
-
-    private Salsa _salsaIn;
-    private Salsa _salsaOut;
-
-    private string _username;
-
-    public MiceClient(TcpClient tcp, string username)
+    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler)
     {
+        _logger = logger;
+        _commandHandler = commandHandler;
+    }
+
+    public async Task Run(TcpClient tcp, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation("MiceGUID: {guid}", id);
         _tcp = tcp;
         _tcpStream = _tcp.GetStream();
 
         _salsaIn = new Salsa("bbbbbbbbbbbbbbbb", 16);
         _salsaOut = new Salsa("bbbbbbbbbbbbbbbb", 16);
 
-        _username = username;
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        INSTANCE = this;
-    }
-
-    public async Task Run()
-    {
         Task receiving = ReceiveTask();
         Task reading = ReadTask();
 
@@ -64,7 +59,7 @@ public class MiceClient
             try
             {
                 int bytesRead = await _tcpStream.ReadAsync(memory, _cts.Token);
-                // Console.WriteLine("Receiving...");
+                _logger.LogDebug("Receiving...");
                 if (bytesRead == 0)
                 {
                     break;
@@ -78,7 +73,7 @@ public class MiceClient
             }
             catch (Exception ex)
             {
-                await Console.Error.WriteLineAsync(ex.ToString());
+                _logger.LogError(ex, "Exception during receive.");
                 break;
             }
 
@@ -123,7 +118,7 @@ public class MiceClient
                 }
                 else if (buffer.Length >= cmdLen)
                 {
-                    //Console.WriteLine($"Received command (len: {cmdLen})");
+                    _logger.LogDebug("Received command (len: {lentgh})", cmdLen);
                     await HandleCommand(buffer.Slice(buffer.Start, cmdLen).ToArray());
                     pipeReader.AdvanceTo(buffer.GetPosition(cmdLen));
                     cmdLen = 0;
@@ -132,7 +127,7 @@ public class MiceClient
                 else
                 {
                     pipeReader.AdvanceTo(buffer.Start, buffer.End);
-                    // Console.WriteLine("Waiting for more data!");
+                    _logger.LogDebug("Waiting for more data!");
                 }
             }
             catch (OperationCanceledException)
@@ -141,7 +136,7 @@ public class MiceClient
             }
             catch (Exception ex)
             {
-                await Console.Error.WriteLineAsync(ex.ToString());
+                _logger.LogError(ex, "Exception during read.");
                 break;
             }
 
@@ -157,10 +152,11 @@ public class MiceClient
         // Mark the PipeReader as complete
         _tcpStream.Dispose();
     }
-
-    public async Task SendResponse(string response)
+    public async Task SendMessage(object response)
     {
-        var encrypted = _salsaOut.Encrypt(response);
+        var json = response.ToJson();
+        _logger.LogDebug(response.ToJson());
+        var encrypted = _salsaOut.Encrypt(json);
         var length = EncodeSize(encrypted.Length);
         var packet = new byte[length.Length + encrypted.Length];
         System.Buffer.BlockCopy(length, 0, packet, 0, length.Length);
@@ -207,7 +203,7 @@ public class MiceClient
         }
         catch (System.Exception ex)
         {
-            Console.WriteLine(ex.ToString());
+            _logger.LogError(ex, "Exception parsing json message.");
             throw;
         }
 
@@ -215,34 +211,33 @@ public class MiceClient
 
         if (cmd == ".close" || cmd == "party.leave")
         {
-            Console.WriteLine($"Received .close command!");
+            _logger.LogInformation("Received .close command!");
             _closed = true;
             return;
         }
 
-        if (HANDLERS.ContainsKey(cmd))
+        if (_commandHandler.CanHandle(cmd))
         {
-            Console.WriteLine($"Received handled command: {cmd}");
-            Console.WriteLine(((Object)payload).ToJson());
+            _logger.LogInformation("Received handled command: {cmd}", cmd as string);
+            // _logger.LogDebug("{msg}", ((object)payload).ToJson());
             try
             {
-                var response = await HANDLERS[cmd](payload);
+                var response = await _commandHandler.Handle(cmd, payload, this);
                 if (response != null)
                 {
-                    var responseMsg = new[] { new[] { response }, id }.ToJson();
-                    // Console.WriteLine(responseMsg);
-                    await SendResponse(responseMsg);
+                    var responseMsg = new[] { new[] { response }, id };
+                    await SendMessage(responseMsg);
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Exception while handling command {cmd}.", cmd as string);
             }
         }
         else
         {
-            Console.WriteLine($"Received unhandled command: {cmd} \n{((object)payload).ToJson()}");
-            // Console.WriteLine($"Received unhandled command: {cmd}");
+            _logger.LogInformation("Received unhandled command: {cmd}", cmd as string);
+            //_logger.LogDebug("{msg}", ((object)payload).ToJson());
         }
     }
 
@@ -258,7 +253,7 @@ public class MiceClient
                 moid = 1,
                 exp = 0,
                 rank = 1,
-                name = _username,
+                name = "",
                 deviceid = "noString",
                 gameid = "ggc",
                 version = "298288",
@@ -267,12 +262,12 @@ public class MiceClient
                     host = "127.0.0.1",
                 },
             },
-        }.ToJson();
+        };
 
-        await SendResponse(response);
+        await SendMessage(response);
 
         _authenticated = true;
 
-        Console.WriteLine("Client authenticated!");
+        _logger.LogInformation("Client authenticated!");
     }
 }

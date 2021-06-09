@@ -1,14 +1,13 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using Fetchgoods.Text.Json.Extensions;
 
 public static class MatchCommands
 {
     [MiceCommand("match.me")]
-    public static async Task<object> Me(dynamic payload)
+    public static async Task<object> Me(dynamic payload, MiceClient client)
     {
-        Task match = Task.Delay(3000).ContinueWith(async _ =>
+        Task match = Task.Delay(2000).ContinueWith(async _ =>
         {
             Console.WriteLine("Sending [match.ready]");
             var ck2 = Convert.ToBase64String(Encoding.UTF8.GetBytes("imagoodcipherkey"));
@@ -30,8 +29,8 @@ public static class MatchCommands
                         moid = 2,
                     },
                 },
-            }}.ToJson();
-            await MiceClient.INSTANCE.SendResponse(msg);
+            }};
+            await client.SendMessage(msg);
         });
         return new object { };
     }
