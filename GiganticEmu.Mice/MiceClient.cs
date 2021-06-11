@@ -1,17 +1,17 @@
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Linq;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
+using GiganticEmu.Shared.Backend;
 using Microsoft.Extensions.Logging;
 
 public class MiceClient
 {
+    public ApplicationDatabase Database { get; init; }
     const int MIN_BUFFER_SIZE = 512;
     const int MAX_LENGTH_BYTES = sizeof(long) + 1;
     private TcpClient _tcp = null!;
@@ -26,10 +26,11 @@ public class MiceClient
     private MiceCommandHandler _commandHandler;
     private Guid id = Guid.NewGuid();
 
-    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler)
+    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler, ApplicationDatabase database)
     {
         _logger = logger;
         _commandHandler = commandHandler;
+        Database = database;
     }
 
     public async Task Run(TcpClient tcp, CancellationToken cancellationToken = default)

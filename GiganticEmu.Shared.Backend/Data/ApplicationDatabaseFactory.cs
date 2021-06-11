@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -9,7 +10,7 @@ namespace GiganticEmu.Shared.Backend
         {
             var builder = new DbContextOptionsBuilder<ApplicationDatabase>();
 
-            builder.UseSqlite("DataSource=app.db;Cache=Shared");
+            builder.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTIONSTRINGS__POSTGRES"));
 
             return new ApplicationDatabase(builder.Options);
         }

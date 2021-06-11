@@ -8,6 +8,8 @@ services:
 
   - name: postgres
     image: postgres
+    tags:
+      - database
     env:
       - name: POSTGRES_PASSWORD
         value: "pass@word1"

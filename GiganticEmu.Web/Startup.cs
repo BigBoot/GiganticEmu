@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,7 +33,16 @@ namespace GiganticEmu.Web
                 .AddEntityFrameworkStores<ApplicationDatabase>()
                 .AddDefaultTokenProviders();
 
-            services.AddControllers();
+            services.Configure<IdentityOptions>(c =>
+            {
+                c.User.RequireUniqueEmail = false;
+            });
+
+            services.AddControllers()
+                .AddJsonOptions(c =>
+                {
+                    c.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
