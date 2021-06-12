@@ -12,7 +12,7 @@ RUN dotnet restore GiganticEmu.Web/GiganticEmu.Web.csproj
 COPY GiganticEmu.Shared.Backend ./GiganticEmu.Shared.Backend
 COPY GiganticEmu.Shared ./GiganticEmu.Shared
 COPY GiganticEmu.Web ./GiganticEmu.Web
-RUN dotnet publish -c Release -o out -p:DebugType=None -p:DebugSymbols=false GiganticEmu.Web/GiganticEmu.Web.csproj
+RUN dotnet publish -c Debug -o out GiganticEmu.Web/GiganticEmu.Web.csproj
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
