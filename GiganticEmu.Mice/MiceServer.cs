@@ -24,7 +24,7 @@ public class MiceServer : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var listener = new TcpListener(IPAddress.Parse("127.0.0.1"), _configuration.MicePort);
+        var listener = new TcpListener(IPAddress.Parse(_configuration.BindInterface), _configuration.MicePort);
         listener.Start();
 
         _logger.LogInformation("MICE Server listening on localhost:{_configuration.MicePort}", _configuration.MicePort);

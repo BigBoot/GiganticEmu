@@ -22,22 +22,8 @@ class Program
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) => new HostBuilder()
-        .ConfigureHostConfiguration(configHost =>
-        {
-            configHost.SetBasePath(Directory.GetCurrentDirectory());
-            configHost.AddJsonFile("hostsettings.json", optional: true);
-            configHost.AddEnvironmentVariables();
-            configHost.AddCommandLine(args);
-        })
-        .ConfigureAppConfiguration((hostContext, configApp) =>
-        {
-            configApp.AddJsonFile("appsettings.json", optional: true);
-            configApp.AddJsonFile(
-                $"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json",
-                optional: true);
-            configApp.AddEnvironmentVariables();
-            configApp.AddCommandLine(args);
-        })
+        .ConfigureHostConfiguration(configHost => configHost.AddGiganticEmuHostConfiguration(args))
+        .ConfigureAppConfiguration((hostContext, configApp) => configApp.AddGiganticEmuAppConfiguration(args))
         .ConfigureServices((hostContext, services) =>
         {
             services.Configure<GiganticEmuConfiguration>(hostContext.Configuration.GetSection(GiganticEmuConfiguration.GiganticEmu));

@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
+using GiganticEmu.Shared.Backend;
 using GiganticEmu.Web;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 class Program
@@ -14,11 +16,18 @@ class Program
             .GetAwaiter().GetResult();
     }
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        var hostConfig = new ConfigurationBuilder().AddGiganticEmuHostConfiguration(args).Build();
+        var emuConfiguration = new GiganticEmuConfiguration();
+        hostConfig.GetSection(GiganticEmuConfiguration.GiganticEmu).Bind(emuConfiguration);
+        return Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
+                webBuilder.UseConfiguration(hostConfig);
                 webBuilder.UseStartup<Startup>();
-                webBuilder.UseUrls("http://localhost:3000/");
+                webBuilder.UseUrls($"http://{emuConfiguration.BindInterface}:{emuConfiguration.WebPort}/");
             });
+    }
+
 }
