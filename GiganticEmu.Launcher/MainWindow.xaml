@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
         xmlns:bc="clr-namespace:BlurryControls.Controls;assembly=BlurryControls"
-        Title="" Height="600" Width="800" FadeContentIfInactive="False" BorderForegroundBrush="#1a7d93" ResizeMode="NoResize">
+        Title="" Height="600" Width="800" FadeContentIfInactive="False" BorderForegroundBrush="#1a7d93" ResizeMode="NoResize" KeyboardNavigation.TabNavigation="None" Loaded="Window_Loaded">
 
     <mde:MaterialWindow.BorderBackgroundBrush>
         <ImageBrush ImageSource="/Resources/background.jpg"/>
@@ -38,32 +38,32 @@
                             </Style>
                         </TabControl.ItemContainerStyle>
                         <TabItem x:Name="PageLogin">
-                            <DockPanel>
-                                <Button DockPanel.Dock="Bottom" Margin="100,-5,100,0" Style="{StaticResource MaterialDesignFlatButton}" Content="Register" HorizontalAlignment="Center" Click="ShowRegisterPage"/>
-                                <Button DockPanel.Dock="Bottom" Content="Log in" Margin="100 20" HorizontalAlignment="Stretch" Click="Login"/>
+                            <DockPanel KeyboardNavigation.TabNavigation="Cycle">
+                                <Button TabIndex="4" DockPanel.Dock="Bottom" Margin="100,-5,100,0" Style="{StaticResource MaterialDesignFlatButton}" Content="Register" HorizontalAlignment="Center" Click="ShowRegisterPage"/>
+                                <Button TabIndex="3" DockPanel.Dock="Bottom" Content="Log in" Margin="100 20" HorizontalAlignment="Stretch" Click="Login"/>
                                 <TextBlock x:Name="LoginError" Visibility="Hidden" DockPanel.Dock="Bottom" FontSize="16" Margin="0 0 0 0" HorizontalAlignment="Center" Foreground="Red" Text="" VerticalAlignment="Center" TextWrapping="Wrap"/>
                                 <Canvas DockPanel.Dock="Bottom" Height="50" ></Canvas>
-                                <PasswordBox x:Name="LoginPassword" DockPanel.Dock="Bottom" materialDesign:HintAssist.Hint="Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="100 5"/>
-                                <TextBox x:Name="LoginUsername" DockPanel.Dock="Bottom" materialDesign:HintAssist.Hint="Username" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="100 5"/>
+                                <PasswordBox TabIndex="2" x:Name="LoginPassword" DockPanel.Dock="Bottom" materialDesign:HintAssist.Hint="Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="100 5" KeyUp="TextBox_KeyUp"/>
+                                <TextBox TabIndex="1" x:Name="LoginUsername" DockPanel.Dock="Bottom" materialDesign:HintAssist.Hint="Username" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="100 5"  KeyUp="TextBox_KeyUp"/>
                                 <Canvas></Canvas>
                             </DockPanel>
                         </TabItem>
                         <TabItem x:Name="PageRegister">
-                            <DockPanel>
-                                <TextBox x:Name="RegisterUsername" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="Username" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="100 5"/>
-                                <TextBox x:Name="RegisterEmail" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="Email" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="100 5"/>
-                                <PasswordBox x:Name="RegisterPassword" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="100 5"/>
-                                <PasswordBox x:Name="RegisterPasswordConfirm" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="Confirm Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="100 5"/>
-                                <Button DockPanel.Dock="Bottom" Margin="100,-5,100,0" Style="{StaticResource MaterialDesignFlatButton}" Content="Back to Login" HorizontalAlignment="Center" Click="ShowLoginPage"/>
-                                <Button DockPanel.Dock="Bottom" Content="Register" Margin="100 20" Click="Register"/>
+                            <DockPanel KeyboardNavigation.TabNavigation="Cycle">
+                                <TextBox TabIndex="1" x:Name="RegisterUsername" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="Username" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="100 5" KeyUp="TextBox_KeyUp"/>
+                                <TextBox TabIndex="2"  x:Name="RegisterEmail" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="Email" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="100 5" KeyUp="TextBox_KeyUp"/>
+                                <PasswordBox TabIndex="3"  x:Name="RegisterPassword" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="100 5" KeyUp="TextBox_KeyUp"/>
+                                <PasswordBox TabIndex="4"  x:Name="RegisterPasswordConfirm" DockPanel.Dock="Top" materialDesign:HintAssist.Hint="Confirm Password" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" Margin="100 5" KeyUp="TextBox_KeyUp"/>
+                                <Button TabIndex="6"  DockPanel.Dock="Bottom" Margin="100,-5,100,0" Style="{StaticResource MaterialDesignFlatButton}" Content="Back to Login" HorizontalAlignment="Center" Click="ShowLoginPage"/>
+                                <Button TabIndex="5" DockPanel.Dock="Bottom" Content="Register" Margin="100 20" Click="Register"/>
                                 <TextBlock x:Name="RegisterError" Visibility="Hidden" DockPanel.Dock="Bottom" FontSize="16" Margin="0 0 0 0" HorizontalAlignment="Center" Foreground="Red" Text="" VerticalAlignment="Center" TextWrapping="Wrap"/>
                                 <Canvas></Canvas>
                             </DockPanel>
                         </TabItem>
                         <TabItem x:Name="PageUser">
-                            <DockPanel>
-                                <Button DockPanel.Dock="Bottom" Margin="0,-5,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="Log out" HorizontalAlignment="Center"  Click="Logout"/>
-                                <Button DockPanel.Dock="Bottom" Content="Start Game" FontSize="32" Margin="0 20" Height="64" Click="StartGame"/>
+                            <DockPanel KeyboardNavigation.TabNavigation="Cycle">
+                                <Button TabIndex="2" DockPanel.Dock="Bottom" Margin="0,-5,0,0" Style="{StaticResource MaterialDesignFlatButton}" Content="Log out" HorizontalAlignment="Center"  Click="Logout"/>
+                                <Button TabIndex="1" DockPanel.Dock="Bottom" Content="Start Game" FontSize="32" Margin="0 20" Height="64" Click="StartGame"/>
                                 <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <TextBlock FontSize="32" FontWeight="Bold" Margin="0 0 0 20" HorizontalAlignment="Center" Foreground="#1a7d93" Text="Logged in as " VerticalAlignment="Center"/>
                                     <TextBlock x:Name="UserUsername" FontSize="32" FontWeight="Bold" Margin="0 0 0 20" HorizontalAlignment="Center" Foreground="#1a7d93" Text="" VerticalAlignment="Center" TextWrapping="Wrap"/>

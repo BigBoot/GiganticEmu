@@ -2,9 +2,15 @@ name: giganticemu
 services:
   - name: giganticemu-mice
     project: GiganticEmu.Mice/GiganticEmu.Mice.csproj
+    env:
+      - name: GiganticEmu__SalsaCK
+        value: cccccccccccccccc
 
   - name: giganticemu-web
     project: GiganticEmu.Web/GiganticEmu.Web.csproj
+    env:
+      - name: GiganticEmu__SalsaCK
+        value: cccccccccccccccc
 
   - name: postgres
     image: postgres

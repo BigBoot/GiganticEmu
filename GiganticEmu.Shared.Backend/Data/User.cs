@@ -7,14 +7,11 @@ namespace GiganticEmu.Shared.Backend
 {
     public class User : IdentityUser<Guid>
     {
-        [Required]
         public int Rank { get; set; } = 69;
 
-        [Required]
-        public string SavedLoadouts { get; set; } = "";
+        public string SavedLoadouts { get; set; } = "{}";
 
-        [Required]
-        public string ProfileSettings { get; set; } = "";
+        public string ProfileSettings { get; set; } = "{}";
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MotigaId { get; set; }
@@ -22,6 +19,22 @@ namespace GiganticEmu.Shared.Backend
         public string? AuthToken { get; set; } = null;
 
         public DateTimeOffset? AuthTokenExpires { get; set; } = null;
+
+
+        public Guid? SessionId { get; set; } = null;
+
+        public int SessionVersion { get; set; } = 0;
+
+        public bool IsSessionHost { get; set; } = false;
+
+        public string MemberSettings { get; set; } = "{}";
+
+        public string JoinState { get; set; } = "open";
+
+        public string SessionSettings { get; set; } = "{}";
+
+        public string SessionConfiguration { get; set; } = "{}";
+        public string? SalsaSCK { get; set; } = null;
 
     }
 }

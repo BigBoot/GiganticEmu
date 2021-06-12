@@ -6,29 +6,28 @@ using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using GiganticEmu.Mice;
+using Microsoft.Extensions.Options;
+using GiganticEmu.Shared.Backend;
 
 public class MiceServer : BackgroundService
 {
-    public int Port { get => _options.Port; }
-    public string Address { get => _options.Address; }
     private readonly ILogger<MiceServer> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly MiceOptions _options;
+    private readonly GiganticEmuConfiguration _configuration;
 
-    public MiceServer(ILogger<MiceServer> logger, IServiceProvider serviceProvider, MiceOptions options)
+    public MiceServer(ILogger<MiceServer> logger, IServiceProvider serviceProvider, IOptions<GiganticEmuConfiguration> configuration)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
-        _options = options;
+        _configuration = configuration.Value;
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        var listener = new TcpListener(IPAddress.Parse(Address), Port);
+        var listener = new TcpListener(IPAddress.Parse("127.0.0.1"), _configuration.MicePort);
         listener.Start();
 
-        _logger.LogInformation("MICE Server listening on localhost:{Port}", Port);
+        _logger.LogInformation("MICE Server listening on localhost:{_configuration.MicePort}", _configuration.MicePort);
 
         try
         {

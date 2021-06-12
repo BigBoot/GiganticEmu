@@ -7,11 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
 using GiganticEmu.Shared.Backend;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 public class MiceClient
 {
     public ApplicationDatabase Database { get; init; }
+    public Guid UserId { get; private set; } = Guid.Empty;
     const int MIN_BUFFER_SIZE = 512;
     const int MAX_LENGTH_BYTES = sizeof(long) + 1;
     private TcpClient _tcp = null!;
@@ -24,23 +27,22 @@ public class MiceClient
     private Salsa _salsaOut = null!;
     private ILogger<MiceClient> _logger;
     private MiceCommandHandler _commandHandler;
-    private Guid id = Guid.NewGuid();
+    private GiganticEmuConfiguration _configuration;
 
-    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler, ApplicationDatabase database)
+    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler, IOptions<GiganticEmuConfiguration> configuration, ApplicationDatabase database)
     {
         _logger = logger;
         _commandHandler = commandHandler;
+        _configuration = configuration.Value;
         Database = database;
     }
 
     public async Task Run(TcpClient tcp, CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("MiceGUID: {guid}", id);
         _tcp = tcp;
         _tcpStream = _tcp.GetStream();
 
-        _salsaIn = new Salsa("bbbbbbbbbbbbbbbb", 16);
-        _salsaOut = new Salsa("bbbbbbbbbbbbbbbb", 16);
+
 
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
@@ -242,33 +244,59 @@ public class MiceClient
         }
     }
 
-    private async Task Authenticate(byte[] cmd)
+    private async Task Authenticate(byte[] data)
     {
-        var msg = new Salsa("aaaaaaaaaaaaaaaa", 12).Decrypt(cmd);
+        var content = new Salsa(_configuration.SalsaCK, 12).Decrypt(data);
 
-        var response = new object[]
+        string token;
+        try
         {
-            ".auth",
-            new {
-                time = 1,
-                moid = 1,
-                exp = 0,
-                rank = 1,
-                name = "",
-                deviceid = "noString",
-                gameid = "ggc",
-                version = "298288",
-                xmpp = new
-                {
-                    host = "127.0.0.1",
+            var msg = content.FromJsonTo<dynamic>();
+            token = msg[0];
+        }
+        catch (System.Exception ex)
+        {
+            _logger.LogError(ex, "Exception parsing json message.");
+            throw;
+        }
+
+        var user = await Database.Users
+            .Where(user => user.AuthToken == token)
+            .FirstOrDefaultAsync();
+
+        if (user != null && user.SalsaSCK is string salsaSCK)
+        {
+            UserId = user.Id;
+
+            _salsaIn = new Salsa(salsaSCK, 16);
+            _salsaOut = new Salsa(salsaSCK, 16);
+
+            await SendMessage(new object[]
+            {
+                ".auth",
+                new {
+                    time = 1,
+                    moid = user.MotigaId,
+                    exp = 0,
+                    rank = 1,
+                    name = user.UserName,
+                    deviceid = "noString",
+                    gameid = "ggc",
+                    version = "298288",
+                    xmpp = new
+                    {
+                        host = "127.0.0.1",
+                    },
                 },
-            },
-        };
+            });
 
-        await SendMessage(response);
+            _authenticated = true;
 
-        _authenticated = true;
-
-        _logger.LogInformation("Client authenticated!");
+            _logger.LogInformation("Client authenticated using salsa sck: {sck}!", salsaSCK);
+        }
+        else
+        {
+            await SendMessage(new object[] { ".auth", false });
+        }
     }
 }

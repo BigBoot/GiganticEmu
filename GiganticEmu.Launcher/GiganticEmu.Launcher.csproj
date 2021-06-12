@@ -8,8 +8,6 @@
     <NoWarn>1998</NoWarn>
     <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="BlurryControls" Version="1.0.24" />
+    <PackageReference Include="CredentialManagement" Version="1.0.2" />
     <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />

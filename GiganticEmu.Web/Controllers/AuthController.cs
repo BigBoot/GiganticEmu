@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
+using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Web.Controllers
 {
@@ -13,9 +19,13 @@ namespace Web.Controllers
     [Route("[controller]/0.0/arc/auth")]
     public class AuthController : ControllerBase
     {
-        public static readonly string CDN_JSON;
-        public static readonly string CDN_JSON_SHA256;
+        private static readonly string CDN_JSON;
+        private static readonly string CDN_JSON_SHA256;
+        private static readonly char[] KEY_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
+
         private readonly ILogger<AuthController> _logger;
+        private readonly ApplicationDatabase _database;
+        private readonly GiganticEmuConfiguration _configuration;
 
         static AuthController()
         {
@@ -35,64 +45,92 @@ namespace Web.Controllers
             }
         }
 
-        public AuthController(ILogger<AuthController> logger)
+        public AuthController(ILogger<AuthController> logger, ApplicationDatabase database, IOptions<GiganticEmuConfiguration> configuration)
         {
             _logger = logger;
+            _database = database;
+            _configuration = configuration.Value;
         }
 
         [HttpPost]
         [Produces("application/json")]
-        public IActionResult Post()
+        public async Task<IActionResult> Post([FromHeader(Name = "Host")] string host, [FromForm(Name = "arc_token")] string token, [FromForm(Name = "v")] int version)
         {
-            var version = 16897;
-            var token = "zwl42ixhzshhfajvt8likv8ujkyoxlrn";
-            var http_host = "127.0.0.1";
-            var http_port = 3000;
-            var mice_host = "127.0.0.1";
-            var mice_port = 4000;
-            var SALSA_CK = "aaaaaaaaaaaaaaaa";
-            var SALSA_SCK = "bbbbbbbbbbbbbbbb";
+            var user = await _database.Users.Where(user => user.AuthToken == token).FirstOrDefaultAsync();
 
-            return Content(new
+            if (user != null)
             {
-                result = "ok",
-                auth = token,
-                token = token,
-                name = "Player",
-                username = "test@example.de",
-                buddy_key = false,
-                founders_pack = true,
+                user.SalsaSCK = GenerateKey(16);
 
-                host = mice_host,
-                port = mice_port,
-                ck = Convert.ToBase64String(new byte[] { 0, 0 }.Concat(Encoding.UTF8.GetBytes(SALSA_CK)).ToArray()),
-                sck = Convert.ToBase64String(new byte[] { 0, 0 }.Concat(Encoding.UTF8.GetBytes(SALSA_SCK)).ToArray()),
-
-                flags = "", // unknown string
-                xbox_preview = false,
-                accounts = "accmple", // unknown string
-                mostash_verbosity_level = 0,
-                min_version = version,
-                current_version = version, // game doesnt event check
-                catalog = new
+                await _database.SaveChangesAsync();
+                IPAddress? miceIp;
+                if (!IPAddress.TryParse(_configuration.MiceHost, out miceIp))
                 {
+                    miceIp = (await Dns.GetHostAddressesAsync(_configuration.MiceHost))
+                        .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork)
+                        .FirstOrDefault();
+                }
 
-                    cdn_url = $"http://{http_host}:{http_port}/cdn",
-                    sha256_digest = "53e8adf03a506dedde073150537b9bd79168ae7e30b3b2152835c22abf98455b",
-                },
-                announcements = new
+                return Content(new
                 {
+                    result = "ok",
+                    auth = token,
+                    token = token,
+                    name = user.UserName,
+                    username = user.Email,
+                    buddy_key = false,
+                    founders_pack = true,
 
-                    message = "serverMessage",
-                    status = "serverStatus",
-                },
-                voice_chat = new
-                {
-                    baseurl = "http://127.0.01/voice.html",
-                    username = "sup:.username.@voice.sipServ.com",
-                    token = "sipToken"
-                },
-            }.ToJson(), "application/json");
+                    host = miceIp?.ToString(),
+                    port = _configuration.MicePort,
+                    ck = Convert.ToBase64String(new byte[] { 0, 0 }.Concat(Encoding.ASCII.GetBytes(_configuration.SalsaCK)).ToArray()),
+                    sck = Convert.ToBase64String(new byte[] { 0, 0 }.Concat(Encoding.ASCII.GetBytes(user.SalsaSCK)).ToArray()),
+
+                    flags = "", // unknown string
+                    xbox_preview = false,
+                    accounts = "accmple", // unknown string
+                    mostash_verbosity_level = 0,
+                    min_version = version,
+                    current_version = version,
+                    catalog = new
+                    {
+                        cdn_url = $"{HttpContext.Request.Scheme}://{host}/cdn",
+                        sha256_digest = CDN_JSON_SHA256,
+                    },
+                    announcements = new
+                    {
+                        message = "serverMessage",
+                        status = "serverStatus",
+                    },
+                    voice_chat = new
+                    {
+                        baseurl = "http://127.0.01/voice.html",
+                        username = "sup:.username.@voice.sipServ.com",
+                        token = "sipToken"
+                    },
+                }.ToJson(), "application/json");
+            }
+            return Unauthorized();
+        }
+
+        private static string GenerateKey(int length)
+        {
+            byte[] data = new byte[4 * length];
+            using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
+            {
+                crypto.GetBytes(data);
+            }
+            StringBuilder result = new StringBuilder(length);
+            for (int i = 0; i < length; i += 2)
+            {
+                var rnd = BitConverter.ToUInt32(data, i * 4);
+                var idx = rnd % KEY_CHARS.Length;
+
+                result.Append(KEY_CHARS[idx]);
+                result.Append(KEY_CHARS[idx]);
+            }
+
+            return result.ToString();
         }
     }
 }

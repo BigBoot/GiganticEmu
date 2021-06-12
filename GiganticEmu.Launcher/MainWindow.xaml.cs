@@ -10,11 +10,16 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.Json;
 using System.Diagnostics;
+using System.Windows.Input;
+using CredentialManagement;
 
 namespace GiganticEmu.Launcher
 {
     public partial class MainWindow : MaterialWindow
     {
+        private const string CREDENTIALS_TARGET = "giganticemu.mistforge.net";
+        private const string HOST = "https://api.mistforge.net";
+
         private IApi _api;
         private AuthHeaderHandler _auth;
 
@@ -24,8 +29,17 @@ namespace GiganticEmu.Launcher
             _auth = new AuthHeaderHandler();
             _api = RestService.For<IApi>(new HttpClient(_auth)
             {
-                BaseAddress = new Uri("http://localhost:3000")
+                BaseAddress = new Uri(HOST)
             });
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (LoadToken() is string token)
+            {
+                _auth.AuthToken = token;
+                await GetUserInfo();
+            }
         }
 
         private void ShowRegisterPage(object sender, RoutedEventArgs e)
@@ -38,7 +52,7 @@ namespace GiganticEmu.Launcher
             PageContainer.SelectedItem = PageLogin;
         }
 
-        private async void Login(object sender, RoutedEventArgs e)
+        private async void Login(object? sender, RoutedEventArgs? e)
         {
             var username = LoginUsername.Text;
             var password = LoginPassword.Password;
@@ -69,7 +83,7 @@ namespace GiganticEmu.Launcher
             }
         }
 
-        private async void Register(object sender, RoutedEventArgs e)
+        private async void Register(object? sender, RoutedEventArgs? e)
         {
             if (RegisterPassword.Password != RegisterPasswordConfirm.Password)
             {
@@ -115,9 +129,9 @@ namespace GiganticEmu.Launcher
             {
                 await _api.Logout(new SessionDeleteRequest());
             }
-            catch
+            finally
             {
-
+                ClearToken();
             }
 
             PageContainer.SelectedItem = PageLogin;
@@ -129,8 +143,9 @@ namespace GiganticEmu.Launcher
             try
             {
                 var result = await _api.GetSession();
-                if (result.Code == RequestResult.Success)
+                if (result.Code == RequestResult.Success && _auth.AuthToken is string token)
                 {
+                    SaveToken(token);
                     UserUsername.Text = result.Username;
                     PageContainer.SelectedItem = PageUser;
                 }
@@ -149,7 +164,7 @@ namespace GiganticEmu.Launcher
 
         private async void StartGame(object sender, RoutedEventArgs e)
         {
-            if(!File.Exists("Binaries/Win64/RxGame-Win64-Test.exe"))
+            if (!File.Exists("Binaries/Win64/RxGame-Win64-Test.exe"))
             {
                 MessageBox.Show("Binaries/Win64/RxGame-Win64-Test.exe not found!", "File not found!", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -163,7 +178,7 @@ namespace GiganticEmu.Launcher
             });
 
             await File.WriteAllTextAsync("Binaries/Win64/userinfo", userinfo);
-            Process.Start("Binaries/Win64/RxGame-Win64-Test.exe");
+            Process.Start("Binaries/Win64/RxGame-Win64-Test.exe", $"-ini:RxEngine:MotigaAuthIntegration.AuthUrlPrefix={HOST}/,ArcIntegration.AuthUrlPrefix={HOST}/");
 
             Application.Current.Shutdown();
         }
@@ -173,9 +188,51 @@ namespace GiganticEmu.Launcher
             RegisterUsername.Clear();
             RegisterPassword.Clear();
             RegisterPasswordConfirm.Clear();
-            RegisterEmail.Clear(); 
+            RegisterEmail.Clear();
             LoginUsername.Clear();
             LoginPassword.Clear();
+        }
+
+        private void TextBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                if (PageContainer.SelectedItem == PageLogin)
+                {
+                    Login(null!, null!);
+                }
+
+                if (PageContainer.SelectedItem == PageRegister)
+                {
+                    Register(null!, null!);
+                }
+            }
+        }
+
+        public static string? LoadToken()
+        {
+            var cm = new Credential { Target = CREDENTIALS_TARGET };
+            if (!cm.Load())
+            {
+                return null;
+            }
+
+            return cm.Password;
+        }
+
+        public static void SaveToken(string token)
+        {
+            new Credential
+            {
+                Target = CREDENTIALS_TARGET,
+                Password = token,
+                PersistanceType = PersistanceType.LocalComputer
+            }.Save();
+        }
+
+        public static bool ClearToken()
+        {
+            return new Credential { Target = CREDENTIALS_TARGET }.Delete();
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
 using GiganticEmu.Mice;
 using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -24,7 +26,7 @@ class Program
         {
             configHost.SetBasePath(Directory.GetCurrentDirectory());
             configHost.AddJsonFile("hostsettings.json", optional: true);
-            configHost.AddEnvironmentVariables(prefix: "GIGANTICEMU_MICE_");
+            configHost.AddEnvironmentVariables();
             configHost.AddCommandLine(args);
         })
         .ConfigureAppConfiguration((hostContext, configApp) =>
@@ -33,20 +35,18 @@ class Program
             configApp.AddJsonFile(
                 $"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json",
                 optional: true);
-            configApp.AddEnvironmentVariables(prefix: "GIGANTICEMU_MICE_");
+            configApp.AddEnvironmentVariables();
             configApp.AddCommandLine(args);
         })
         .ConfigureServices((hostContext, services) =>
         {
+            services.Configure<GiganticEmuConfiguration>(hostContext.Configuration.GetSection(GiganticEmuConfiguration.GiganticEmu));
             services.AddApplicationDatabase(c =>
             {
-                c.ConnectionString = hostContext.Configuration.GetConnectionString("DefaultConnection");
+                c.ConnectionString = hostContext.Configuration.GetConnectionString(name: "postgres");
             });
 
-            services.AddMice(c =>
-            {
-                c.Port = 4000;
-            });
+            services.AddMice();
         })
         .ConfigureLogging((hostContext, configLogging) =>
         {

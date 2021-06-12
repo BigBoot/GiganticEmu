@@ -18,7 +18,7 @@ cmake --build . --config=Release
 Pop-Location
 Copy-Item -Path $ArcBuildDir/Release/ArcSDK.dll -Destination $ArcDistDir
 
-dotnet publish -r win-x64 -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false --self-contained false -c Release -o bin/ GiganticEmu.Launcher/GiganticEmu.Launcher.csproj
+dotnet publish -r win-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:DebugType=None -p:DebugSymbols=false --self-contained false -c Release -o bin/ GiganticEmu.Launcher/GiganticEmu.Launcher.csproj
 Copy-Item -Path bin//GiganticEmu.Launcher.exe -Destination $Destination/MistforgeLauncher.exe
 
 $Files = Get-ChildItem $Destination -Exclude "MistforgeLauncher.zip"

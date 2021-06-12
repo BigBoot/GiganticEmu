@@ -1,9 +1,9 @@
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GiganticEmu.Shared;
 using GiganticEmu.Shared.Backend;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
@@ -56,7 +56,11 @@ namespace Web.Controllers
                 }
                 else
                 {
-                    return Ok(new UserPostResponse(RequestResult.Success, RequestResult.Success.GetDescription()));
+                    user.AuthToken = Guid.NewGuid().ToString();
+                    user.AuthTokenExpires = DateTimeOffset.Now.AddHours(48);
+                    await _userManager.UpdateAsync(user);
+
+                    return Ok(new UserPostResponse(RequestResult.Success, RequestResult.Success.GetDescription(), AuthToken: user.AuthToken));
                 }
             }
 

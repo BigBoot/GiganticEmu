@@ -23,6 +23,7 @@ namespace GiganticEmu.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<GiganticEmuConfiguration>(Configuration.GetSection(GiganticEmuConfiguration.GiganticEmu));
 
             services.AddApplicationDatabase(c =>
             {
