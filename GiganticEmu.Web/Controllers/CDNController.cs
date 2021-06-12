@@ -17,7 +17,7 @@ namespace Web.Controllers
 
         static CDNController()
         {
-            var assembly = Assembly.GetCallingAssembly();
+            var assembly = typeof(CDNController).Assembly;
 
             using (var input = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.Resources.cdn.json")!)
             {
