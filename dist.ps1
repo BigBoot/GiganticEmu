@@ -4,11 +4,12 @@ param (
     [string]$Destination = "dist"
 )
 
+if (!(Test-Path -path $Destination)) { New-Item $Destination -ItemType "Directory" }
+
 $ArcDistDir = "$(Resolve-Path $Destination)/Binaries/Win64"
 $ArcBuildDir = "bin/ArcSDK/"
 $ArcSrcDir = Resolve-Path "ArcSDK"
     
-if (!(Test-Path -path $Destination)) { New-Item $Destination -ItemType "Directory" }
 if (!(Test-Path -path $ArcBuildDir)) { New-Item $ArcBuildDir -ItemType "Directory" }
 if (!(Test-Path -path $ArcDistDir)) { New-Item $ArcDistDir -ItemType "Directory" }
 
