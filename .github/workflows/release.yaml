@@ -44,7 +44,7 @@ jobs:
         with:
           allowUpdates: true
           name: ${{ steps.version.outputs.version }}
-          artifacts: dist/GiganticEmu.zip
+          artifacts: dist/MistforgeLauncher.zip
           token: ${{ secrets.GITHUB_TOKEN }}
           commit: ${{ github.sha }}
           tag: ${{ steps.version.outputs.version }}

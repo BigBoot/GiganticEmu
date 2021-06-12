@@ -2,19 +2,21 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <nullable>enable</nullable>
     <NoWarn>1998</NoWarn>
+    <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="resources/**/*.*">
-      <Link>resources\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </EmbeddedResource>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Fetchgoods.Text.Json.Extensions" Version="0.1.0" />
     <PackageReference Include="System.IO.Pipelines" Version="4.7.2" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GiganticEmu.Shared\GiganticEmu.Shared.csproj" />
+    <ProjectReference Include="..\GiganticEmu.Shared.Backend\GiganticEmu.Shared.Backend.csproj" />
   </ItemGroup>
 
 </Project>

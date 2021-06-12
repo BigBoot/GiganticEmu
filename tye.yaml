@@ -1,0 +1,24 @@
+name: giganticemu
+services:
+  - name: giganticemu-mice
+    project: GiganticEmu.Mice/GiganticEmu.Mice.csproj
+    env:
+      - name: GiganticEmu__SalsaCK
+        value: cccccccccccccccc
+
+  - name: giganticemu-web
+    project: GiganticEmu.Web/GiganticEmu.Web.csproj
+    env:
+      - name: GiganticEmu__SalsaCK
+        value: cccccccccccccccc
+
+  - name: postgres
+    image: postgres
+    tags:
+      - database
+    env:
+      - name: POSTGRES_PASSWORD
+        value: "pass@word1"
+    bindings:
+      - port: 5432
+        connectionString: Server=${host};Port=${port};User Id=postgres;Password=${env:POSTGRES_PASSWORD};

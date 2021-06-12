@@ -4,6 +4,7 @@
 #define _WIN32_WINNT 0x0602
 #include <Windows.h>
 
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #define DLL_EXPORT __declspec(dllexport)
 #define EXTERN_DLL_EXPORT extern "C" DLL_EXPORT
 
@@ -17,8 +18,16 @@
 #include <fstream>
 #include <streambuf>
 #include <regex>
+#include <locale>
+#include <codecvt>
+
+#include "json.hpp"
 
 PROCESS_INFORMATION pi;
+
+std::wstring nickname;
+std::wstring username;
+std::wstring auth_token;
 
 void ArcPanic(const char *message)
 {
@@ -41,6 +50,29 @@ void ArcWriteString(const std::wstring &string, wchar_t *buffer, size_t buffer_s
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserved)
 {
+    switch (reason)
+    {
+    case DLL_PROCESS_ATTACH:
+        if (std::filesystem::exists("userinfo"))
+        {
+            std::ifstream in("userinfo");
+            auto json = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+            in.close();
+
+            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+            auto userinfo = nlohmann::json::parse(json);
+            nickname = converter.from_bytes(userinfo["nickname"]);
+            username = converter.from_bytes(userinfo["username"]);
+            auth_token = converter.from_bytes(userinfo["auth_token"]);
+
+            std::filesystem::remove("userinfo");
+        }
+        else
+        {
+            ArcPanic("Please launch the game using the Mistforge Launcher");
+        }
+        break;
+    }
     return TRUE;
 }
 
@@ -72,13 +104,13 @@ EXTERN_DLL_EXPORT int64_t CC_GetArcRunningMode(uint32_t *Mode)
 
 EXTERN_DLL_EXPORT int64_t CC_GetNickName(const wchar_t *state, wchar_t *buffer, uint32_t buffer_size)
 {
-    ArcWriteString(L"GiganticEmu", buffer, buffer_size);
+    ArcWriteString(nickname, buffer, buffer_size);
     return 0;
 }
 
 EXTERN_DLL_EXPORT int64_t CC_GetAccountName(const wchar_t *state, wchar_t *buffer, uint32_t buffer_size)
 {
-    ArcWriteString(L"GiganticEmu", buffer, buffer_size);
+    ArcWriteString(username, buffer, buffer_size);
     return 0;
 }
 
@@ -103,12 +135,7 @@ EXTERN_DLL_EXPORT int64_t CC_GetToken(int64_t arg1, int64_t arg2, int64_t arg3, 
 
 EXTERN_DLL_EXPORT int64_t CC_GetTokenEx(const wchar_t *arg1, const wchar_t *arg2, const wchar_t *arg3, wchar_t *buffer, int buffer_size)
 {
-    /*
-    Auth token sent from game client to auth server.
-    Usually acquired from arc client which launches the game.
-    Was formatted like this: "XHj3VK1webHFQchh"
-    */
-    ArcWriteString(L"zwl42ixhzshhfajvt8likv8ujkyoxlrn", buffer, buffer_size);
+    ArcWriteString(auth_token, buffer, buffer_size);
     return 0;
 }
 
@@ -124,31 +151,6 @@ EXTERN_DLL_EXPORT int64_t CC_GotoUrlInOverlay(int64_t arg1, const wchar_t *arg2)
 
 EXTERN_DLL_EXPORT wchar_t *CC_Init(int64_t arg1, int64_t arg2, uint32_t *arg3)
 {
-    if (std::filesystem::exists("../../RxGame/Config/DefaultEngine.ini"))
-    {
-        std::ifstream in("../../RxGame/Config/DefaultEngine.ini");
-        std::string original((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        in.close();
-
-        std::string modified = std::regex_replace(original, std::regex("^AuthUrlPrefix=.*$"), "AuthUrlPrefix=http://127.0.0.1:3000");
-
-        if (modified != original)
-        {
-            std::ofstream out("../../RxGame/Config/DefaultEngine.ini");
-            out << modified;
-            out.close();
-            exit(0);
-        }
-    }
-
-    if (std::filesystem::exists("GiganticEmu.exe"))
-    {
-        STARTUPINFO si = {sizeof(STARTUPINFO)};
-        si.cb = sizeof(si);
-        si.dwFlags = STARTF_USESHOWWINDOW;
-        si.wShowWindow = SW_HIDE;
-        CreateProcess("GiganticEmu.exe", NULL, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
-    }
     // Never figured out what this was for, string remains the same for release build
     return L"This is our secret, probably encrypted, internal state..";
 }
@@ -175,7 +177,7 @@ EXTERN_DLL_EXPORT int64_t CC_LaunchClient(const wchar_t *arg1, int arg2, int64_t
     For some reason, the "Gigantic-Core_de" build returns 0 instead
     return 0;
     */
-    return 0;
+    return 0xE0000019;
 }
 
 /*

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk" TreatAsLocalProperty="SelfContained">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <nullable>enable</nullable>
+    <NoWarn>1998</NoWarn>
+    <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GiganticEmu.Shared\GiganticEmu.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\background.jpg" />
+    <None Remove="Resources\troika.otf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlurryControls" Version="1.0.24" />
+    <PackageReference Include="CredentialManagement" Version="1.0.2" />
+    <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
+    <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
+    <PackageReference Include="PresentationFramework" Version="4.6.0" />
+    <PackageReference Include="refit" Version="6.0.38" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\background.jpg" />
+    <Resource Include="Resources\troika.otf" />
+  </ItemGroup>
+
+</Project>
