@@ -19,37 +19,33 @@ namespace Web.Controllers
     [Route("[controller]/0.0/arc/auth")]
     public class AuthController : ControllerBase
     {
-        private static readonly string CDN_JSON;
-        private static readonly string CDN_JSON_SHA256;
         private static readonly char[] KEY_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
 
         private readonly ILogger<AuthController> _logger;
         private readonly ApplicationDatabase _database;
         private readonly GiganticEmuConfiguration _configuration;
-
-        static AuthController()
-        {
-            var assembly = Assembly.GetEntryAssembly()!;
-
-            using (var input = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.Resources.cdn.json")!)
-            {
-                var buffer = new byte[input.Length];
-                input.Read(buffer, 0, (int)input.Length);
-                CDN_JSON = Encoding.UTF8.GetString(buffer);
-
-                using (SHA256 sha256Hash = SHA256.Create())
-                {
-                    byte[] sha = sha256Hash.ComputeHash(buffer);
-                    CDN_JSON_SHA256 = string.Join(" ", sha.Select(b => b.ToString("x2")));
-                }
-            }
-        }
+        private readonly string _cdnJsonSha256;
 
         public AuthController(ILogger<AuthController> logger, ApplicationDatabase database, IOptions<GiganticEmuConfiguration> configuration)
         {
             _logger = logger;
             _database = database;
             _configuration = configuration.Value;
+
+            var assembly = typeof(AuthController).Assembly;
+
+            using (var input = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.Resources.cdn.json")!)
+            {
+                var buffer = new byte[input.Length];
+                input.Read(buffer, 0, (int)input.Length);
+                var json = Encoding.UTF8.GetString(buffer);
+
+                using (SHA256 sha256Hash = SHA256.Create())
+                {
+                    byte[] sha = sha256Hash.ComputeHash(buffer);
+                    _cdnJsonSha256 = string.Join(" ", sha.Select(b => b.ToString("x2")));
+                }
+            }
         }
 
         [HttpPost]
@@ -95,7 +91,7 @@ namespace Web.Controllers
                     catalog = new
                     {
                         cdn_url = $"{HttpContext.Request.Scheme}://{host}/cdn",
-                        sha256_digest = CDN_JSON_SHA256,
+                        sha256_digest = _cdnJsonSha256,
                     },
                     announcements = new
                     {
