@@ -18,13 +18,12 @@ class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
-        var hostConfig = new ConfigurationBuilder().AddGiganticEmuHostConfiguration(args).Build();
-        var emuConfiguration = new GiganticEmuConfiguration();
-        hostConfig.GetSection(GiganticEmuConfiguration.GiganticEmu).Bind(emuConfiguration);
         return Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseConfiguration(hostConfig);
+                var hostConfig = new ConfigurationBuilder().AddGiganticEmuHostConfiguration(args).Build();
+                var emuConfiguration = new GiganticEmuConfiguration();
+                hostConfig.GetSection(GiganticEmuConfiguration.GiganticEmu).Bind(emuConfiguration);
                 webBuilder.UseStartup<Startup>();
                 webBuilder.UseUrls($"http://{emuConfiguration.BindInterface}:{emuConfiguration.WebPort}/");
             });
