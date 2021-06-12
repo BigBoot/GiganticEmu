@@ -8,9 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="resources/**/*.*">
-      <Link>Resources\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </EmbeddedResource>
+    <None Update="Resources/**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
