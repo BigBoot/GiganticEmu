@@ -207,9 +207,9 @@ namespace GiganticEmu.Mice
                         var hostname = url.IdnHost;
 
                         IPAddress? ip;
-                        if (!IPAddress.TryParse(_configuration.MiceHost, out ip))
+                        if (!IPAddress.TryParse(hostname, out ip))
                         {
-                            ip = (await Dns.GetHostAddressesAsync(_configuration.MiceHost))
+                            ip = (await Dns.GetHostAddressesAsync(hostname))
                                 .Where(ip => ip.AddressFamily == AddressFamily.InterNetwork)
                                 .FirstOrDefault();
                         }
