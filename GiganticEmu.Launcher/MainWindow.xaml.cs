@@ -20,14 +20,14 @@ namespace GiganticEmu.Launcher
         private const string CREDENTIALS_TARGET = "giganticemu.mistforge.net";
         private const string HOST = "https://api.mistforge.net";
 
-        private IApi _api;
-        private AuthHeaderHandler _auth;
+        private IBackendApi _api;
+        private ApiTokenHandler _auth;
 
         public MainWindow()
         {
             InitializeComponent();
-            _auth = new AuthHeaderHandler();
-            _api = RestService.For<IApi>(new HttpClient(_auth)
+            _auth = new ApiTokenHandler();
+            _api = RestService.For<IBackendApi>(new HttpClient(_auth)
             {
                 BaseAddress = new Uri(HOST)
             });
@@ -60,7 +60,7 @@ namespace GiganticEmu.Launcher
             PageContainer.SelectedItem = PageLoading;
             try
             {
-                var result = await _api.Login(new Shared.SessionPostRequest(username, password, false));
+                var result = await _api.Login(new SessionPostRequest { UserName = username, Password = password });
                 if (result.Code == RequestResult.Success)
                 {
                     ClearInputs();
@@ -98,7 +98,7 @@ namespace GiganticEmu.Launcher
             PageContainer.SelectedItem = PageLoading;
             try
             {
-                var result = await _api.Register(new UserPostRequest(email, username, password));
+                var result = await _api.Register(new UserPostRequest { Email = email, UserName = username, Password = password });
                 if (result.Code == RequestResult.Success)
                 {
                     ClearInputs();
@@ -146,7 +146,7 @@ namespace GiganticEmu.Launcher
                 if (result.Code == RequestResult.Success && _auth.AuthToken is string token)
                 {
                     SaveToken(token);
-                    UserUsername.Text = result.Username;
+                    UserUsername.Text = result.UserName;
                     PageContainer.SelectedItem = PageUser;
                 }
                 else

@@ -5,6 +5,12 @@ services:
     env:
       - name: GiganticEmu__SalsaCK
         value: cccccccccccccccc
+      - name: GiganticEmu__Agents__0__Host
+        value: http://localhost:8081
+      - name: GiganticEmu__Agents__0__Region
+        value: EU
+      - name: GiganticEmu__Agents__0__ApiKey
+        value: aaaaaaaaaaaaa
 
   - name: giganticemu-web
     project: GiganticEmu.Web/GiganticEmu.Web.csproj

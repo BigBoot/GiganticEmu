@@ -28,6 +28,9 @@ namespace GiganticEmu.Shared
 
         [Description("email not confirmed")]
         EmailNotConfirmed,
+
+        [Description("no instance available")]
+        NoInstanceAvailable,
     }
 
     public static class RequestResultExtensions

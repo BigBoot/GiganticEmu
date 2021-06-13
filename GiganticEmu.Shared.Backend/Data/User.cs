@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
@@ -20,7 +19,6 @@ namespace GiganticEmu.Shared.Backend
 
         public DateTimeOffset? AuthTokenExpires { get; set; } = null;
 
-
         public Guid? SessionId { get; set; } = null;
 
         public int SessionVersion { get; set; } = 0;
@@ -34,7 +32,9 @@ namespace GiganticEmu.Shared.Backend
         public string SessionSettings { get; set; } = "{}";
 
         public string SessionConfiguration { get; set; } = "{}";
+
         public string? SalsaSCK { get; set; } = null;
 
+        public bool InQueue { get; set; } = false;
     }
 }

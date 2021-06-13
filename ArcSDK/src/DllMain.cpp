@@ -50,29 +50,6 @@ void ArcWriteString(const std::wstring &string, wchar_t *buffer, size_t buffer_s
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserved)
 {
-    switch (reason)
-    {
-    case DLL_PROCESS_ATTACH:
-        if (std::filesystem::exists("userinfo"))
-        {
-            std::ifstream in("userinfo");
-            auto json = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-            in.close();
-
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            auto userinfo = nlohmann::json::parse(json);
-            nickname = converter.from_bytes(userinfo["nickname"]);
-            username = converter.from_bytes(userinfo["username"]);
-            auth_token = converter.from_bytes(userinfo["auth_token"]);
-
-            std::filesystem::remove("userinfo");
-        }
-        else
-        {
-            ArcPanic("Please launch the game using the Mistforge Launcher");
-        }
-        break;
-    }
     return TRUE;
 }
 
@@ -151,6 +128,29 @@ EXTERN_DLL_EXPORT int64_t CC_GotoUrlInOverlay(int64_t arg1, const wchar_t *arg2)
 
 EXTERN_DLL_EXPORT wchar_t *CC_Init(int64_t arg1, int64_t arg2, uint32_t *arg3)
 {
+    if (std::filesystem::exists("userinfo"))
+    {
+        std::ifstream in("userinfo");
+        auto json = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+        in.close();
+
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+        auto userinfo = nlohmann::json::parse(json);
+        nickname = converter.from_bytes(userinfo["nickname"]);
+        username = converter.from_bytes(userinfo["username"]);
+        auth_token = converter.from_bytes(userinfo["auth_token"]);
+
+        std::filesystem::remove("userinfo");
+    }
+    else if (std::filesystem::exists("serverstart"))
+    {
+        std::filesystem::remove("serverstart");
+    }
+    else
+    {
+        ArcPanic("Please launch the game using the Mistforge Launcher");
+    }
+
     // Never figured out what this was for, string remains the same for release build
     return L"This is our secret, probably encrypted, internal state..";
 }

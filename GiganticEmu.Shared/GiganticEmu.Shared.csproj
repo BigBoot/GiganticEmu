@@ -7,4 +7,8 @@
     <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="refit" Version="6.0.38" />
+  </ItemGroup>
+
 </Project>

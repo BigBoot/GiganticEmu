@@ -3,3 +3,4 @@
 packages/
 dist/
 app.db
+config.json

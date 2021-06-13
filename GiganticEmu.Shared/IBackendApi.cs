@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
-using GiganticEmu.Shared;
 using Refit;
 
-namespace GiganticEmu.Launcher
+namespace GiganticEmu.Shared
 {
-    public interface IApi
+    public interface IBackendApi
     {
 
         [Post("/session")]

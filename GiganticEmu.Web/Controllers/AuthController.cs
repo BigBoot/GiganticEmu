@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,9 +22,9 @@ namespace Web.Controllers
 
         private readonly ILogger<AuthController> _logger;
         private readonly ApplicationDatabase _database;
-        private readonly GiganticEmuConfiguration _configuration;
+        private readonly BackendConfiguration _configuration;
 
-        public AuthController(ILogger<AuthController> logger, ApplicationDatabase database, IOptions<GiganticEmuConfiguration> configuration)
+        public AuthController(ILogger<AuthController> logger, ApplicationDatabase database, IOptions<BackendConfiguration> configuration)
         {
             _logger = logger;
             _database = database;

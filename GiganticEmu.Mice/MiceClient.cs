@@ -13,25 +13,27 @@ using Microsoft.Extensions.Options;
 
 public class MiceClient
 {
+    public event EventHandler? ConnectionClosed;
     public ApplicationDatabase Database { get; init; }
+    public ILogger<MiceClient> Logger { get; init; }
     public Guid UserId { get; private set; } = Guid.Empty;
+    public int MotigaId { get; private set; } = 0;
     const int MIN_BUFFER_SIZE = 512;
     const int MAX_LENGTH_BYTES = sizeof(long) + 1;
-    private TcpClient _tcp = null!;
-    private NetworkStream _tcpStream = null!;
+    private TcpClient _tcp = default!;
+    private NetworkStream _tcpStream = default!;
     private Pipe _pipe = new Pipe();
     private bool _authenticated = false;
     private bool _closed = false;
-    private CancellationTokenSource _cts = null!;
-    private Salsa _salsaIn = null!;
-    private Salsa _salsaOut = null!;
-    private ILogger<MiceClient> _logger;
+    private CancellationTokenSource _cts = default!;
+    private Salsa _salsaIn = default!;
+    private Salsa _salsaOut = default!;
     private MiceCommandHandler _commandHandler;
-    private GiganticEmuConfiguration _configuration;
+    private BackendConfiguration _configuration;
 
-    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler, IOptions<GiganticEmuConfiguration> configuration, ApplicationDatabase database)
+    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler, IOptions<BackendConfiguration> configuration, ApplicationDatabase database)
     {
-        _logger = logger;
+        Logger = logger;
         _commandHandler = commandHandler;
         _configuration = configuration.Value;
         Database = database;
@@ -42,8 +44,6 @@ public class MiceClient
         _tcp = tcp;
         _tcpStream = _tcp.GetStream();
 
-
-
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         Task receiving = ReceiveTask();
@@ -51,6 +51,15 @@ public class MiceClient
 
         await Task.WhenAll(reading, receiving);
         _tcp.Close();
+
+        var user = await Database.Users.SingleAsync(user => user.Id == UserId);
+        user.InQueue = false;
+        await Database.SaveChangesAsync();
+
+        if (ConnectionClosed is EventHandler handler)
+        {
+            handler(this, new EventArgs());
+        }
     }
 
     private async Task ReceiveTask()
@@ -62,7 +71,7 @@ public class MiceClient
             try
             {
                 int bytesRead = await _tcpStream.ReadAsync(memory, _cts.Token);
-                _logger.LogDebug("Receiving...");
+                Logger.LogDebug("Receiving...");
                 if (bytesRead == 0)
                 {
                     break;
@@ -76,7 +85,7 @@ public class MiceClient
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception during receive.");
+                Logger.LogError(ex, "Exception during receive.");
                 break;
             }
 
@@ -121,7 +130,7 @@ public class MiceClient
                 }
                 else if (buffer.Length >= cmdLen)
                 {
-                    _logger.LogDebug("Received command (len: {lentgh})", cmdLen);
+                    Logger.LogDebug("Received command (len: {lentgh})", cmdLen);
                     await HandleCommand(buffer.Slice(buffer.Start, cmdLen).ToArray());
                     pipeReader.AdvanceTo(buffer.GetPosition(cmdLen));
                     cmdLen = 0;
@@ -130,7 +139,7 @@ public class MiceClient
                 else
                 {
                     pipeReader.AdvanceTo(buffer.Start, buffer.End);
-                    _logger.LogDebug("Waiting for more data!");
+                    Logger.LogDebug("Waiting for more data!");
                 }
             }
             catch (OperationCanceledException)
@@ -139,7 +148,7 @@ public class MiceClient
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception during read.");
+                Logger.LogError(ex, "Exception during read.");
                 break;
             }
 
@@ -158,7 +167,7 @@ public class MiceClient
     public async Task SendMessage(object response)
     {
         var json = response.ToJson();
-        _logger.LogDebug(response.ToJson());
+        Logger.LogDebug(response.ToJson());
         var encrypted = _salsaOut.Encrypt(json);
         var length = EncodeSize(encrypted.Length);
         var packet = new byte[length.Length + encrypted.Length];
@@ -206,7 +215,7 @@ public class MiceClient
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Exception parsing json message.");
+            Logger.LogError(ex, "Exception parsing json message.");
             throw;
         }
 
@@ -214,14 +223,14 @@ public class MiceClient
 
         if (cmd == ".close" || cmd == "party.leave")
         {
-            _logger.LogInformation("Received .close command!");
+            Logger.LogInformation("Received .close command!");
             _closed = true;
             return;
         }
 
         if (_commandHandler.CanHandle(cmd))
         {
-            _logger.LogInformation("Received handled command: {cmd}", cmd as string);
+            Logger.LogInformation("Received handled command: {cmd}", cmd as string);
             // _logger.LogDebug("{msg}", ((object)payload).ToJson());
             try
             {
@@ -234,12 +243,12 @@ public class MiceClient
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception while handling command {cmd}.", cmd as string);
+                Logger.LogError(ex, "Exception while handling command {cmd}.", cmd as string);
             }
         }
         else
         {
-            _logger.LogInformation("Received unhandled command: {cmd}", cmd as string);
+            Logger.LogInformation("Received unhandled command: {cmd}", cmd as string);
             //_logger.LogDebug("{msg}", ((object)payload).ToJson());
         }
     }
@@ -256,7 +265,7 @@ public class MiceClient
         }
         catch (System.Exception ex)
         {
-            _logger.LogError(ex, "Exception parsing json message.");
+            Logger.LogError(ex, "Exception parsing json message.");
             throw;
         }
 
@@ -267,6 +276,7 @@ public class MiceClient
         if (user != null && user.SalsaSCK is string salsaSCK)
         {
             UserId = user.Id;
+            MotigaId = user.MotigaId;
 
             _salsaIn = new Salsa(salsaSCK, 16);
             _salsaOut = new Salsa(salsaSCK, 16);
@@ -292,7 +302,7 @@ public class MiceClient
 
             _authenticated = true;
 
-            _logger.LogInformation("Client authenticated using salsa sck: {sck}!", salsaSCK);
+            Logger.LogInformation("Client authenticated using salsa sck: {sck}!", salsaSCK);
         }
         else
         {

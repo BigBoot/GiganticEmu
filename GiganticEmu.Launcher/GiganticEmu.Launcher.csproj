@@ -27,7 +27,6 @@
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
     <PackageReference Include="PresentationFramework" Version="4.6.0" />
-    <PackageReference Include="refit" Version="6.0.38" />
   </ItemGroup>
 
   <ItemGroup>

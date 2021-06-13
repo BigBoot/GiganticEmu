@@ -1,10 +1,8 @@
 using System;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using GiganticEmu.Shared;
 using GiganticEmu.Shared.Backend;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,11 +38,14 @@ namespace Web.Controllers
 
                 if (user != null)
                 {
-                    return Ok(new SessionGetResponse(RequestResult.Success, RequestResult.Success.GetDescription(), user.UserName));
+                    return Ok(new SessionGetResponse(RequestResult.Success)
+                    {
+                        UserName = user.UserName
+                    });
                 }
             }
 
-            return Ok(new SessionGetResponse(RequestResult.Unauthorized, RequestResult.Unauthorized.GetDescription()));
+            return Ok(new SessionGetResponse(RequestResult.Unauthorized));
         }
 
         [HttpPost]
@@ -60,19 +61,23 @@ namespace Web.Controllers
                     await _userManager.AccessFailedAsync(user);
                 }
 
-                return Ok(new SessionPostResponse(RequestResult.InvalidUser, RequestResult.InvalidUser.GetDescription()));
+                return Ok(new SessionPostResponse(RequestResult.InvalidUser));
             }
 
             if (await _userManager.IsLockedOutAsync(user))
             {
-                return Ok(new SessionPostResponse(RequestResult.AccountLocked, RequestResult.AccountLocked.GetDescription()));
+                return Ok(new SessionPostResponse(RequestResult.AccountLocked));
             }
 
             user.AuthToken = Guid.NewGuid().ToString();
             user.AuthTokenExpires = DateTimeOffset.Now.AddHours(48);
             await _userManager.UpdateAsync(user);
 
-            return Ok(new SessionPostResponse(RequestResult.Success, RequestResult.Success.GetDescription(), user.AuthToken, user.AuthTokenExpires));
+            return Ok(new SessionPostResponse(RequestResult.Success)
+            {
+                AuthToken = user.AuthToken,
+                Expiry = user.AuthTokenExpires
+            });
         }
 
         [HttpDelete]
@@ -94,7 +99,7 @@ namespace Web.Controllers
                 }
             }
 
-            return Ok(new SessionDeleteResponse(RequestResult.Success, RequestResult.Success.GetDescription()));
+            return Ok(new SessionDeleteResponse(RequestResult.Success));
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Web.Controllers
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 {
-                    return Ok(new UserPostResponse(RequestResult.EmailNotConfirmed, RequestResult.EmailNotConfirmed.GetDescription()));
+                    return Ok(new UserPostResponse(RequestResult.EmailNotConfirmed));
                 }
                 else
                 {
@@ -60,15 +60,17 @@ namespace Web.Controllers
                     user.AuthTokenExpires = DateTimeOffset.Now.AddHours(48);
                     await _userManager.UpdateAsync(user);
 
-                    return Ok(new UserPostResponse(RequestResult.Success, RequestResult.Success.GetDescription(), AuthToken: user.AuthToken));
+                    return Ok(new UserPostResponse(RequestResult.Success)
+                    {
+                        AuthToken = user.AuthToken
+                    });
                 }
             }
 
-            return Ok(new UserPostResponse(
-                RequestResult.RegistrationError,
-                RequestResult.RegistrationError.GetDescription(),
-                result.Errors.Select(err => new UserPostError(err.Code, err.Description))
-            ));
+            return Ok(new UserPostResponse(RequestResult.RegistrationError)
+            {
+                Errors = result.Errors.Select(err => new UserPostError { Code = err.Code, Message = err.Description })
+            });
         }
     }
 }

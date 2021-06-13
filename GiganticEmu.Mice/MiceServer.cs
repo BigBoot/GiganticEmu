@@ -8,14 +8,16 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using GiganticEmu.Shared.Backend;
+using System.Collections.Generic;
 
 public class MiceServer : BackgroundService
 {
+    public readonly IList<MiceClient> ConnectedClients = new List<MiceClient>();
     private readonly ILogger<MiceServer> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly GiganticEmuConfiguration _configuration;
+    private readonly BackendConfiguration _configuration;
 
-    public MiceServer(ILogger<MiceServer> logger, IServiceProvider serviceProvider, IOptions<GiganticEmuConfiguration> configuration)
+    public MiceServer(ILogger<MiceServer> logger, IServiceProvider serviceProvider, IOptions<BackendConfiguration> configuration)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
@@ -34,7 +36,7 @@ public class MiceServer : BackgroundService
             cancellationToken.Register(() => listener.Stop());
             while (listener.Server.IsBound)
             {
-                var client = await listener.AcceptTcpClientAsync();
+                var conn = await listener.AcceptTcpClientAsync();
 
                 _logger.LogInformation("Mice Client connected...");
                 var _ = Task.Run(async () =>
@@ -43,7 +45,15 @@ public class MiceServer : BackgroundService
                     {
                         using (var scope = _serviceProvider.CreateScope())
                         {
-                            await scope.ServiceProvider.GetRequiredService<MiceClient>().Run(client, cancellationToken);
+                            var client = scope.ServiceProvider.GetRequiredService<MiceClient>();
+
+                            ConnectedClients.Add(client);
+                            client.ConnectionClosed += (sender, ev) =>
+                            {
+                                ConnectedClients.Remove(client);
+                            };
+
+                            await client.Run(conn, cancellationToken);
                         }
                     }
                     catch (Exception ex)

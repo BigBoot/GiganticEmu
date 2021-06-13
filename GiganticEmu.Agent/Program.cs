@@ -1,11 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
-using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace GiganticEmu.Web
+namespace GiganticEmu.Agent
 {
     class Program
     {
@@ -22,11 +22,16 @@ namespace GiganticEmu.Web
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    var hostConfig = new ConfigurationBuilder().AddBackendHostConfiguration(args).Build();
-                    var emuConfiguration = new BackendConfiguration();
-                    hostConfig.GetSection(BackendConfiguration.GiganticEmu).Bind(emuConfiguration);
+                    var configuration = new ConfigurationBuilder()
+                        .AddAgentConfiguration(args)
+                        .SetBasePath(Directory.GetCurrentDirectory())
+                        .Build();
+                    var agentConfiguration = new AgentConfiguration();
+                    configuration.Bind(agentConfiguration, o => o.BindNonPublicProperties = true);
+
+                    webBuilder.UseConfiguration(configuration);
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls($"http://{emuConfiguration.BindInterface}:{emuConfiguration.WebPort}/");
+                    webBuilder.UseUrls($"http://{agentConfiguration.BindInterface}:{agentConfiguration.WebPort}/");
                 });
         }
     }

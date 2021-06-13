@@ -76,7 +76,7 @@ public static class PartyCommands
             session_id = sessionHost.SessionId.ToString(),
             session = new
             {
-                host = sessionHost.Id.ToString(),
+                host = sessionHost.MotigaId.ToString(),
                 document_version = sessionVersion,
                 join_state = sessionHost.JoinState,
                 session_settings = sessionHost.SessionSettings.FromJsonTo<dynamic>(),

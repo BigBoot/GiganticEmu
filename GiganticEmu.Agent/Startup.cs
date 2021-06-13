@@ -1,16 +1,12 @@
-using System;
 using System.Text.Json.Serialization;
-using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-namespace GiganticEmu.Web
+namespace GiganticEmu.Agent
 {
     public class Startup
     {
@@ -23,21 +19,9 @@ namespace GiganticEmu.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<BackendConfiguration>(Configuration.GetSection(BackendConfiguration.GiganticEmu));
+            services.Configure<AgentConfiguration>(Configuration, o => o.BindNonPublicProperties = true);
 
-            services.AddApplicationDatabase(c =>
-            {
-                c.ConnectionString = Configuration.GetConnectionString(name: "postgres");
-            });
-
-            services.AddIdentity<User, IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<ApplicationDatabase>()
-                .AddDefaultTokenProviders();
-
-            services.Configure<IdentityOptions>(c =>
-            {
-                c.User.RequireUniqueEmail = false;
-            });
+            services.AddSingleton<ServerManager>();
 
             services.AddControllers()
                 .AddJsonOptions(c =>
@@ -76,13 +60,6 @@ namespace GiganticEmu.Web
             {
                 endpoints.MapControllers();
             });
-
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetService<ApplicationDatabase>();
-                context?.Database.Migrate();
-            }
-
         }
     }
 }
