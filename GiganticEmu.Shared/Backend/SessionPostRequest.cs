@@ -4,6 +4,6 @@ namespace GiganticEmu.Shared
     {
         public string UserName { get; init; } = default!;
         public string Password { get; init; } = default!;
-        public string RememberMe { get; init; } = default!;
+        public bool RememberMe { get; init; } = true;
     }
 }

@@ -79,7 +79,7 @@ namespace GiganticEmu.Mice
                     .Select(group => new Session { Players = group.Select(user => user.MotigaId).ToList() })
                     .ToList();
 
-                var matches = FindMatches(1, queue);
+                var matches = FindMatches(_configuration.NumPlayers, queue);
 
                 var match = matches.FirstOrDefault(); // <<-- totally fair matchmaking
 

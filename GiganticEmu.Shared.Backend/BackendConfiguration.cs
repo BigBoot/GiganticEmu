@@ -22,6 +22,7 @@ namespace GiganticEmu.Shared.Backend
         public string MiceHost { get; set; } = "localhost";
         public int GameVersion { get; set; } = 301530;
         public ICollection<Agent> Agents { get; set; } = new List<Agent>();
+        public int NumPlayers { get; set; } = 10;
     }
 
     public static class BackendConfigurationExtensions
