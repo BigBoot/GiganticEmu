@@ -2,6 +2,6 @@ namespace GiganticEmu.Shared
 {
     public record SessionGetResponse(RequestResult Code) : ResponseBase(Code)
     {
-        public string? UserName { get; init; } = null!;
+        public string? UserName { get; init; } = default!;
     }
 }
