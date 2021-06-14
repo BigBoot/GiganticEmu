@@ -87,7 +87,7 @@ namespace GiganticEmu.Mice
                 {
                     _logger.LogInformation("{} match found.", nameof(MatchmakingService));
 
-                    var map = new[] { "LV_Mistforge", "LV_Canyon", "LV_Valley" }.OrderBy(x => Guid.NewGuid()).First();
+                    var map = _configuration.Maps.OrderBy(x => Guid.NewGuid()).First();
 
                     var server = await StartServer(map);
 

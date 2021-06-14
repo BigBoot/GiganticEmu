@@ -24,6 +24,7 @@ namespace GiganticEmu.Shared.Backend
         public ICollection<Agent> Agents { get; set; } = new List<Agent>();
         public int NumPlayers { get; set; } = 10;
         public string? ApiKey { get; set; }
+        public ICollection<string> Maps { get; set; } = new List<string> { "LV_Canyon", "LV_Mistforge", "LV_Valley" };
     }
 
     public static class BackendConfigurationExtensions
