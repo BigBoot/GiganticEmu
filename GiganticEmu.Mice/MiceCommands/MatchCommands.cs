@@ -18,7 +18,7 @@ public static class MatchCommands
     public static async Task<object> LeaveQueue(dynamic payload, MiceClient client)
     {
         var user = await client.Database.Users.SingleAsync(user => user.Id == client.UserId);
-        user.InQueue = true;
+        user.InQueue = false;
         await client.Database.SaveChangesAsync();
 
         return new { };
