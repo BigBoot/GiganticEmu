@@ -45,7 +45,8 @@ namespace GiganticEmu.Agent
             };
 
             process.StartInfo.ArgumentList.Add($"server");
-            process.StartInfo.ArgumentList.Add($"lobby?listen={port}");
+            process.StartInfo.ArgumentList.Add($"lobby");
+            process.StartInfo.ArgumentList.Add($"-port={port}");
             process.StartInfo.ArgumentList.Add($"-log=GiganticEmu.Agent.{port}.log");
             process.StartInfo.ArgumentList.Add($"-forcelogflush");
             process.StartInfo.ArgumentList.Add($"-ini:RxGame:RxGame.RxPreGameLobbyGame_Base.ReservedMapName={map}");
