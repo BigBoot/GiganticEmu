@@ -29,7 +29,6 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.0.2" />
     <PackageReference Include="PresentationFramework" Version="4.6.0" />
     <PackageReference Include="DynamicData" Version="7.1.17" />
-    <PackageReference Include="NuGet.Protocol" Version="5.9.1" />
     <PackageReference Include="ReactiveUI" Version="13.3.2" />
     <PackageReference Include="ReactiveUI.Events.WPF" Version="13.3.2" />
     <PackageReference Include="ReactiveUI.Fody" Version="13.3.2" />
