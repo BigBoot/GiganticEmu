@@ -14,8 +14,8 @@ namespace GiganticEmu.Launcher
     /// </summary>
     public partial class App : Application
     {
-        private const string HOST = "https://api.mistforge.net";
-        //private const string HOST = "http://localhost:3000";
+        public const string HOST = "https://api.mistforge.net";
+        //public const string HOST = "http://localhost:3000";
 
         public App()
         {

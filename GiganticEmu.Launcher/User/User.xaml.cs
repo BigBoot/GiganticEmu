@@ -18,6 +18,11 @@ namespace GiganticEmu.Launcher
                     .Select(x => Unit.Default)
                     .InvokeCommand(this, x => x.ViewModel!.Logout)
                     .DisposeWith(disposables);
+
+                Observable.FromEventPattern(ButtonStartGame, nameof(ButtonLogout.Click))
+                    .Select(x => Unit.Default)
+                    .InvokeCommand(this, x => x.ViewModel!.StartGame)
+                    .DisposeWith(disposables);
             });
         }
     }
