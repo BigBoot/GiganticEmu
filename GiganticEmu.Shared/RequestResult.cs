@@ -31,6 +31,9 @@ namespace GiganticEmu.Shared
 
         [Description("no instance available")]
         NoInstanceAvailable,
+
+        [Description("unknown username")]
+        UnknownUser,
     }
 
     public static class RequestResultExtensions

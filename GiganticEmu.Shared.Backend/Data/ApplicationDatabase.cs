@@ -8,6 +8,9 @@ namespace GiganticEmu.Shared.Backend
 {
     public class ApplicationDatabase : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
+        public DbSet<Friend> Friends { get; set; } = default!;
+        public DbSet<GroupInvite> GroupInvites { get; set; } = default!;
+
         public ApplicationDatabase(DbContextOptions<ApplicationDatabase> options)
             : base(options)
         {

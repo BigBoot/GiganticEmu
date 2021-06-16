@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
@@ -18,6 +19,8 @@ namespace GiganticEmu.Shared.Backend
         public string? AuthToken { get; set; } = null;
 
         public DateTimeOffset? AuthTokenExpires { get; set; } = null;
+
+        public DateTimeOffset LastOnline { get; set; } = DateTimeOffset.MinValue;
 
         public Guid? SessionId { get; set; } = null;
 

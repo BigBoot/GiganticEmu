@@ -6,7 +6,7 @@ param (
 
 if (!(Test-Path -path $Destination)) { New-Item $Destination -ItemType "Directory" }
 
-$ArcDistDir = "$(Resolve-Path $Destination)/MistforgeLauncher/Binaries/Win64"
+$ArcDistDir = "$(Resolve-Path $Destination)"
 $ArcBuildDir = "bin/ArcSDK/"
 $ArcSrcDir = Resolve-Path "ArcSDK"
     
@@ -20,10 +20,7 @@ Pop-Location
 Copy-Item -Path $ArcBuildDir/Release/ArcSDK.dll -Destination $ArcDistDir
 
 dotnet publish -r win-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:DebugType=None -p:DebugSymbols=false --self-contained false -c Release -o bin/ GiganticEmu.Launcher/GiganticEmu.Launcher.csproj
-Copy-Item -Path bin//GiganticEmu.Launcher.exe -Destination $Destination/MistforgeLauncher/MistforgeLauncher.exe
-
-$Files = Get-ChildItem $Destination/MistforgeLauncher -Exclude "MistforgeLauncher.zip"
-Compress-Archive -Path $Files -Update -CompressionLevel "Optimal" -DestinationPath "$Destination/MistforgeLauncher.zip"
+Copy-Item -Path bin/GiganticEmu.Launcher.exe -Destination $Destination/MistforgeLauncher/MistforgeLauncher.exe
 
 dotnet publish -r win-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:DebugType=None -p:DebugSymbols=false --self-contained false -c Release -o bin/ GiganticEmu.Agent/GiganticEmu.Agent.csproj
 Copy-Item -Path bin/GiganticEmu.Agent.exe -Destination $Destination/GiganticEmu.Agent.exe

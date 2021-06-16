@@ -3,15 +3,17 @@ using System;
 using GiganticEmu.Shared.Backend;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GiganticEmu.Shared.Backend.Migrations
 {
     [DbContext(typeof(ApplicationDatabase))]
-    partial class ApplicationDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20210616113317_add_friends")]
+    partial class add_friends
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,9 +101,6 @@ namespace GiganticEmu.Shared.Backend.Migrations
                     b.Property<string>("JoinState")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("LastOnline")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");

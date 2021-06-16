@@ -28,8 +28,6 @@ namespace Web.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Post(UserPostRequest register)
         {
-            _logger.LogInformation(register.Password);
-
             var user = new User()
             {
                 Email = register.Email,

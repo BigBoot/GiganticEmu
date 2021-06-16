@@ -17,5 +17,14 @@ namespace GiganticEmu.Shared
 
         [Post("/user")]
         Task<UserPostResponse> Register([Body] UserPostRequest request);
+
+        [Get("/friends")]
+        Task<FriendsGetResponse> GetFriends();
+
+        [Delete("/friends")]
+        Task<FriendsDeleteResponse> RemoveFriend([Body] FriendsDeleteRequest request);
+
+        [Post("/friends/invite")]
+        Task<FriendsInvitePostResponse> SendFriendRequest([Body] FriendsInvitePostRequest request);
     }
 }

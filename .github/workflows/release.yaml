@@ -50,7 +50,7 @@ jobs:
         with:
           allowUpdates: true
           name: ${{ steps.version.outputs.version }}
-          artifacts: dist/MistforgeLauncher.zip,dist/GiganticEmu.Agent.exe
+          artifacts: dist/MistforgeLauncher.exe,dist/GiganticEmu.Agent.exe,dist/ArcSDK.dll
           token: ${{ secrets.GITHUB_TOKEN }}
           commit: ${{ github.sha }}
           tag: ${{ steps.version.outputs.version }}

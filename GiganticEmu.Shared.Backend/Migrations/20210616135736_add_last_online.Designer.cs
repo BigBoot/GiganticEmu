@@ -3,15 +3,17 @@ using System;
 using GiganticEmu.Shared.Backend;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GiganticEmu.Shared.Backend.Migrations
 {
     [DbContext(typeof(ApplicationDatabase))]
-    partial class ApplicationDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20210616135736_add_last_online")]
+    partial class add_last_online
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
