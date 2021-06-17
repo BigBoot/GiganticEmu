@@ -5,6 +5,7 @@ WORKDIR /app
 COPY GiganticEmu.Shared.Backend/GiganticEmu.Shared.Backend.csproj ./GiganticEmu.Shared.Backend/GiganticEmu.Shared.Backend.csproj
 COPY GiganticEmu.Shared/GiganticEmu.Shared.csproj ./GiganticEmu.Shared/GiganticEmu.Shared.csproj
 COPY GiganticEmu.Web/GiganticEmu.Web.csproj ./GiganticEmu.Web/GiganticEmu.Web.csproj
+COPY Directory.Build.props ./Directory.Build.props
 
 RUN dotnet restore GiganticEmu.Web/GiganticEmu.Web.csproj
 
