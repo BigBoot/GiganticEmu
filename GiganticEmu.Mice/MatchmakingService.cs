@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -7,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Fetchgoods.Text.Json.Extensions;
 using GiganticEmu.Shared;
 using GiganticEmu.Shared.Backend;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +24,7 @@ namespace GiganticEmu.Mice
     {
         private readonly ILogger<MatchmakingService> _logger;
         private Timer _timer;
-        private ApplicationDatabase _database;
+        private IDbContextFactory<ApplicationDatabase> _databaseFactory;
         private MiceServer _mice;
         private BackendConfiguration _configuration;
         private IList<(BackendConfiguration.Agent, IAgentApi)> _agents;
@@ -33,11 +35,11 @@ namespace GiganticEmu.Mice
             public int Size { get => Players.Count; }
         }
 
-        public MatchmakingService(ILogger<MatchmakingService> logger, ApplicationDatabase database, MiceServer mice, IOptions<BackendConfiguration> configuration)
+        public MatchmakingService(ILogger<MatchmakingService> logger, IDbContextFactory<ApplicationDatabase> databaseFactory, MiceServer mice, IOptions<BackendConfiguration> configuration)
         {
             _logger = logger;
             _timer = new Timer(DoWork, null, Timeout.Infinite, Timeout.Infinite);
-            _database = database;
+            _databaseFactory = databaseFactory;
             _mice = mice;
             _configuration = configuration.Value;
             _agents = _configuration.Agents.Select(agent => (agent, RestService.For<IAgentApi>(
@@ -54,13 +56,16 @@ namespace GiganticEmu.Mice
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("{} is starting.", nameof(MatchmakingService));
+            _logger.LogInformation("{Service} is starting.", nameof(MatchmakingService));
 
-            await _database.Users
-                .Where(user => user.InQueue)
-                .ForEachAsync(user => user.InQueue = false);
+            using (var database = _databaseFactory.CreateDbContext())
+            {
+                await database.Users
+                    .Where(user => user.InQueue)
+                    .ForEachAsync(user => user.InQueue = false);
 
-            await _database.SaveChangesAsync();
+                await database.SaveChangesAsync();
+            }
 
             _timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(5));
         }
@@ -69,9 +74,11 @@ namespace GiganticEmu.Mice
         {
             try
             {
-                _logger.LogDebug("{} matching triggered.", nameof(MatchmakingService));
+                _logger.LogDebug("Looking for matches.", nameof(MatchmakingService));
 
-                var queue = (await _database.Users
+                using var database = _databaseFactory.CreateDbContext();
+
+                var queue = (await database.Users
                     .Where(user => user.InQueue)
                     .Select(user => new { SessionId = user.SessionId, MotigaId = user.MotigaId })
                     .ToListAsync())
@@ -79,15 +86,18 @@ namespace GiganticEmu.Mice
                     .Select(group => new Session { Players = group.Select(user => user.MotigaId).ToList() })
                     .ToList();
 
-                var matches = FindMatches(_configuration.NumPlayers, queue);
+                var match = FindMatches(_configuration.NumPlayers, queue)
+                    .Select(groups => MakeTeams((_configuration.NumPlayers + 1) / 2, groups))
+                    .FirstOrDefault(x => x != null); // <<-- totally fair matchmaking
 
-                var match = matches.FirstOrDefault(); // <<-- totally fair matchmaking
+                _logger.LogInformation("{NumOfSessions} groups in queue.", queue.Count);
+                //_logger.LogInformation(queue.ToJson());
 
-                if (match != null)
+                if (match is not null)
                 {
-                    _logger.LogInformation("{} match found.", nameof(MatchmakingService));
-
                     var map = _configuration.Maps.OrderBy(x => Guid.NewGuid()).First();
+
+                    _logger.LogInformation("Match found. Starting server with map {Map}", map);
 
                     var server = await StartServer(map);
 
@@ -97,15 +107,20 @@ namespace GiganticEmu.Mice
                         return;
                     }
 
-                    var players = match.SelectMany(session => session.Players).ToHashSet();
-                    var clients = _mice.ConnectedClients.Where(client => players.Contains(client.MotigaId));
+                    var players = match
+                        .SelectMany((players, index) => players
+                            .Select(player => (index, player)))
+                        .ToDictionary(x => x.player, x => x.index);
 
-                    foreach (var player in players)
+                    var clients = _mice.ConnectedClients.Where(client => players.ContainsKey(client.MotigaId));
+
+                    foreach (var player in players.Keys)
                     {
-                        (await _database.Users.SingleAsync(user => user.MotigaId == player)).InQueue = false;
+                        var p = await database.Users.SingleAsync(user => user.MotigaId == player);
+                        p.InQueue = false;
                     }
 
-                    await _database.SaveChangesAsync();
+                    await database.SaveChangesAsync();
 
                     _logger.LogInformation("Waiting for the server to become ready...");
                     await Task.Delay(TimeSpan.FromSeconds(15));
@@ -113,28 +128,29 @@ namespace GiganticEmu.Mice
                     var ck2 = Convert.ToBase64String(Encoding.UTF8.GetBytes("imagoodcipherkey"));
                     var ck = Convert.ToBase64String(Encoding.UTF8.GetBytes("amotigadeveloper"));
                     var bcryptHmac = Convert.ToBase64String(Encoding.UTF8.GetBytes("totsagoodsuperlonghmacsecretkeys"));
-                    var msg = new object[] { "match.ready", new
-                    {
-                        matchinfo = new
-                        {
-                            server = new
-                            {
-                                connstr = server,
-                                map = map,
-                            },
-                            instanceid = "12",
-                            token = ck + ck2 + bcryptHmac,
-                            meta = new
-                            {
-                                moid = 2,
-                            },
-                        },
-                    }};
 
                     foreach (var client in clients)
                     {
                         try
                         {
+                            var team = players[client.MotigaId];
+                            var msg = new object[] { "match.ready", new
+                            {
+                                matchinfo = new
+                                {
+                                    server = new
+                                    {
+                                        connstr = $"{server}?team=1",
+                                        map = map,
+                                    },
+                                    instanceid = team.ToString(),
+                                    token = ck + ck2 + bcryptHmac,
+                                    meta = new
+                                    {
+                                        moid = 2,
+                                    },
+                                },
+                            }};
                             await client.SendMessage(msg);
                         }
                         catch { }
@@ -149,7 +165,7 @@ namespace GiganticEmu.Mice
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("{} is stopping.", nameof(MatchmakingService));
+            _logger.LogInformation("{Service} is stopping.", nameof(MatchmakingService));
 
             _timer.Change(Timeout.Infinite, 0);
 
@@ -190,6 +206,35 @@ namespace GiganticEmu.Mice
             }
         }
 
+        private ICollection<ICollection<int>>? MakeTeams(int teamSize, IEnumerable<Session> sessions)
+        {
+            var available = new Queue<Session>(sessions.OrderByDescending(x => x.Size));
+
+            var team1 = new List<int>();
+            var team2 = new List<int>();
+            while (available.Count > 0)
+            {
+                var next = available.Dequeue();
+                if (team1.Count + next.Size == teamSize)
+                {
+                    team1.AddRange(next.Players);
+                    team2.AddRange(available.SelectMany(group => group.Players));
+                    return new List<ICollection<int>> { team1, team2 };
+                }
+
+                if (team1.Count + next.Size < teamSize)
+                {
+                    team1.AddRange(next.Players);
+                }
+                else
+                {
+                    team2.AddRange(next.Players);
+                }
+            }
+
+            return null;
+        }
+
         private async Task<string?> StartServer(string map)
         {
             foreach (var (agent, api) in _agents)
@@ -216,8 +261,15 @@ namespace GiganticEmu.Mice
 
                         return $"{ip}:{port}";
                     }
+                    else
+                    {
+                        _logger.LogInformation("Unable to start instance on {Server}: {Reason}", agent.Host, response.Message);
+                    }
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex, "Unable to reach {Server}", agent.Host);
+                }
             }
             return null;
         }

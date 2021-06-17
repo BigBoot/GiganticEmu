@@ -16,14 +16,14 @@ namespace Web.Controllers
     {
         private readonly ILogger<SessionController> _logger;
         private readonly UserManager<User> _userManager;
-        private readonly ApplicationDatabase _database;
+        private readonly IDbContextFactory<ApplicationDatabase> _databaseFactory;
 
 
-        public SessionController(ILogger<SessionController> logger, UserManager<User> userManager, ApplicationDatabase database)
+        public SessionController(ILogger<SessionController> logger, UserManager<User> userManager, IDbContextFactory<ApplicationDatabase> databaseFactory)
         {
             _logger = logger;
             _userManager = userManager;
-            _database = database;
+            _databaseFactory = databaseFactory;
         }
 
         [HttpGet]
@@ -32,7 +32,9 @@ namespace Web.Controllers
         {
             if (token != null)
             {
-                var user = await _database.Users
+                var db = _databaseFactory.CreateDbContext();
+
+                var user = await db.Users
                    .Where(user => user.AuthToken == token)
                    .FirstOrDefaultAsync();
 
@@ -86,7 +88,9 @@ namespace Web.Controllers
         {
             if (token != null)
             {
-                var user = await _database.Users
+                var db = _databaseFactory.CreateDbContext();
+
+                var user = await db.Users
                     .Where(user => user.AuthToken == token)
                     .FirstOrDefaultAsync();
 

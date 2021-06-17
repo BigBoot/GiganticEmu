@@ -31,6 +31,9 @@
             <TextBlock x:Name="TextOnlineStatus" d:Text="Online" HorizontalAlignment="Left" VerticalAlignment="Center" />
         </StackPanel>
         <StackPanel Grid.RowSpan="2" Grid.Column="2" Orientation="Horizontal">
+            <Button x:Name="ButtonInviteGroup" Style="{DynamicResource MaterialDesignToolButton}" Width="28" Height="28" ToolTip="Invite to group">
+                <materialDesign:PackIcon Kind="GamepadVariant"  Width="16" Height="16"  Grid.RowSpan="2" Foreground="#999999" Margin="0,2,0,0"/>
+            </Button>
             <Button x:Name="ButtonJoinGroup" Style="{DynamicResource MaterialDesignToolButton}" Width="28" Height="28" ToolTip="New join request">
                 <materialDesign:PackIcon Kind="AlertCircle"  Width="16" Height="16"  Grid.RowSpan="2" Foreground="#999999" Margin="0,2,0,0"/>
             </Button>

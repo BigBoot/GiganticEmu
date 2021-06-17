@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
+using GiganticEmu.Shared;
 using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,13 +22,13 @@ namespace Web.Controllers
         private static readonly char[] KEY_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
 
         private readonly ILogger<AuthController> _logger;
-        private readonly ApplicationDatabase _database;
+        private readonly IDbContextFactory<ApplicationDatabase> _databaseFactory;
         private readonly BackendConfiguration _configuration;
 
-        public AuthController(ILogger<AuthController> logger, ApplicationDatabase database, IOptions<BackendConfiguration> configuration)
+        public AuthController(ILogger<AuthController> logger, IDbContextFactory<ApplicationDatabase> databaseFactory, IOptions<BackendConfiguration> configuration)
         {
             _logger = logger;
-            _database = database;
+            _databaseFactory = databaseFactory;
             _configuration = configuration.Value;
         }
 
@@ -35,13 +36,15 @@ namespace Web.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Post([FromHeader(Name = "Host")] string host, [FromForm(Name = "arc_token")] string token, [FromForm(Name = "v")] int version)
         {
-            var user = await _database.Users.Where(user => user.AuthToken == token).FirstOrDefaultAsync();
+            var db = _databaseFactory.CreateDbContext();
+
+            var user = await db.Users.Where(user => user.AuthToken == token).FirstOrDefaultAsync();
 
             if (user != null)
             {
                 user.SalsaSCK = GenerateKey(16);
 
-                await _database.SaveChangesAsync();
+                await db.SaveChangesAsync();
                 IPAddress? miceIp;
                 if (!IPAddress.TryParse(_configuration.MiceHost, out miceIp))
                 {

@@ -49,6 +49,14 @@ namespace GiganticEmu.Agent
             process.StartInfo.ArgumentList.Add($"-port={port}");
             process.StartInfo.ArgumentList.Add($"-log=GiganticEmu.Agent.{port}.log");
             process.StartInfo.ArgumentList.Add($"-forcelogflush");
+
+
+            // process.StartInfo.ArgumentList.Add($"-forcelogflush");
+            // process.StartInfo.ArgumentList.Add($"RXRESERVATION=a_file");
+            // process.StartInfo.ArgumentList.Add($"MAPNAME={map}");
+            // process.StartInfo.ArgumentList.Add($"GAMESTATSURL=127.0.0.1:3000/some/fake/address");
+            // process.StartInfo.ArgumentList.Add($"TEAMINFOJSONSTR={{}}");
+            // process.StartInfo.ArgumentList.Add($"DATACENTERID=1");
             process.StartInfo.ArgumentList.Add($"-ini:RxGame:RxGame.RxPreGameLobbyGame_Base.ReservedMapName={map}");
 
             await File.WriteAllTextAsync(Path.Join(_binaryPath, "serverstart"), "");

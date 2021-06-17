@@ -1,0 +1,8 @@
+<Project>
+    <PropertyGroup>
+        <nullable>enable</nullable>
+        <NoWarn>1998;CS8524</NoWarn>
+        <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+</Project>

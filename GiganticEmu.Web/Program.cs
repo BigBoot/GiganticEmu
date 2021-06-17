@@ -4,6 +4,7 @@ using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace GiganticEmu.Web
 {
@@ -20,6 +21,9 @@ namespace GiganticEmu.Web
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(builder => builder.AddBackendAppConfiguration(args))
+                .ConfigureHostConfiguration(builder => builder.AddBackendHostConfiguration(args))
+                .AddBackendLogging()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     var hostConfig = new ConfigurationBuilder().AddBackendHostConfiguration(args).Build();

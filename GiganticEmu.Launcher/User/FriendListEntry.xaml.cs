@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Reactive.Linq;
 using System.Reactive;
+using GiganticEmu.Shared;
 
 namespace GiganticEmu.Launcher
 {
@@ -38,16 +39,29 @@ namespace GiganticEmu.Launcher
                 .DisposeWith(disposables);
 
                 this.OneWayBind(ViewModel,
-                    viewModel => viewModel.Friend.IsOnline,
+                    viewModel => viewModel.Friend.Status,
                     view => view.IconOnlineStatus.Foreground,
-                    value => new SolidColorBrush(value ? Colors.Green : Colors.DarkGray)
+                    value => new SolidColorBrush(value switch
+                    {
+                        UserStatus.InGame => Colors.Green,
+                        UserStatus.Online => Colors.Green,
+                        _ => Colors.DarkGray
+                    })
                 )
                 .DisposeWith(disposables);
 
                 this.OneWayBind(ViewModel,
-                    viewModel => viewModel.Friend.IsOnline,
+                    viewModel => viewModel.Friend.Status,
                     view => view.TextOnlineStatus.Text,
-                    value => value ? "Online" : "Offline"
+                    value => value switch
+                    {
+                        UserStatus.InMatch => "In a match",
+                        UserStatus.InQueue => "In matchmaking",
+                        UserStatus.InGame => "In Game",
+                        UserStatus.Online => "Online",
+                        UserStatus.Offline => "Offline",
+                        UserStatus.Unknown => "Unknown"
+                    }
                 )
                 .DisposeWith(disposables);
 
@@ -79,7 +93,14 @@ namespace GiganticEmu.Launcher
                 )
                 .DisposeWith(disposables);
 
-                Observable.FromEventPattern(ButtonFriendDelete, nameof(ButtonFriendAccept.Click))
+                this.OneWayBind(ViewModel,
+                    viewModel => viewModel.Friend.CanInvite,
+                    view => view.ButtonInviteGroup.Visibility,
+                    value => value ? Visibility.Visible : Visibility.Collapsed
+                )
+                .DisposeWith(disposables);
+
+                Observable.FromEventPattern(ButtonFriendDelete, nameof(ButtonFriendDelete.Click))
                     .Select(_ => Unit.Default)
                     .InvokeCommand(this, x => x.ViewModel!.RemoveFriend)
                     .DisposeWith(disposables);
@@ -89,9 +110,37 @@ namespace GiganticEmu.Launcher
                     .InvokeCommand(this, x => x.ViewModel!.AcceptRequest)
                     .DisposeWith(disposables);
 
-                Observable.FromEventPattern(ButtonFriendDeny, nameof(ButtonFriendAccept.Click))
+                Observable.FromEventPattern(ButtonFriendDeny, nameof(ButtonFriendDeny.Click))
                     .Select(_ => Unit.Default)
                     .InvokeCommand(this, x => x.ViewModel!.DenyRequest)
+                    .DisposeWith(disposables);
+
+                Observable.FromEventPattern(ButtonJoinGroup, nameof(ButtonJoinGroup.Click))
+                    .Select(_ => ViewModel!.AcceptInvite.Execute())
+                    .Concat()
+                    .SubscribeOn(RxApp.MainThreadScheduler)
+                    .Do(result =>
+                    {
+                        if (result.Errors.Count > 0)
+                        {
+                            MessageBox.Show(string.Join('\n', result.Errors), "Unable to accept invite.", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    })
+                    .Subscribe()
+                    .DisposeWith(disposables);
+
+                Observable.FromEventPattern(ButtonInviteGroup, nameof(ButtonInviteGroup.Click))
+                    .Select(_ => ViewModel!.InviteFriend.Execute())
+                    .Concat()
+                    .SubscribeOn(RxApp.MainThreadScheduler)
+                    .Do(result =>
+                    {
+                        if(result.Errors.Count > 0)
+                        {
+                            MessageBox.Show(string.Join('\n', result.Errors), "Unable to send invite.", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    })
+                    .Subscribe()
                     .DisposeWith(disposables);
             });
         }

@@ -14,7 +14,6 @@ using Microsoft.Extensions.Options;
 public class MiceClient
 {
     public event EventHandler? ConnectionClosed;
-    public ApplicationDatabase Database { get; init; }
     public ILogger<MiceClient> Logger { get; init; }
     public Guid UserId { get; private set; } = Guid.Empty;
     public int MotigaId { get; private set; } = 0;
@@ -30,13 +29,14 @@ public class MiceClient
     private Salsa _salsaOut = default!;
     private MiceCommandHandler _commandHandler;
     private BackendConfiguration _configuration;
+    private IDbContextFactory<ApplicationDatabase> _databaseFactory;
 
-    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler, IOptions<BackendConfiguration> configuration, ApplicationDatabase database)
+    public MiceClient(ILogger<MiceClient> logger, MiceCommandHandler commandHandler, IOptions<BackendConfiguration> configuration, IDbContextFactory<ApplicationDatabase> database)
     {
         Logger = logger;
         _commandHandler = commandHandler;
         _configuration = configuration.Value;
-        Database = database;
+        _databaseFactory = database;
     }
 
     public async Task Run(TcpClient tcp, CancellationToken cancellationToken = default)
@@ -46,19 +46,31 @@ public class MiceClient
 
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        Task receiving = ReceiveTask();
-        Task reading = ReadTask();
-
-        await Task.WhenAll(reading, receiving);
-        _tcp.Close();
-
-        var user = await Database.Users.SingleAsync(user => user.Id == UserId);
-        user.InQueue = false;
-        await Database.SaveChangesAsync();
-
-        if (ConnectionClosed is EventHandler handler)
+        try
         {
-            handler(this, new EventArgs());
+            Task receiving = ReceiveTask();
+            Task reading = ReadTask();
+            Task updateParty = UpdatePartyTask();
+
+            await Task.WhenAll(reading, receiving, updateParty);
+            _tcp.Close();
+        }
+        finally
+        {
+            using var db = _databaseFactory.CreateDbContext();
+
+            var user = await db.Users.SingleAsync(user => user.Id == UserId);
+            user.ClearSession();
+            db.GroupInvites.RemoveRange(await db.GroupInvites
+                .Where(invite => invite.UserId == user.Id || invite.InvitedUserId == user.Id)
+                .ToListAsync()
+            );
+            await db.SaveChangesAsync();
+
+            if (ConnectionClosed is EventHandler handler)
+            {
+                handler(this, new EventArgs());
+            }
         }
     }
 
@@ -164,6 +176,56 @@ public class MiceClient
         // Mark the PipeReader as complete
         _tcpStream.Dispose();
     }
+
+    private async Task UpdatePartyTask()
+    {
+        try
+        {
+            var lastSessionVersion = 0;
+            while (true)
+            {
+                if (_authenticated)
+                {
+                    using var db = _databaseFactory.CreateDbContext();
+
+                    var user = await db.Users.SingleAsync(user => user.Id == UserId);
+                    var sessionHost = await db.Users.SingleAsync(x => x.SessionId == user.SessionId && x.IsSessionHost);
+
+                    if (sessionHost.SessionVersion != lastSessionVersion)
+                    {
+                        lastSessionVersion = sessionHost.SessionVersion;
+
+                        var members = await db.Users
+                            .Where(x => x.SessionId == user.SessionId)
+                            .ToDictionaryAsync(x => x.MotigaId, x => new
+                            {
+                                username = x.UserName,
+                                member_settings = x.MemberSettings.FromJsonTo<dynamic>()
+                            });
+
+                        await SendMessage(new object[] { "party.stateupdated", new
+                        {
+                            data = new {
+                                changed_keys = new
+                                {
+                                    document_version = lastSessionVersion + 100,
+                                }
+                            }
+                        }});
+                    }
+
+
+                    //await SendMessage(new object[] { "lobby.notifyjoin", new object { } });
+                }
+                await Task.Delay(TimeSpan.FromMilliseconds(1000), _cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Client requested disconnected
+        }
+    }
+
     public async Task SendMessage(object response)
     {
         var json = response.ToJson();
@@ -253,6 +315,11 @@ public class MiceClient
         }
     }
 
+    public ApplicationDatabase CreateDbContext()
+    {
+        return _databaseFactory.CreateDbContext();
+    }
+
     private async Task Authenticate(byte[] data)
     {
         var content = new Salsa(_configuration.SalsaCK, 12).Decrypt(data);
@@ -269,7 +336,9 @@ public class MiceClient
             throw;
         }
 
-        var user = await Database.Users
+        using var database = CreateDbContext();
+
+        var user = await database.Users
             .Where(user => user.AuthToken == token)
             .FirstOrDefaultAsync();
 
@@ -292,13 +361,16 @@ public class MiceClient
                     name = user.UserName,
                     deviceid = "noString",
                     gameid = "ggc",
-                    version = "298288",
+                    version = "301530",
                     xmpp = new
                     {
                         host = "127.0.0.1",
                     },
                 },
             });
+
+            user.ClearSession();
+            await database.SaveChangesAsync();
 
             _authenticated = true;
 

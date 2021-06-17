@@ -13,5 +13,23 @@ namespace GiganticEmu.Shared.Backend
         public User User { get; set; } = default!;
 
         public User FriendUser { get; set; } = default!;
+
+        public UserStatus Status
+        {
+            get => true switch
+            {
+                _ when Accepted => true switch
+                {
+                    _ when FriendUser.LastOnline.AddMinutes(5) >= DateTimeOffset.UtcNow => true switch
+                    {
+                        _ when FriendUser.InQueue => UserStatus.InQueue,
+                        _ when FriendUser.SessionId != null => UserStatus.InGame,
+                        _ => UserStatus.Online,
+                    },
+                    _ => UserStatus.Offline
+                },
+                _ => UserStatus.Unknown
+            };
+        }
     }
 }

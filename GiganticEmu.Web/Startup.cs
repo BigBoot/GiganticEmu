@@ -25,10 +25,7 @@ namespace GiganticEmu.Web
         {
             services.Configure<BackendConfiguration>(Configuration.GetSection(BackendConfiguration.GiganticEmu));
 
-            services.AddApplicationDatabase(c =>
-            {
-                c.ConnectionString = Configuration.GetConnectionString(name: "postgres");
-            });
+            services.AddApplicationDatabase();
 
             services.AddIdentity<User, IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<ApplicationDatabase>()

@@ -5,8 +5,10 @@ services:
     env:
       - name: GiganticEmu__SalsaCK
         value: cccccccccccccccc
+      - name: GiganticEmu__NumPlayers
+        value: "1"
       - name: GiganticEmu__Agents__0__Host
-        value: http://localhost:8081
+        value: http://localhost:8001
       - name: GiganticEmu__Agents__0__Region
         value: EU
       - name: GiganticEmu__Agents__0__ApiKey

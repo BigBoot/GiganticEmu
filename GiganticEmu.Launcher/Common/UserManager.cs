@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GiganticEmu.Launcher
 {
-    class UserManager
+    public class UserManager
     {
         public record LoginResult(UserData? User, ICollection<string> Errors);
         public record FriendsResult(ICollection<FriendData>? Friends, ICollection<string> Errors);
@@ -33,18 +33,20 @@ namespace GiganticEmu.Launcher
                     {
                         UserName = friend.UserName,
                         IconHash = friend.IconHash,
-                        IsOnline = friend.IsOnline,
+                        Status = friend.Status,
                         HasAccepted = friend.Accepted,
-                        CanJoin = false,
                         CanAccept = false,
+                        CanInvite = friend.CanInvite && !friend.CanJoin,
+                        CanJoin = friend.CanJoin
                     }).Concat(result.FriendRequests.Select(request => new FriendData()
                     {
                         UserName = request.UserName,
                         IconHash = request.IconHash,
                         CanAccept = true,
-                        IsOnline = false,
                         HasAccepted = false,
                         CanJoin = false,
+                        CanInvite = false,
+                        Status = UserStatus.Unknown,
                     })).ToList(), new List<string>());
                 }
                 else
@@ -82,7 +84,7 @@ namespace GiganticEmu.Launcher
         {
             try
             {
-                var result = await _api.SendFriendRequest(new FriendsInvitePostRequest { UserName = userName });
+                var result = await _api.SendFriendRequest(new FriendsRequestPostRequest { UserName = userName });
                 if (result.Code == RequestResult.Success)
                 {
                     return new GeneralResult(new List<string>());
@@ -102,7 +104,7 @@ namespace GiganticEmu.Launcher
         {
             try
             {
-                var result = await _api.SendFriendRequest(new FriendsInvitePostRequest { UserName = userName });
+                var result = await _api.SendInvite(new FriendsInvitePostRequest { UserName = userName });
                 if (result.Code == RequestResult.Success)
                 {
                     return new GeneralResult(new List<string>());

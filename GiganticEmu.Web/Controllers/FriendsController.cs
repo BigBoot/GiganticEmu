@@ -16,19 +16,21 @@ namespace Web.Controllers
     public class FriendsController : ControllerBase
     {
         private readonly ILogger<FriendsController> _logger;
-        private readonly ApplicationDatabase _database;
+        private readonly IDbContextFactory<ApplicationDatabase> _databaseFactory;
 
-        public FriendsController(ILogger<FriendsController> logger, ApplicationDatabase database)
+        public FriendsController(ILogger<FriendsController> logger, IDbContextFactory<ApplicationDatabase> databaseFactory)
         {
             _logger = logger;
-            _database = database;
+            _databaseFactory = databaseFactory;
         }
 
         [HttpGet]
         [Produces("application/json")]
         public async Task<IActionResult> Get([FromHeader(Name = "X-API-KEY")] string token)
         {
-            var user = await _database.Users
+            var db = _databaseFactory.CreateDbContext();
+
+            var user = await db.Users
                 .Where(user => user.AuthToken == token)
                 .SingleOrDefaultAsync();
 
@@ -37,36 +39,48 @@ namespace Web.Controllers
                 return Ok(new FriendsGetResponse(RequestResult.Unauthorized));
             }
 
-            var friends = await _database.Friends
-                .Where(friend => friend.UserId == user.Id)
-                .Select(friend => new FriendsGetResponse.FriendData(
-                    friend.FriendUser.UserName,
-                    friend.Accepted,
-                    friend.Accepted && friend.FriendUser.LastOnline.AddMinutes(5) >= DateTimeOffset.UtcNow,
-                    CreateIconHash(friend.FriendUser.Email)
-                ))
-                .ToListAsync();
-
-            var friendRequests = await _database.Friends
+            var friendRequests = await db.Friends
                 .Where(friend => friend.FriendUserId == user.Id && friend.Accepted == false)
                 .Select(friend => new FriendsGetResponse.FriendRequestData(friend.User.UserName, CreateIconHash(friend.User.Email)))
                 .ToListAsync();
 
+            var invites = await db.GroupInvites
+                .Where(invite => invite.InvitedUserId == user.Id)
+                .Select(invite => invite.User.UserName)
+                .ToListAsync();
+
+            var canInvite = user.SessionId != null && !user.InQueue;
+            var friends = await db.Friends
+                .Where(friend => friend.UserId == user.Id)
+                .Include(friend => friend.FriendUser)
+                .Select(friend => new FriendsGetResponse.FriendData(
+                    friend.FriendUser.UserName,
+                    friend.Accepted,
+                    friend.Status,
+                    CreateIconHash(friend.FriendUser.Email),
+                    canInvite,
+                    invites.Contains(friend.FriendUser.UserName)
+                ))
+                .ToListAsync();
+
+
             user.LastOnline = DateTimeOffset.UtcNow;
-            await _database.SaveChangesAsync();
+            await db.SaveChangesAsync();
 
             return Ok(new FriendsGetResponse(RequestResult.Success)
             {
                 Friends = friends,
-                FriendRequests = friendRequests
+                FriendRequests = friendRequests,
             });
         }
 
-        [HttpPost("invite")]
+        [HttpPost("request")]
         [Produces("application/json")]
-        public async Task<IActionResult> PostInvite(FriendsInvitePostRequest request, [FromHeader(Name = "X-API-KEY")] string token)
+        public async Task<IActionResult> PostRequest(FriendsInvitePostRequest request, [FromHeader(Name = "X-API-KEY")] string token)
         {
-            var user = await _database.Users
+            var db = _databaseFactory.CreateDbContext();
+
+            var user = await db.Users
                           .Where(user => user.AuthToken == token)
                           .SingleOrDefaultAsync();
 
@@ -75,7 +89,7 @@ namespace Web.Controllers
                 return Ok(new FriendsInvitePostResponse(RequestResult.Unauthorized));
             }
 
-            var friend = await _database.Users
+            var friend = await db.Users
                           .Where(user => user.UserName == request.UserName)
                           .SingleOrDefaultAsync();
 
@@ -85,13 +99,13 @@ namespace Web.Controllers
             }
 
             bool Accepted = false;
-            if (await _database.Friends.Where(e => e.FriendUserId == user.Id && e.UserId == friend.Id).FirstOrDefaultAsync() is Friend existing)
+            if (await db.Friends.Where(e => e.FriendUserId == user.Id && e.UserId == friend.Id).FirstOrDefaultAsync() is Friend existing)
             {
                 Accepted = true;
                 existing.Accepted = true;
             }
 
-            if (!await _database.Friends.Where(e => e.UserId == user.Id && e.FriendUserId == friend.Id).AnyAsync())
+            if (!await db.Friends.Where(e => e.UserId == user.Id && e.FriendUserId == friend.Id).AnyAsync())
             {
                 var invite = new Friend()
                 {
@@ -100,8 +114,71 @@ namespace Web.Controllers
                     Accepted = Accepted,
                 };
 
-                await _database.Friends.AddAsync(invite);
-                await _database.SaveChangesAsync();
+                await db.Friends.AddAsync(invite);
+                await db.SaveChangesAsync();
+            }
+
+            return Ok(new FriendsInvitePostResponse(RequestResult.Success));
+        }
+
+        [HttpPost("invite")]
+        [Produces("application/json")]
+        public async Task<IActionResult> PostInvite(FriendsInvitePostRequest request, [FromHeader(Name = "X-API-KEY")] string token)
+        {
+            var db = _databaseFactory.CreateDbContext();
+
+            var user = await db.Users
+                          .Where(user => user.AuthToken == token)
+                          .SingleOrDefaultAsync();
+
+            if (user == null)
+            {
+                return Ok(new FriendsInvitePostResponse(RequestResult.Unauthorized));
+            }
+
+            var invited = await db.Users
+                          .Where(user => user.UserName == request.UserName)
+                          .SingleOrDefaultAsync();
+
+            if (invited == null || invited.Id == user.Id)
+            {
+                return Ok(new FriendsInvitePostResponse(RequestResult.InvalidUser));
+            }
+
+            if (await db.GroupInvites.Where(e => e.InvitedUserId == user.Id && e.UserId == invited.Id).FirstOrDefaultAsync() is GroupInvite existing)
+            {
+                var session = invited.SessionId;
+
+                db.Remove(existing);
+                await db.SaveChangesAsync();
+
+                if (session == null || invited.InQueue)
+                {
+                    return Ok(new FriendsInvitePostResponse(RequestResult.SessionInvalid));
+                }
+
+                if (await db.Users.Where(user => user.SessionId == session).CountAsync() >= 5)
+                {
+                    return Ok(new FriendsInvitePostResponse(RequestResult.SessionFull));
+                }
+
+                user.ClearSession(false);
+                user.SessionId = session;
+
+                invited.SessionVersion++;
+
+                await db.SaveChangesAsync();
+            }
+            else if (!await db.GroupInvites.Where(e => e.UserId == user.Id && e.InvitedUserId == invited.Id).AnyAsync())
+            {
+                var invite = new GroupInvite()
+                {
+                    UserId = user.Id,
+                    InvitedUserId = invited.Id,
+                };
+
+                await db.GroupInvites.AddAsync(invite);
+                await db.SaveChangesAsync();
             }
 
             return Ok(new FriendsInvitePostResponse(RequestResult.Success));
@@ -112,7 +189,9 @@ namespace Web.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Delete(FriendsDeleteRequest request, [FromHeader(Name = "X-API-KEY")] string token)
         {
-            var user = await _database.Users
+            var db = _databaseFactory.CreateDbContext();
+
+            var user = await db.Users
                           .Where(user => user.AuthToken == token)
                           .SingleOrDefaultAsync();
 
@@ -121,7 +200,7 @@ namespace Web.Controllers
                 return Ok(new FriendsDeleteResponse(RequestResult.Unauthorized));
             }
 
-            var friend = await _database.Users
+            var friend = await db.Users
                           .Where(user => user.UserName == request.UserName)
                           .SingleOrDefaultAsync();
 
@@ -130,16 +209,16 @@ namespace Web.Controllers
                 return Ok(new FriendsDeleteResponse(RequestResult.InvalidUser));
             }
 
-            var friends = await _database.Friends
+            var friends = await db.Friends
                 .Where(e => (e.FriendUserId == user.Id && e.UserId == friend.Id) || (e.FriendUserId == friend.Id && e.UserId == user.Id))
                 .ToListAsync();
 
             foreach (var f in friends)
             {
-                _database.Friends.Remove(f);
+                db.Friends.Remove(f);
             }
 
-            await _database.SaveChangesAsync();
+            await db.SaveChangesAsync();
 
             return Ok(new FriendsDeleteResponse(RequestResult.Success));
         }

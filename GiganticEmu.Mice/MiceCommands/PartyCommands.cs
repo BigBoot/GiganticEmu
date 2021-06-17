@@ -10,11 +10,13 @@ public static class PartyCommands
     [MiceCommand("party.create")]
     public static async Task<object> Create(dynamic payload, MiceClient client)
     {
+        using var db = client.CreateDbContext();
+
         var session_settings = payload.session_settings;
         var session_configuration = payload.configuration;
         var member_settings = payload.member_settings;
 
-        var user = await client.Database.Users.SingleAsync(user => user.Id == client.UserId);
+        var user = await db.Users.SingleAsync(user => user.Id == client.UserId);
 
         user.SessionId = Guid.NewGuid();
         user.IsSessionHost = true;
@@ -23,7 +25,7 @@ public static class PartyCommands
         user.SessionSettings = ((object)session_settings).ToJson();
         user.MemberSettings = ((object)member_settings).ToJson();
 
-        await client.Database.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         return new
         {
@@ -36,9 +38,9 @@ public static class PartyCommands
                 session_settings = session_settings,
                 configuration = session_configuration,
                 members = new Dictionary<int, object>()
-            {
-                {user.MotigaId, new {username = user.UserName, member_settings = payload.member_settings} },
-            }
+                {
+                    {user.MotigaId, new {username = user.UserName, member_settings = payload.member_settings} },
+                }
             }
         };
     }
@@ -46,8 +48,10 @@ public static class PartyCommands
     [MiceCommand("party.update")]
     public static async Task<object> Update(dynamic payload, MiceClient client)
     {
-        var user = await client.Database.Users.SingleAsync(user => user.Id == client.UserId);
-        var sessionHost = await client.Database.Users.SingleAsync(x => x.SessionId == user.SessionId && x.IsSessionHost);
+        using var db = client.CreateDbContext();
+
+        var user = await db.Users.SingleAsync(user => user.Id == client.UserId);
+        var sessionHost = await db.Users.SingleAsync(x => x.SessionId == user.SessionId && x.IsSessionHost);
 
         if (DynamicJsonConverter.GetProperty<dynamic>(() => payload.session_settings) is object session_settings)
         {
@@ -62,14 +66,16 @@ public static class PartyCommands
             user.MemberSettings = ((object)member_settings).ToJson();
         }
 
-        var sessionVersion = sessionHost.SessionVersion++;
-        var members = await client.Database.Users
+        var sessionVersion = ++sessionHost.SessionVersion;
+        var members = await db.Users
             .Where(x => x.SessionId == user.SessionId)
             .ToDictionaryAsync(x => x.MotigaId, x => new
             {
                 username = x.UserName,
                 member_settings = x.MemberSettings.FromJsonTo<dynamic>()
             });
+
+        await db.SaveChangesAsync();
 
         return new
         {
@@ -78,6 +84,39 @@ public static class PartyCommands
             {
                 host = sessionHost.MotigaId.ToString(),
                 document_version = sessionVersion,
+                join_state = sessionHost.JoinState,
+                session_settings = sessionHost.SessionSettings.FromJsonTo<dynamic>(),
+                configuration = sessionHost.SessionConfiguration.FromJsonTo<dynamic>(),
+                members = members
+            }
+        };
+    }
+
+    [MiceCommand("party.get")]
+    public static async Task<object> Get(dynamic payload, MiceClient client)
+    {
+        using var db = client.CreateDbContext();
+
+        var user = await db.Users.SingleAsync(user => user.Id == client.UserId);
+        var sessionHost = await db.Users.SingleAsync(x => x.SessionId == user.SessionId && x.IsSessionHost);
+
+        var members = await db.Users
+            .Where(x => x.SessionId == user.SessionId)
+            .ToDictionaryAsync(x => x.MotigaId, x => new
+            {
+                username = x.UserName,
+                member_settings = x.MemberSettings.FromJsonTo<dynamic>()
+            });
+
+        await db.SaveChangesAsync();
+
+        return new
+        {
+            session_id = sessionHost.SessionId.ToString(),
+            session = new
+            {
+                host = sessionHost.MotigaId.ToString(),
+                document_version = sessionHost.SessionVersion,
                 join_state = sessionHost.JoinState,
                 session_settings = sessionHost.SessionSettings.FromJsonTo<dynamic>(),
                 configuration = sessionHost.SessionConfiguration.FromJsonTo<dynamic>(),

@@ -29,7 +29,7 @@ public class MiceServer : BackgroundService
         var listener = new TcpListener(IPAddress.Parse(_configuration.BindInterface), _configuration.MicePort);
         listener.Start();
 
-        _logger.LogInformation("MICE Server listening on localhost:{_configuration.MicePort}", _configuration.MicePort);
+        _logger.LogInformation("MICE Server listening on localhost:{Port}", _configuration.MicePort);
 
         try
         {

@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
 
 namespace GiganticEmu.Shared.Backend
 {
@@ -38,6 +41,7 @@ namespace GiganticEmu.Shared.Backend
 
             return config;
         }
+
         public static IConfigurationBuilder AddBackendAppConfiguration(this IConfigurationBuilder config, string[] args)
         {
             config.AddJsonFile("appsettings.json", optional: true);
@@ -45,6 +49,19 @@ namespace GiganticEmu.Shared.Backend
             config.AddCommandLine(args);
 
             return config;
+        }
+        public static IHostBuilder AddBackendLogging(this IHostBuilder config)
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {Message:lj}{NewLine}{Exception}")
+                //.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
+                .CreateLogger();
+
+            return config.UseSerilog();
         }
     }
 }

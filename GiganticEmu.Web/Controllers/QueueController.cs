@@ -14,14 +14,14 @@ namespace Web.Controllers
     public class QueueController : ControllerBase
     {
         private readonly ILogger<QueueController> _logger;
-        private readonly ApplicationDatabase _database;
+        private readonly IDbContextFactory<ApplicationDatabase> _databaseFactory;
         private readonly BackendConfiguration _configuration;
 
 
-        public QueueController(ILogger<QueueController> logger, ApplicationDatabase database, IOptions<BackendConfiguration> configuration)
+        public QueueController(ILogger<QueueController> logger, IDbContextFactory<ApplicationDatabase> databaseFactory, IOptions<BackendConfiguration> configuration)
         {
             _logger = logger;
-            _database = database;
+            _databaseFactory = databaseFactory;
             _configuration = configuration.Value;
         }
 
@@ -31,7 +31,9 @@ namespace Web.Controllers
         {
             if (_configuration.ApiKey != null && token == _configuration.ApiKey)
             {
-                var players = await _database.Users
+                var db = _databaseFactory.CreateDbContext();
+
+                var players = await db.Users
                     .Where(user => user.InQueue == true)
                     .Select(user => user.UserName)
                     .ToListAsync();

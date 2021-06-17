@@ -34,6 +34,12 @@ namespace GiganticEmu.Shared
 
         [Description("unknown username")]
         UnknownUser,
+
+        [Description("the party is already full")]
+        SessionFull,
+
+        [Description("the invite is invalid")]
+        SessionInvalid,
     }
 
     public static class RequestResultExtensions

@@ -2,10 +2,8 @@
 using Fetchgoods.Text.Json.Extensions;
 using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace GiganticEmu.Mice
 {
@@ -26,18 +24,11 @@ namespace GiganticEmu.Mice
             .ConfigureServices((hostContext, services) =>
             {
                 services.Configure<BackendConfiguration>(hostContext.Configuration.GetSection(BackendConfiguration.GiganticEmu));
-                services.AddApplicationDatabase(c =>
-                {
-                    c.ConnectionString = hostContext.Configuration.GetConnectionString(name: "postgres");
-                });
+                services.AddApplicationDatabase();
 
                 services.AddMice();
             })
-            .ConfigureLogging((hostContext, configLogging) =>
-            {
-                configLogging.AddConsole();
-                configLogging.AddDebug();
-            })
+            .AddBackendLogging()
             .UseConsoleLifetime();
     }
 }

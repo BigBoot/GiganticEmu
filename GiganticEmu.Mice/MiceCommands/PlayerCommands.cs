@@ -15,12 +15,14 @@ public static class PlayerCommands
     [MiceCommand("player.setinfo")]
     public static async Task<object?> SetInfo(dynamic payload, MiceClient client)
     {
-        var user = await client.Database.Users.SingleAsync(user => user.Id == client.UserId);
+        using var db = client.CreateDbContext();
+
+        var user = await db.Users.SingleAsync(user => user.Id == client.UserId);
 
         user.ProfileSettings = ((object)payload.profilesettings).ToJson();
         user.SavedLoadouts = ((object)payload.savedLoadouts).ToJson();
 
-        await client.Database.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         return null;
     }
@@ -28,7 +30,9 @@ public static class PlayerCommands
     [MiceCommand("player.getinfo")]
     public static async Task<object?> GetInfo(dynamic payload, MiceClient client)
     {
-        var user = await client.Database.Users.SingleAsync(user => user.Id == client.UserId);
+        using var db = client.CreateDbContext();
+
+        var user = await db.Users.SingleAsync(user => user.Id == client.UserId);
 
         return new
         {
@@ -52,7 +56,9 @@ public static class PlayerCommands
     [MiceCommand("player.progressionget")]
     public static async Task<object> ProgressionGet(dynamic payload, MiceClient client)
     {
-        var user = await client.Database.Users.SingleAsync(user => user.Id == client.UserId);
+        using var db = client.CreateDbContext();
+
+        var user = await db.Users.SingleAsync(user => user.Id == client.UserId);
 
         return new
         {

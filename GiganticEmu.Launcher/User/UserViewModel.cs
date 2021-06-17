@@ -38,9 +38,12 @@ namespace GiganticEmu.Launcher
 
         private async Task DoStartGame()
         {
-            if (!File.Exists("Binaries/Win64/RxGame-Win64-Test.exe"))
+            var config = Locator.Current.GetService<LauncherConfiguration>()!;
+            var path = Path.GetFullPath(Path.Join(config.Game, "Binaries", "Win64"));
+
+            if (!File.Exists(Path.Join(path, "RxGame-Win64-Test.exe")))
             {
-                MessageBox.Show("Binaries/Win64/RxGame-Win64-Test.exe not found!", "File not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{Path.Join(path, "RxGame-Win64-Test.exe")} not found!", "File not found!", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -51,8 +54,8 @@ namespace GiganticEmu.Launcher
                 auth_token = User?.AuthToken
             });
 
-            await File.WriteAllTextAsync("Binaries/Win64/userinfo", userinfo);
-            Process.Start("Binaries/Win64/RxGame-Win64-Test.exe", $"-ini:RxEngine:MotigaAuthIntegration.AuthUrlPrefix={App.HOST}/,ArcIntegration.AuthUrlPrefix={App.HOST}/");
+            await File.WriteAllTextAsync(Path.Join(path, "userinfo"), userinfo);
+            Process.Start(Path.Join(path, "RxGame-Win64-Test.exe"), $"-ini:RxEngine:MotigaAuthIntegration.AuthUrlPrefix={config.Host}/,ArcIntegration.AuthUrlPrefix={config.Host}/ -log=GiganticEmu.Launcher.{User!.UserName}.log");
         }
     }
 }

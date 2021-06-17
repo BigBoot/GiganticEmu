@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
@@ -39,5 +38,20 @@ namespace GiganticEmu.Shared.Backend
         public string? SalsaSCK { get; set; } = null;
 
         public bool InQueue { get; set; } = false;
+
+        public void ClearSession(bool clearMemberSettings = true)
+        {
+            InQueue = false;
+            SessionId = null;
+            SessionVersion = 0;
+            SessionConfiguration = "{}";
+            SessionSettings = "{}";
+            JoinState = "open";
+            IsSessionHost = false;
+            if (clearMemberSettings)
+            {
+                MemberSettings = "{}";
+            }
+        }
     }
 }
