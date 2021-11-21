@@ -1,0 +1,65 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<p>
+<h1>Available instances: @Model.AvailableInstances/@Model.MaxInstances</h1>
+</p>
+<p>
+<h2>Instructions</h2>
+Just configure your server using the settings below, then press the "Start server" button and a new server instance will
+be setup for you.<br>
+After the server is started you will be redirected to a page showing you how to connect to your instance.
+</p>
+
+<form asp-page-handler="view" method="post">
+    <div class="form-row">
+        <div class="form-group col-md-8">
+            <label for="selectMap">Select map:</label>
+            <select class="form-control selectpicker" id="selectMap" name="map" size="1">
+                @foreach (var map in @Model.Maps)
+                {
+                    <option value="@map.Id">@map.Name</option>
+                }
+            </select>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="maxPlayers">Select maximum number of players:</label>
+            <input class="form-control" id="maxPlayers" type="number" name="maxPlayers" min="2" max="20" value="20">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Select creature loadout:</label>
+        <div class="form-row">
+            @for (int i = 0; i < 3; i++)
+            {
+                <select class="form-control selectpicker col-md-4" autocomplete="off" name="creature@(i)" size="1">
+                    @foreach (var creature in @Model.Creatures)
+                    {
+                        var selected = @Model.DefaultCreatures[i] == creature.Id;
+                        <option value="@creature.Id" selected="@selected">@creature.Name</option>
+                    }
+                </select>
+            }
+
+        </div>
+    </div>
+
+    <div class="form-row">
+        @if (@Model.Instance != null)
+        {
+            <span class="green">Instance started, to connect please use: open @Model.Instance</span>
+        }
+        else if (@Model.RunningInstances < @Model.MaxInstances)
+        {
+            <input class="btn btn-primary" type="submit" value="Start server">
+        }
+        else
+        {
+            <input disabled="" class="btn btn-primary" type="submit" value="Start server">
+            <span class="red">No instance available, please try again later.</span>
+        }
+</form>

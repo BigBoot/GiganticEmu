@@ -5,3 +5,5 @@ dist/
 app.db
 config.json
 *.csproj.user
+.tye
+.vs

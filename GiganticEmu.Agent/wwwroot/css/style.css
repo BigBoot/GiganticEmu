@@ -1,0 +1,30 @@
+.login-page .page-header {
+    max-height: unset;
+    height: unset;
+    background-image: url('../img/bg.jpg'); 
+    background-size: cover;
+    background-position: top center;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+.login-page .page-header>.container {
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+}
+
+ul {
+    list-style: none;
+}
+
+.red {
+    margin-left: 0.5em;
+    align-self: center;
+    color: red;
+}
+
+.green {
+    margin-left: 0.5em;
+    align-self: center;
+    color: green;
+}

@@ -1,8 +1,10 @@
+using System.Linq;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
@@ -28,6 +30,9 @@ namespace GiganticEmu.Agent
                 {
                     c.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
+
+            services.AddRazorPages();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
@@ -49,7 +54,16 @@ namespace GiganticEmu.Agent
                 // app.UseHsts();
             }
 
-            app.UseStaticFiles();
+            var assembly = typeof(Startup).Assembly;
+            var files = assembly.GetManifestResourceNames()
+                .Select(x => assembly.GetManifestResourceInfo(x))
+                .ToArray();
+
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new ManifestEmbeddedFileProvider(assembly, "wwwroot")
+            });
 
             app.UseRouting();
 
@@ -59,6 +73,7 @@ namespace GiganticEmu.Agent
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
         }
     }

@@ -8,8 +8,10 @@ namespace GiganticEmu.Agent
         public string BindInterface { get; set; } = "0.0.0.0";
         public string? GiganticPath { get; set; }
         public int MaxInstances { get; set; } = 1;
+        public string ServerHost { get; set; } = "127.0.0.1";
         public int ServerPort { get; set; } = 7777;
         public int WebPort { get; set; } = 8080;
+        public string[] DefaultCreatures { get; set; } = new string[] { "bloomer", "cerb", "cyclops" };
 
         #region GCP config.json compatibility
         private string api_key
@@ -36,6 +38,16 @@ namespace GiganticEmu.Agent
         {
             get => default;
             set => ServerPort = value;
+        }
+        private string server_url
+        {
+            get => default!;
+            set => ServerHost = value;
+        }
+        private string[] default_creatures
+        {
+            get => default!;
+            set => DefaultCreatures = value;
         }
         #endregion
     }
