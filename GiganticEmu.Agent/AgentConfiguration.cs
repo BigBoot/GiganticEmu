@@ -8,46 +8,52 @@ namespace GiganticEmu.Agent
         public string BindInterface { get; set; } = "0.0.0.0";
         public string? GiganticPath { get; set; }
         public int MaxInstances { get; set; } = 1;
+        public string Title { get; set; } = "Gigantic Control Panel";
         public string ServerHost { get; set; } = "127.0.0.1";
         public int ServerPort { get; set; } = 7777;
         public int WebPort { get; set; } = 8080;
         public string[] DefaultCreatures { get; set; } = new string[] { "bloomer", "cerb", "cyclops" };
 
         #region GCP config.json compatibility
-        private string api_key
+        private string? api_key
         {
             get => default!;
-            set => ApiKey = value;
+            set { if (value != null) ApiKey = value; }
         }
         private string? gigantic_path
         {
             get => default;
-            set => GiganticPath = value;
+            set { if (value != null) GiganticPath = value; }
         }
-        private int http_port
+        private int? http_port
         {
             get => default;
-            set => WebPort = value;
+            set { if (value.HasValue) WebPort = value.Value; }
         }
-        private int max_instances
+        private int? max_instances
         {
             get => default;
-            set => MaxInstances = value;
+            set { if (value.HasValue) MaxInstances = value.Value; }
         }
-        private int server_port
+        private int? server_port
         {
             get => default;
-            set => ServerPort = value;
+            set { if (value.HasValue) ServerPort = value.Value; }
         }
-        private string server_url
+        private string? title
         {
             get => default!;
-            set => ServerHost = value;
+            set { if (value != null) Title = value; }
         }
-        private string[] default_creatures
+        private string? server_url
         {
             get => default!;
-            set => DefaultCreatures = value;
+            set { if (value != null) ServerHost = value; }
+        }
+        private string[]? default_creatures
+        {
+            get => default!;
+            set { if (value != null) DefaultCreatures = value; }
         }
         #endregion
     }

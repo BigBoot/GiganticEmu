@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using GiganticEmu.Shared;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,6 +13,7 @@ namespace GiganticEmu.Agent.Pages
         private readonly AgentConfiguration _configuration;
         private readonly ServerManager _serverManager;
 
+        public string Title { get => _configuration.Title; }
         public int MaxInstances { get => _configuration.MaxInstances; }
         public int RunningInstances { get => _serverManager.RunningInstances; }
         public int AvailableInstances { get => MaxInstances - RunningInstances; }
