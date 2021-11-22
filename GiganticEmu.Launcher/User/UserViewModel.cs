@@ -68,7 +68,7 @@ namespace GiganticEmu.Launcher
                     var result = MessageBox.Show("Mismatched ArcSDK.dll version detected. The version of MistforgeLauncher and ArcSDK.dll should match or problems can occur.\n\nShould MistforgeLauncher replace your ArcSDK.dll with the correct version?", "Mismatched ArcSDK.dll version!", MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result == MessageBoxResult.Yes)
                     {
-                        await github.DownloadFile(Version.ApplicationVersion, "ArcSDK.dll", Path.Join(path, "ArcSDK.dll"));
+                        await github.DownloadFile(Version.ApplicationVersion, "ArcSDK.dll", path);
                     }
                 }
             }
