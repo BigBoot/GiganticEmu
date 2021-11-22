@@ -131,7 +131,7 @@ namespace GiganticEmu.Launcher
                 }
                 else
                 {
-                    return new LoginResult(null, new List<string> { result.Message });
+                    return new LoginResult(null, result.Errors?.Select(err => $"{err.Message} [{err.Code}]").ToList() ?? new List<string> { result.Message });
                 }
             }
             catch (Exception ex)

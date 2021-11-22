@@ -20,14 +20,14 @@
 #include <regex>
 #include <locale>
 #include <codecvt>
-
-#include "json.hpp"
+#include <shellapi.h>
 
 PROCESS_INFORMATION pi;
 
 std::wstring nickname;
 std::wstring username;
 std::wstring auth_token;
+int64_t launch_code;
 
 void ArcPanic(const char *message)
 {
@@ -48,8 +48,52 @@ void ArcWriteString(const std::wstring &string, wchar_t *buffer, size_t buffer_s
     buffer[num_chars] = 0; // null terminate it
 }
 
+void Init()
+{
+    LPWSTR *szArglist;
+    int nArgs;
+    int i;
+
+    szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+    if (NULL == szArglist)
+    {
+        ArcPanic("CommandLineToArgvW failed\n");
+        return;
+    }
+    else
+    {
+        for (i = 0; i < nArgs; i++)
+        {
+            if (wcsncmp(szArglist[i], L"-emu:nickname=", wcslen(L"-emu:nickname=")) == 0)
+            {
+                nickname = std::wstring(szArglist[i] + wcslen(L"-emu:nickname="));
+            }
+            if (wcsncmp(szArglist[i], L"-emu:username=", wcslen(L"-emu:username=")) == 0)
+            {
+                username = std::wstring(szArglist[i] + wcslen(L"-emu:username="));
+            }
+            if (wcsncmp(szArglist[i], L"-emu:auth_token=", wcslen(L"-emu:auth_token=")) == 0)
+            {
+                auth_token = std::wstring(szArglist[i] + wcslen(L"-emu:auth_token="));
+            }
+            if (wcsncmp(szArglist[i], L"-emu:launch_code=", wcslen(L"-emu:launch_code=")) == 0)
+            {
+                launch_code = std::stoi(std::wstring(szArglist[i] + wcslen(L"-emu:launch_code=")));
+            }
+        }
+    }
+
+    LocalFree(szArglist);
+}
+
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserved)
 {
+    switch (reason)
+    {
+    case DLL_PROCESS_ATTACH:
+        Init();
+        break;
+    }
     return TRUE;
 }
 
@@ -128,29 +172,6 @@ EXTERN_DLL_EXPORT int64_t CC_GotoUrlInOverlay(int64_t arg1, const wchar_t *arg2)
 
 EXTERN_DLL_EXPORT wchar_t *CC_Init(int64_t arg1, int64_t arg2, uint32_t *arg3)
 {
-    if (std::filesystem::exists("userinfo"))
-    {
-        std::ifstream in("userinfo");
-        auto json = std::string((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-        in.close();
-
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        auto userinfo = nlohmann::json::parse(json);
-        nickname = converter.from_bytes(userinfo["nickname"]);
-        username = converter.from_bytes(userinfo["username"]);
-        auth_token = converter.from_bytes(userinfo["auth_token"]);
-
-        std::filesystem::remove("userinfo");
-    }
-    else if (std::filesystem::exists("serverstart"))
-    {
-        std::filesystem::remove("serverstart");
-    }
-    else
-    {
-        ArcPanic("Please launch the game using the Mistforge Launcher");
-    }
-
     // Never figured out what this was for, string remains the same for release build
     return L"This is our secret, probably encrypted, internal state..";
 }
@@ -177,7 +198,7 @@ EXTERN_DLL_EXPORT int64_t CC_LaunchClient(const wchar_t *arg1, int arg2, int64_t
     For some reason, the "Gigantic-Core_de" build returns 0 instead
     return 0;
     */
-    return 0xE0000019;
+    return launch_code;
 }
 
 /*

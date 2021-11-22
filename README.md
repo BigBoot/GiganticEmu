@@ -3,51 +3,45 @@
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BigBoot/GiganticEmu)
 ![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/BigBoot/GiganticEmu?include_prereleases&label=pre-release)
 
-# GiganticEmu
+# GiganticEmu 
+A backend emulator for the game Gigantic by Motiga.
 
-![Emu](https://repository-images.githubusercontent.com/373163363/488c5b80-c7b8-11eb-9a78-306e77d8ccf4)
-
-Basically this is a hacked together Emulator for the Gigantic Backend Server.
-By using this emulator you will be able to press the Start button on the Login screen.
-It will also allow you to set your username and allow you to save your settings.
+![Logo](GiganticEmu.Agent/icon.svg)
 
 
+## GiganticEmu.Launcher (Mistforge Launcher)
+A WPF based launcher application for connecting to the emulated backend.
+
+![GiganticEmu.Launcher](GiganticEmu.Launcher/screenshot.png)
+
+## GiganticEmu.Agent
+Provides a WebInterface and a REST api for hosting private Servers.
+![GiganticEmu.Agent](GiganticEmu.Agent/screenshot.png)
+
+## GiganticEmu.Web
+Provides a Rest API for user account creation/login.
+As well as some methods required for authenticating the game clients.
+
+## GiganticEmu.Mice
+Implements the TCP based MICE protocol used by the client to talk to the backend.
 
 ## Instructions
-* Download and extract the [latest release](https://github.com/BigBoot/GiganticEmu/releases/latest) into your Binaries\Win64 folder. it should ask you if you want to replace the ArcSDK.dll file -> confirm.
-* You can change your username by editing the username.txt using your favorite text editor.
-* Start the RxGame-Win64-Test.exe 
-
-*NOTE* On the first start the game will immediately close, this is expected. Just start the game again and everything should be working.
+* Download the Misfroge Launcher from the [latest release](https://github.com/BigBoot/GiganticEmu/releases/latest) into your Gigantic folder.
+* Start the MistforgeLauncher.exe 
 
 ## Building
 Requirements:
 * MSVC 2019 (e.g. Visual Studio 2019 with C++ Build Tools)
 * CMake
 * .NET SDK 5.0
+* Powershell 7.x
 
-### ArcSDK.dll
 ```
-mkdir build
-cd build
-cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release ..
-cmake --build . --config=Release 
+./dist.ps1
 ```
-The dll will be in build/Release/ArcSDK.dll
-
-### GiganticEmu.exe
-```
-dotnet publish -r win-x64 -p:PublishSingleFile=true --self-contained false -c Release
-```
-The exe will be in bin\Release\net5.0\win-x64\publish\GiganticEmu.exe
+The resulting files will be in dist/
 
 ## Troubleshooting
 
-#### The game keeps closing immediately without any error:
-Make sure your DefaultEngine.ini is not read-only
-
 #### The game crashes with an error report:
 Install the latest vc_redist: https://aka.ms/vs/16/release/vc_redist.x64.exe
-
-#### The game starts but the login still fails:
-Install the latest .net runtime: https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-5.0.6-windows-x64-installer

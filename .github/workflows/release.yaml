@@ -23,35 +23,61 @@ jobs:
       - name: Setup msvc
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+
       - name: Build
         run: pwsh dist.ps1
 
       - name: Set Version
         id: version
-        shell: bash
+        uses: gittools/actions/gitversion/execute@v0.9.7
+
+      - name: Display Version outputs
         run: |
-          if [ "$(git describe --tags --abbrev=0)" == "$(git describe --tags)" ]; then
-            echo "::set-output name=is_release::true"
-            echo "::set-output name=version::$(git describe --tags)"
-            if [[ $(git describe --tags) == *"-"* ]]; then
-              echo "::set-output name=is_prerelease::true"
-            else
-              echo "::set-output name=is_prerelease::false"
-            fi
-          else
-            echo "::set-output name=is_release::false"
-            echo "::set-output name=is_prerelease::false"
-            echo "::set-output name=version::$(git describe --tags --abbrev=0)-$(git rev-list $(git describe --tags --abbrev=0)..HEAD --count)"
-          fi
+          echo "Major: ${{ steps.version.outputs.major }}"
+          echo "Minor: ${{ steps.version.outputs.minor }}"
+          echo "Patch: ${{ steps.version.outputs.patch }}"
+          echo "PreReleaseTag: ${{ steps.version.outputs.preReleaseTag }}"
+          echo "PreReleaseTagWithDash: ${{ steps.version.outputs.preReleaseTagWithDash }}"
+          echo "PreReleaseLabel: ${{ steps.version.outputs.preReleaseLabel }}"
+          echo "PreReleaseNumber: ${{ steps.version.outputs.preReleaseNumber }}"
+          echo "WeightedPreReleaseNumber: ${{ steps.version.outputs.weightedPreReleaseNumber }}"
+          echo "BuildMetaData: ${{ steps.version.outputs.buildMetaData }}"
+          echo "BuildMetaDataPadded: ${{ steps.version.outputs.buildMetaDataPadded }}"
+          echo "FullBuildMetaData: ${{ steps.version.outputs.fullBuildMetaData }}"
+          echo "MajorMinorPatch: ${{ steps.version.outputs.majorMinorPatch }}"
+          echo "SemVer: ${{ steps.version.outputs.semVer }}"
+          echo "LegacySemVer: ${{ steps.version.outputs.legacySemVer }}"
+          echo "LegacySemVerPadded: ${{ steps.version.outputs.legacySemVerPadded }}"
+          echo "AssemblySemVer: ${{ steps.version.outputs.assemblySemVer }}"
+          echo "AssemblySemFileVer: ${{ steps.version.outputs.assemblySemFileVer }}"
+          echo "FullSemVer: ${{ steps.version.outputs.fullSemVer }}"
+          echo "InformationalVersion: ${{ steps.version.outputs.informationalVersion }}"
+          echo "BranchName: ${{ steps.version.outputs.branchName }}"
+          echo "EscapedBranchName: ${{ steps.version.outputs.escapedBranchName }}"
+          echo "Sha: ${{ steps.version.outputs.sha }}"
+          echo "ShortSha: ${{ steps.version.outputs.shortSha }}"
+          echo "NuGetVersionV2: ${{ steps.version.outputs.nuGetVersionV2 }}"
+          echo "NuGetVersion: ${{ steps.version.outputs.nuGetVersion }}"
+          echo "NuGetPreReleaseTagV2: ${{ steps.version.outputs.nuGetPreReleaseTagV2 }}"
+          echo "NuGetPreReleaseTag: ${{ steps.version.outputs.nuGetPreReleaseTag }}"
+          echo "VersionSourceSha: ${{ steps.version.outputs.versionSourceSha }}"
+          echo "CommitsSinceVersionSource: ${{ steps.version.outputs.commitsSinceVersionSource }}"
+          echo "CommitsSinceVersionSourcePadded: ${{ steps.version.outputs.commitsSinceVersionSourcePadded }}"
+          echo "UncommittedChanges: ${{ steps.version.outputs.uncommittedChanges }}"
+          echo "CommitDate: ${{ steps.version.outputs.commitDate }}"
 
       - name: Create Release
         uses: ncipollo/release-action@v1
-        if: ${{ steps.version.outputs.is_release == 'true' }}
+        if: ${{ steps.version.outputs.commitsSinceVersionSource == '0' }}
         with:
           allowUpdates: true
-          name: ${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.informationalVersion }}
           artifacts: dist/MistforgeLauncher.exe,dist/GiganticEmu.Agent.exe,dist/ArcSDK.dll
           token: ${{ secrets.GITHUB_TOKEN }}
           commit: ${{ github.sha }}
-          tag: ${{ steps.version.outputs.version }}
-          prerelease: ${{ steps.version.outputs.is_release }}
+          tag: v${{ steps.version.outputs.informationalVersion }}
+          prerelease: ${{ steps.version.outputs.preReleaseLabel  != '' }}

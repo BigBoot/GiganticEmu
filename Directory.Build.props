@@ -1,8 +1,14 @@
 <Project>
-    <PropertyGroup>
-        <nullable>enable</nullable>
-        <NoWarn>1998;CS8524</NoWarn>
-        <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
-        <TargetFramework>net5.0</TargetFramework>
-    </PropertyGroup>
+  <PropertyGroup>
+    <nullable>enable</nullable>
+    <NoWarn>1998;CS8524</NoWarn>
+    <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.6.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

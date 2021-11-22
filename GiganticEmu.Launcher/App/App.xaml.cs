@@ -28,6 +28,7 @@ namespace GiganticEmu.Launcher
 
         public App()
         {
+            Settings.Load();
 
             Parser.Default.ParseArguments<Options>(Environment.GetCommandLineArgs())
                    .WithParsed<Options>(o =>
@@ -44,10 +45,16 @@ namespace GiganticEmu.Launcher
             Locator.CurrentMutable.RegisterLazySingleton(() => new CredentialStorage());
             Locator.CurrentMutable.RegisterLazySingleton(() => new UserManager());
             Locator.CurrentMutable.RegisterLazySingleton(() => new ApiTokenHandler());
+            Locator.CurrentMutable.RegisterLazySingleton(() => new GitHub());
             Locator.CurrentMutable.RegisterLazySingleton(() => RestService.For<IBackendApi>(new HttpClient(Locator.Current.GetService<ApiTokenHandler>()!)
             {
                 BaseAddress = new Uri(Locator.Current.GetService<LauncherConfiguration>()!.Host)
             }), typeof(IBackendApi));
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            Settings.Save();
         }
     }
 }
