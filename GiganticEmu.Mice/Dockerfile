@@ -13,7 +13,7 @@ RUN dotnet restore GiganticEmu.Mice/GiganticEmu.Mice.csproj
 COPY GiganticEmu.Shared.Backend ./GiganticEmu.Shared.Backend
 COPY GiganticEmu.Shared ./GiganticEmu.Shared
 COPY GiganticEmu.Mice ./GiganticEmu.Mice
-COPY .git ./git
+COPY .git ./.git
 RUN dotnet publish -c Release -o out -p:DebugType=None -p:DebugSymbols=false GiganticEmu.Mice/GiganticEmu.Mice.csproj
 
 # Build runtime image
