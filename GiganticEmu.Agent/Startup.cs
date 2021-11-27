@@ -41,6 +41,9 @@ namespace GiganticEmu.Agent
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Request the ServerManager to fail early in case of configuration problems
+            app.ApplicationServices.GetService<ServerManager>();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

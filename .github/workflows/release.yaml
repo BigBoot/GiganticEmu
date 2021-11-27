@@ -69,6 +69,10 @@ jobs:
           echo "CommitsSinceVersionSourcePadded: ${{ steps.version.outputs.commitsSinceVersionSourcePadded }}"
           echo "UncommittedChanges: ${{ steps.version.outputs.uncommittedChanges }}"
           echo "CommitDate: ${{ steps.version.outputs.commitDate }}"
+      
+      - name: Parse Changelog
+        id: changelog
+        uses: coditory/changelog-parser@v1
 
       - name: Create Release
         uses: ncipollo/release-action@v1
@@ -76,7 +80,8 @@ jobs:
         with:
           allowUpdates: true
           name: v${{ steps.version.outputs.informationalVersion }}
-          artifacts: dist/MistforgeLauncher.exe,dist/GiganticEmu.Agent.exe,dist/ArcSDK.dll
+          body: ${{ steps.changelog.outputs.description }}
+          artifacts: dist/win-x64/MistforgeLauncher.exe,dist/win-x64/GiganticEmu.Agent.exe,dist/win-x64/ArcSDK.dll,dist/linux-x64/GigatnicEmu.Agent
           token: ${{ secrets.GITHUB_TOKEN }}
           commit: ${{ github.sha }}
           tag: v${{ steps.version.outputs.informationalVersion }}

@@ -32,7 +32,7 @@ namespace GiganticEmu.Agent
                     webBuilder.UseConfiguration(configuration);
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls($"http://{agentConfiguration.BindInterface}:{agentConfiguration.WebPort}/");
-                });
+                }).UseConsoleLifetime();
         }
     }
 }

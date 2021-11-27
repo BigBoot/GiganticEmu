@@ -1,16 +1,23 @@
-﻿using GiganticEmu.Shared;
+﻿using GiganticEmu.Agent;
+using GiganticEmu.Shared;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace GiganticEmu.Launcher
 {
-    public class UserViewModel : ReactiveObject
+    public class MainContainerViewModel : ReactiveObject
     {
         [Reactive]
         public bool IsLoading { get; set; } = false;
@@ -18,22 +25,18 @@ namespace GiganticEmu.Launcher
         [Reactive]
         public UserData? User { get; set; } = null;
 
-        public ReactiveCommand<Unit, Unit> Logout { get; }
-
         public ReactiveCommand<Unit, Unit> StartGame { get; }
 
-        public UserViewModel()
-        {
-            Logout = ReactiveCommand.CreateFromTask(DoLogout);
-            StartGame = ReactiveCommand.CreateFromTask(DoStartGame);
-        }
+        public ReactiveCommand<Unit, Unit> StartServer { get; }
 
-        private async Task DoLogout()
+        private int? _serverPort;
+
+        public MainContainerViewModel()
         {
-            IsLoading = true;
-            await Locator.Current.GetService<CredentialStorage>()!.ClearToken();
-            User = null;
-            IsLoading = false;
+            StartGame = ReactiveCommand.CreateFromTask(DoStartGame);
+            StartServer = ReactiveCommand.CreateFromTask(DoStartServer);
+
+            _serverPort = null;
         }
 
         private async Task DoStartGame()
@@ -88,6 +91,50 @@ namespace GiganticEmu.Launcher
             process.StartInfo.ArgumentList.Add($"-emu:launch_code={(giganticMetadata.ProductBuildPart == 16601 ? 0 : 0xE0000019)}");
 
             process.Start();
+        }
+
+        private async Task DoStartServer()
+        {
+            var config = Locator.Current.GetService<LauncherConfiguration>()!;
+            var path = Path.GetFullPath(Path.Join(config.Game));
+
+            if (!File.Exists(Path.Join(path, "Binaries", "Win64", "RxGame-Win64-Test.exe")))
+            {
+                MessageBox.Show($"{Path.Join(path, "RxGame-Win64-Test.exe")} not found!", "File not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (_serverPort == null)
+            {
+                var l = new TcpListener(IPAddress.Loopback, 0);
+                l.Start();
+                _serverPort = ((IPEndPoint)l.LocalEndpoint).Port;
+                l.Stop();
+
+
+                var _ = Task.Run(async () => Host.CreateDefaultBuilder()
+                    .ConfigureWebHostDefaults(webBuilder =>
+                    {
+                        var configuration = new ConfigurationBuilder()
+                            .AddInMemoryCollection(new List<KeyValuePair<string, string>> {
+                                new KeyValuePair<string, string>(nameof(AgentConfiguration.WebPort), _serverPort?.ToString() ?? ""),
+                                new KeyValuePair<string, string>(nameof(AgentConfiguration.GiganticPath), path),
+                            })
+                            .Build();
+                        var agentConfiguration = new AgentConfiguration();
+                        configuration.Bind(agentConfiguration, o => o.BindNonPublicProperties = true);
+
+                        webBuilder.UseConfiguration(configuration);
+                        webBuilder.UseStartup<Startup>();
+                        webBuilder.UseUrls($"http://127.0.0.1:{agentConfiguration.WebPort}/");
+                    }).Build().RunAsync());
+            }
+
+            System.Diagnostics.Process.Start(new ProcessStartInfo
+            {
+                FileName = $"http://127.0.0.1:{_serverPort}/",
+                UseShellExecute = true,
+            });
         }
     }
 }

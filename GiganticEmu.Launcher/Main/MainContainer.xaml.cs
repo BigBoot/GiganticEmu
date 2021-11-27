@@ -5,23 +5,23 @@ using System.Reactive.Linq;
 
 namespace GiganticEmu.Launcher
 {
-    public partial class User
+    public partial class MainContainer
     {
-        public User()
+        public MainContainer()
         {
-            ViewModel = new UserViewModel();
+            ViewModel = new MainContainerViewModel();
             InitializeComponent();
 
             this.WhenActivated(disposables =>
             {
-                Observable.FromEventPattern(ButtonLogout, nameof(ButtonLogout.Click))
-                    .Select(x => Unit.Default)
-                    .InvokeCommand(this, x => x.ViewModel!.Logout)
-                    .DisposeWith(disposables);
-
-                Observable.FromEventPattern(ButtonStartGame, nameof(ButtonLogout.Click))
+                Observable.FromEventPattern(ButtonStartGame, nameof(ButtonStartGame.Click))
                     .Select(x => Unit.Default)
                     .InvokeCommand(this, x => x.ViewModel!.StartGame)
+                    .DisposeWith(disposables);
+
+                Observable.FromEventPattern(ButtonStartServer, nameof(ButtonStartServer.Click))
+                    .Select(x => Unit.Default)
+                    .InvokeCommand(this, x => x.ViewModel!.StartServer)
                     .DisposeWith(disposables);
             });
         }

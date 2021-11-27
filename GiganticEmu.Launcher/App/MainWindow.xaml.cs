@@ -29,7 +29,7 @@ namespace GiganticEmu.Launcher
 
                 this.OneWayBind(ViewModel,
                     viewModel => viewModel.User,
-                    view => view.PageUser.Visibility,
+                    view => view.PageMain.Visibility,
                     value => value == null ? Visibility.Hidden : Visibility.Visible
                 )
                 .DisposeWith(disposables);
@@ -56,7 +56,7 @@ namespace GiganticEmu.Launcher
 
                 this.Bind(ViewModel,
                     viewModel => viewModel.User,
-                    view => view.PageUser.ViewModel!.User
+                    view => view.PageMain.ViewModel!.User
                 )
                 .DisposeWith(disposables);
 

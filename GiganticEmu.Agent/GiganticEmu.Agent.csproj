@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,6 +12,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="wwwroot/**" />
+    <Content Update="wwwroot/**">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 

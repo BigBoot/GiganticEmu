@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GiganticEmu.Shared;
@@ -23,7 +24,7 @@ namespace GiganticEmu.Agent
 
         private readonly ILogger<ServerManager> _logger;
         private readonly AgentConfiguration _configuration;
-        private readonly Queue<int> _freePorts;
+        private readonly PriorityQueue<int, int> _freePorts;
         private readonly IDictionary<int, Instance> _instances;
         private readonly string _gamePath;
         private readonly string _binaryPath;
@@ -35,7 +36,7 @@ namespace GiganticEmu.Agent
         {
             _logger = logger;
             _configuration = configuration.Value;
-            _freePorts = new Queue<int>(Enumerable.Range(_configuration.ServerPort, _configuration.MaxInstances));
+            _freePorts = new PriorityQueue<int, int>(Enumerable.Range(_configuration.ServerPort, _configuration.MaxInstances).Select(i => (i, i)));
             _instances = new Dictionary<int, Instance>();
             _gamePath = _configuration.GiganticPath ?? Directory.GetCurrentDirectory();
             _binaryPath = Path.GetFullPath(Path.Join(_gamePath, "Binaries", "Win64"));
@@ -45,20 +46,45 @@ namespace GiganticEmu.Agent
         public async Task<int> StartInstance(string map, int? maxPlayers = null, (string, string, string)? creatures = null, bool useLobby = false)
         {
             int port;
-            if (!_freePorts.TryDequeue(out port))
+            if (!_freePorts.TryDequeue(out port, out _))
             {
                 throw new NoInstanceAvailableException();
             }
 
             var process = new Process();
-            process.StartInfo = new ProcessStartInfo
+
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                UseShellExecute = true,
-                FileName = Path.Join(_binaryPath, "RxGame-Win64-Test.exe"),
-                CreateNoWindow = true,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                WorkingDirectory = _gamePath,
-            };
+                process.StartInfo = new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    FileName = Path.Join(_binaryPath, "RxGame-Win64-Test.exe"),
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    WorkingDirectory = _gamePath,
+                };
+            }
+            else
+            {
+                var path = Environment.GetEnvironmentVariable("PATH");
+                var _wine = _configuration.WinePath ?? path?.Split(":")
+                    ?.Select(path => Path.GetFullPath(Path.Join(path, "wine")))
+                    ?.FirstOrDefault(path => File.Exists(path));
+
+                if (_wine == null)
+                {
+                    throw new UnableToStartServerException("Unable to find wine on PATH, please make sure wine is avaialble on PATH or add WinePath to your configuration file...");
+                }
+
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = _wine,
+                    WorkingDirectory = _gamePath,
+                };
+
+                process.StartInfo.ArgumentList.Add(Path.Join(_binaryPath, "RxGame-Win64-Test.exe"));
+            }
 
             process.StartInfo.ArgumentList.Add($"server");
 
@@ -109,8 +135,6 @@ namespace GiganticEmu.Agent
             await File.WriteAllTextAsync(defGameIniPath, defGameIni);
             process.StartInfo.ArgumentList.Add($"-defgameini={defGameIniPath}");
 
-            await File.WriteAllTextAsync(Path.Join(_binaryPath, "serverstart"), "");
-
             process.Start();
             _instances.Add(port, new Instance(process, adminPassword));
             ChildProcessTracker.AddProcess(process);
@@ -119,7 +143,7 @@ namespace GiganticEmu.Agent
             {
                 await process.WaitForExitAsync();
                 _instances.Remove(port);
-                _freePorts.Enqueue(port);
+                _freePorts.Enqueue(port, port);
                 File.Delete(defGameIniPath);
             });
 

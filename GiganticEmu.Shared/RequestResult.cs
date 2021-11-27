@@ -41,8 +41,11 @@ namespace GiganticEmu.Shared
         [Description("the invite is invalid")]
         SessionInvalid,
 
-        [Description("invalid insttance")]
+        [Description("invalid instance")]
         InvalidInstance,
+
+        [Description("unable to start server")]
+        UnableToStartServer,
     }
 
     public static class RequestResultExtensions

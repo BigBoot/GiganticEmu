@@ -1,5 +1,5 @@
 ﻿<local:ReactiveMaterialWindow x:Class="GiganticEmu.Launcher.MainWindow"
-    xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml" 
+    xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
     xmlns:bc="clr-namespace:BlurryControls.Controls;assembly=BlurryControls"
     xmlns:local="clr-namespace:GiganticEmu.Launcher" x:TypeArguments="local:AppViewModel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -7,11 +7,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:reactiveui="http://reactiveui.net" ResizeMode="NoResize" Title="" Height="600" Width="1000" FadeContentIfInactive="False" BorderForegroundBrush="#1a7d93" KeyboardNavigation.TabNavigation="None" WindowStartupLocation="CenterScreen">
- 
+
     <mde:MaterialWindow.BorderBackgroundBrush>
-        <ImageBrush ImageSource="/Resources/background.jpg"/>
+        <ImageBrush ImageSource="/Resources/background.jpg" />
     </mde:MaterialWindow.BorderBackgroundBrush>
 
     <Grid>
@@ -27,16 +27,16 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
-            
+
             <bc:BlurryUserControl VerticalAlignment="Stretch" HorizontalAlignment="Center" Background="#BFFFFFFF" Margin="30,15,30,30" Width="600" BlurContainer="{Binding ElementName=BlurContainer}" BlurRadius="100" Magnification="0">
-                <Border Padding="30" >
+                <Border Padding="30">
                     <DockPanel VerticalAlignment="Stretch">
-                        <TextBlock DockPanel.Dock="Top" FontSize="50" FontWeight="Bold" Margin="0 0 0 20" HorizontalAlignment="Center" Foreground="#1a7d93" FontFamily="/Resources/troika.otf#Troika" Text="Mistforge Launcher"/>
+                        <TextBlock DockPanel.Dock="Top" FontSize="50" FontWeight="Bold" Margin="0 0 0 20" HorizontalAlignment="Center" Foreground="#1a7d93" FontFamily="/Resources/troika.otf#Troika" Text="Mistforge Launcher" />
                         <Grid VerticalAlignment="Stretch">
-                            <ProgressBar x:Name="ProgressLoading" IsIndeterminate="True" Value="0" Style="{StaticResource MaterialDesignCircularProgressBar}" Width="64" Height="64" d:IsHidden="true"/>
+                            <ProgressBar x:Name="ProgressLoading" IsIndeterminate="True" Value="0" Style="{StaticResource MaterialDesignCircularProgressBar}" Width="64" Height="64" d:IsHidden="true" />
                             <Grid x:Name="ContainerContent">
-                                <local:LoginContainer x:Name="PageLogin"/>
-                                <local:User x:Name="PageUser" d:IsHidden="true"/>
+                                <local:LoginContainer x:Name="PageLogin" />
+                                <local:MainContainer x:Name="PageMain" d:IsHidden="true" />
                             </Grid>
                         </Grid>
                     </DockPanel>
@@ -44,7 +44,7 @@
             </bc:BlurryUserControl>
 
             <bc:BlurryUserControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#BFFFFFFF" Margin="16,15,13,30" BlurContainer="{Binding ElementName=BlurContainer}" BlurRadius="100" Magnification="0" Grid.Column="1">
-                <Border Padding="0" >
+                <Border Padding="0">
                     <local:FriendList x:Name="FriendList" />
                 </Border>
             </bc:BlurryUserControl>

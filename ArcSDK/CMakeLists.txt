@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 project(ArcSDK)
 
 find_program(GITVERSION NAMES gitversion dotnet-gitversion)
@@ -44,3 +44,4 @@ set(FILES ${HEADERS} ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
 add_library(${PROJECT_NAME} SHARED ${FILES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

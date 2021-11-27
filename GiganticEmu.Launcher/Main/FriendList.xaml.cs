@@ -1,5 +1,7 @@
 ﻿using IPrompt;
 using ReactiveUI;
+using System;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
@@ -17,7 +19,7 @@ namespace GiganticEmu.Launcher
                 this.OneWayBind(ViewModel,
                     viewModel => viewModel.User,
                     view => view.TextUserName.Text,
-                    value => value?.UserName ?? ""
+                    value => (value?.UserName ?? "") + " ▼"
                 )
                 .DisposeWith(disposables);
 
@@ -26,6 +28,21 @@ namespace GiganticEmu.Launcher
                     view => view.ListFriends.ItemsSource
                 )
                 .DisposeWith(disposables);
+
+                this.WhenAnyValue(x => x.ViewModel!.User)
+                    .Where(x => x == null)
+                    .Subscribe(x => this.PopupUser.IsOpen = false)
+                    .DisposeWith(disposables);
+                    
+
+                Observable.FromEventPattern(ButtonLogout, nameof(ButtonLogout.Click))
+                    .Select(x => Unit.Default)
+                    .InvokeCommand(this, x => x.ViewModel!.Logout)
+                    .DisposeWith(disposables);
+
+                Observable.FromEventPattern(ButtonLogout, nameof(ButtonLogout.Click))
+                    .Subscribe(x => this.PopupUser.IsOpen = false)
+                    .DisposeWith(disposables);
 
                 Observable.FromEventPattern(ButtonAddFriend, nameof(ButtonAddFriend.Click))
                     .Select(_ => IInputBox.Show("Please enter the username to add", "Add friend", System.Windows.MessageBoxImage.None))

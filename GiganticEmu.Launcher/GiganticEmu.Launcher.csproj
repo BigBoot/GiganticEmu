@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows10.0.17763.0</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <ApplicationIcon>icon.ico</ApplicationIcon>
@@ -36,5 +36,6 @@
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 
     <ProjectReference Include="..\GiganticEmu.Shared\GiganticEmu.Shared.csproj" />
+    <ProjectReference Include="..\GiganticEmu.Agent\GiganticEmu.Agent.csproj" />
   </ItemGroup>
 </Project>

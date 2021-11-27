@@ -13,6 +13,7 @@ namespace GiganticEmu.Agent
         public int ServerPort { get; set; } = 7777;
         public int WebPort { get; set; } = 8080;
         public string[] DefaultCreatures { get; set; } = new string[] { "bloomer", "cerb", "cyclops" };
+        public string? WinePath { get; set; } = null;
 
         #region GCP config.json compatibility
         private string? api_key
@@ -65,7 +66,10 @@ namespace GiganticEmu.Agent
             config.AddJsonFile("config.json", optional: true);
             config.AddJsonFile("GiganticEmu.json", optional: true);
             config.AddJsonFile("GiganticEmu.Agent.json", optional: true);
-            config.AddEnvironmentVariables();
+            config.AddEnvironmentVariables(o =>
+            {
+                o.Prefix = "GiganticEmu_";
+            });
             config.AddCommandLine(args);
 
             return config;

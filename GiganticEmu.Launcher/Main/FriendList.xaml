@@ -1,0 +1,72 @@
+﻿<rxui:ReactiveUserControl x:Class="GiganticEmu.Launcher.FriendList"
+    x:TypeArguments="local:FriendListViewModel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    mc:Ignorable="d"
+    xmlns:rxui="http://reactiveui.net" xmlns:system="clr-namespace:System;assembly=netstandard"
+    d:DesignHeight="400" d:DesignWidth="350">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <DockPanel Margin="0 0 15 0">
+            <Button x:Name="ButtonAddFriend" DockPanel.Dock="Right" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Add friend">
+                <materialDesign:PackIcon Kind="AccountPlus" Grid.RowSpan="2" />
+            </Button>
+            <ToggleButton x:Name="ButtonUserName" Style="{StaticResource MaterialDesignFlatButton}" Grid.Column="1" HorizontalAlignment="Left" Margin="15,10,0,10" FontSize="16">
+                <StackPanel>
+                    <TextBlock x:Name="TextUserName" d:Text="TheLegend27 ▼" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                    <Popup x:Name="PopupUser" IsOpen="{Binding IsChecked, ElementName=ButtonUserName}" PlacementTarget="{Binding ElementName=ButtonUserName}" StaysOpen="False">
+                        <Border BorderBrush="{DynamicResource PrimaryHueMidBrush}" BorderThickness="1,1,1,1">
+                            <Menu Name="UserMenu" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <MenuItem x:Name="ButtonLogout" Header="Logout" />
+                            </Menu>
+                        </Border>
+                    </Popup>
+                </StackPanel>
+            </ToggleButton>
+
+        </DockPanel>
+        <ListBox Margin="10" Name="ListFriends" HorizontalContentAlignment="Stretch" ScrollViewer.CanContentScroll="False" Grid.Row="1">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Focusable" Value="False" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <d:ListBox.ItemsSource>
+                <x:Array Type="{x:Type local:FriendListEntryViewModel}">
+                    <local:FriendListEntryViewModel>
+                        <local:FriendListEntryViewModel.Friend>
+                            <local:FriendData UserName="TheLegend31" CanAccept="True" IconHash="17887f87477a18d04aeb3012f23f23843606e0ab9a9b25664ac348274de89b0c" HasAccepted="true" CanJoin="False" />
+                        </local:FriendListEntryViewModel.Friend>
+                    </local:FriendListEntryViewModel>
+                    <local:FriendListEntryViewModel>
+                        <local:FriendListEntryViewModel.Friend>
+                            <local:FriendData UserName="TheLegend28" CanAccept="False" IconHash="17887f87477a18d04aeb3012f23f23843606e0ab9a9b25664ac348274de89b0c" HasAccepted="true" CanJoin="False" />
+                        </local:FriendListEntryViewModel.Friend>
+                    </local:FriendListEntryViewModel>
+                    <local:FriendListEntryViewModel>
+                        <local:FriendListEntryViewModel.Friend>
+                            <local:FriendData UserName="TheLegend29" CanAccept="False" IconHash="17887f87477a18d04aeb3012f23f23843606e0ab9a9b25664ac348274de89b0c" HasAccepted="true" CanJoin="True" />
+                        </local:FriendListEntryViewModel.Friend>
+                    </local:FriendListEntryViewModel>
+                    <local:FriendListEntryViewModel>
+                        <local:FriendListEntryViewModel.Friend>
+                            <local:FriendData UserName="TheLegend30" CanAccept="False" IconHash="17887f87477a18d04aeb3012f23f23843606e0ab9a9b25664ac348274de89b0c" HasAccepted="true" CanJoin="False" />
+                        </local:FriendListEntryViewModel.Friend>
+                    </local:FriendListEntryViewModel>
+                </x:Array>
+            </d:ListBox.ItemsSource>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <local:FriendListEntry ViewModel="{Binding}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</rxui:ReactiveUserControl>

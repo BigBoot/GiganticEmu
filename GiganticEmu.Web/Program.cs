@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Fetchgoods.Text.Json.Extensions;
 using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Hosting;
@@ -10,12 +11,10 @@ namespace GiganticEmu.Web
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             JsonExtensionMethods.DefaultOptions.WriteIndented = false;
-
-            Task.Run(async () => await CreateHostBuilder(new string[] { }).Build().RunAsync())
-                .GetAwaiter().GetResult();
+            await CreateHostBuilder(new string[] { }).Build().RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)

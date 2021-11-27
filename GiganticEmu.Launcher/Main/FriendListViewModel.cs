@@ -23,10 +23,12 @@ namespace GiganticEmu.Launcher
         private SourceCache<FriendData, string> _friends = new SourceCache<FriendData, string>(x => x.UserName);
         public IObservableCollection<FriendListEntryViewModel> Friends { get; } = new ObservableCollectionExtended<FriendListEntryViewModel>();
         public ReactiveCommand<string, Unit> AddFriend { get; }
+        public ReactiveCommand<Unit, Unit> Logout { get; }
 
         public FriendListViewModel()
         {
             AddFriend = ReactiveCommand.CreateFromTask<string>(DoAddFriend);
+            Logout = ReactiveCommand.CreateFromTask(DoLogout);
 
             _friends.Connect()
                 .AutoRefresh()
@@ -91,6 +93,14 @@ namespace GiganticEmu.Launcher
         private async Task DoAddFriend(string userName)
         {
             await Locator.Current.GetService<UserManager>()!.SendFriendRequest(userName);
+        }
+
+        private async Task DoLogout()
+        {
+            IsLoading = true;
+            await Locator.Current.GetService<CredentialStorage>()!.ClearToken();
+            User = null;
+            IsLoading = false;
         }
     }
 }
