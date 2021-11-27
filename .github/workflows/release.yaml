@@ -81,7 +81,7 @@ jobs:
           allowUpdates: true
           name: v${{ steps.version.outputs.informationalVersion }}
           body: ${{ steps.changelog.outputs.description }}
-          artifacts: dist/win-x64/MistforgeLauncher.exe,dist/win-x64/GiganticEmu.Agent.exe,dist/win-x64/ArcSDK.dll,dist/linux-x64/GigatnicEmu.Agent
+          artifacts: dist/MistforgeLauncher.exe,dist/GiganticEmu.Agent.exe,dist/ArcSDK.dll,dist/GigatnicEmu.Agent
           token: ${{ secrets.GITHUB_TOKEN }}
           commit: ${{ github.sha }}
           tag: v${{ steps.version.outputs.informationalVersion }}
