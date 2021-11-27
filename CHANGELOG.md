@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.1.0] - 2021-11-28
+## [2.0.1] - 2021-11-28
 ### Added
 - Linux support for GiganticEmu.Launcher (requires wine)
 - Embed GiganticEmu.Agent into GiganticEmu.Launcher
