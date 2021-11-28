@@ -1,6 +1,8 @@
 ﻿using ReactiveUI;
+using System;
 using System.Reactive.Disposables;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace GiganticEmu.Launcher;
 
@@ -10,6 +12,10 @@ public partial class MainWindow
     {
         InitializeComponent();
         ViewModel = new AppViewModel();
+
+        var background = new Random().Next(1, 4);
+        WindowBackgroundBrush.ImageSource = new BitmapImage(new Uri($"/Resources/background_{background}.jpg", UriKind.Relative));
+        WindowBackgroundImage.Source = WindowBackgroundBrush.ImageSource;
 
         this.WhenActivated(disposables =>
         {

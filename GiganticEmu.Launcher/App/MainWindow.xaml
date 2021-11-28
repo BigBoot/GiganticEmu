@@ -13,12 +13,12 @@
     xmlns:reactiveui="http://reactiveui.net" ResizeMode="NoResize" Title="" Height="600" Width="1000" FadeContentIfInactive="False" BorderForegroundBrush="#1a7d93" KeyboardNavigation.TabNavigation="None" WindowStartupLocation="CenterScreen">
 
     <mde:MaterialWindow.BorderBackgroundBrush>
-        <ImageBrush ImageSource="/Resources/background.jpg" />
+        <ImageBrush x:Name="WindowBackgroundBrush" />
     </mde:MaterialWindow.BorderBackgroundBrush>
 
     <Grid>
         <Grid x:Name="BlurContainer">
-            <Image Source="/Resources/background.jpg" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="UniformToFill" Margin="0,-30,0,0"></Image>
+            <Image x:Name="WindowBackgroundImage" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="UniformToFill" Margin="0,-30,0,0"></Image>
         </Grid>
 
         <Grid>
