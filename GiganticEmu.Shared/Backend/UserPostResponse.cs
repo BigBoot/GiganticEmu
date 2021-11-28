@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 
-namespace GiganticEmu.Shared
-{
-    public record UserPostResponse(RequestResult Code) : ResponseBase(Code)
-    {
-        public IEnumerable<UserPostError>? Errors { get; init; } = default;
+namespace GiganticEmu.Shared;
 
-        public string? AuthToken { get; init; } = default;
-    }
+public record UserPostResponse(RequestResult Code) : ResponseBase(Code)
+{
+    public IEnumerable<UserPostError>? Errors { get; init; } = default;
+
+    public string? AuthToken { get; init; } = default;
 }

@@ -1,7 +1,6 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record FriendsDeleteRequest()
 {
-    public record FriendsDeleteRequest()
-    {
-        public string UserName { get; init; } = default!;
-    }
+    public string UserName { get; init; } = default!;
 }

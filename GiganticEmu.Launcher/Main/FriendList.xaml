@@ -67,6 +67,15 @@
                     <local:FriendListEntry ViewModel="{Binding}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
+            <ListBox.Template>
+                <ControlTemplate TargetType="{x:Type ListBox}">
+                    <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="1" SnapsToDevicePixels="true">
+                        <local:SmoothScrollViewer Focusable="false" Padding="{TemplateBinding Padding}">
+                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </local:SmoothScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ListBox.Template>
         </ListBox>
     </Grid>
 </rxui:ReactiveUserControl>

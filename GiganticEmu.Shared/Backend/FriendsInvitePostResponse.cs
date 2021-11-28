@@ -1,6 +1,5 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record FriendsInvitePostResponse(RequestResult Code) : ResponseBase(Code)
 {
-    public record FriendsInvitePostResponse(RequestResult Code) : ResponseBase(Code)
-    {
-    }
 }

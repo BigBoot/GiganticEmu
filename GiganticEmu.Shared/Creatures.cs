@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GiganticEmu.Shared
-{
-    public record Creature
-    {
-        public string Id { get; init; } = default!;
-        public string Name { get; init; } = default!;
-        public string Baby { get; init; } = default!;
-        public string Adult { get; init; } = default!;
-        public string Family { get; init; } = default!;
+namespace GiganticEmu.Shared;
 
-        public static IDictionary<string, Creature> ALL_CREATURES = new List<Creature> {
+public record Creature
+{
+    public string Id { get; init; } = default!;
+    public string Name { get; init; } = default!;
+    public string Baby { get; init; } = default!;
+    public string Adult { get; init; } = default!;
+    public string Family { get; init; } = default!;
+
+    public static IDictionary<string, Creature> ALL_CREATURES = new List<Creature> {
             new Creature { Id = "cerb",             Name = "Cerberus",          Baby = "CerberusBaby",          Adult = "CerberusAdult",    Family = "cerb" },
             new Creature { Id = "cerb_shadow",      Name = "Shadow Cerberus",   Baby = "CerberusBaby_Shadow",   Adult = "CerberusShadow",   Family = "cerb" },
             new Creature { Id = "cerb_stone",       Name = "Stone Cerberus",    Baby = "CerberusBaby_Tough",    Adult = "CerberusTough",    Family = "cerb" },
@@ -29,5 +29,4 @@ namespace GiganticEmu.Shared
             new Creature { Id = "infernal_void",    Name = "Void Infernal",     Baby = "DemonBaby",             Adult = "DemonVoid",        Family = "infernal" },
             new Creature { Id = "infernal_savage",  Name = "Savage Infernal",   Baby = "DemonBaby",             Adult = "DemonOni",         Family = "infernal" },
         }.ToDictionary(x => x.Id);
-    }
 }

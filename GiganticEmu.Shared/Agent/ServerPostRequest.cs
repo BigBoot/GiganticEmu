@@ -1,7 +1,6 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record ServerPostRequest
 {
-    public record ServerPostRequest
-    {
-        public string Map { get; init; } = default!;
-    };
-}
+    public string Map { get; init; } = default!;
+};

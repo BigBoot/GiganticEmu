@@ -1,9 +1,6 @@
-using System.Collections.Generic;
+namespace GiganticEmu.Shared;
 
-namespace GiganticEmu.Shared
+public record FriendsDeleteResponse(RequestResult Code) : ResponseBase(Code)
 {
-    public record FriendsDeleteResponse(RequestResult Code) : ResponseBase(Code)
-    {
 
-    }
 }

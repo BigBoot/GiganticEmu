@@ -1,7 +1,6 @@
-namespace GiganticEmu.Shared
-{
-    public record SessionDeleteResponse(RequestResult Code) : ResponseBase(Code)
-    {
+namespace GiganticEmu.Shared;
 
-    }
+public record SessionDeleteResponse(RequestResult Code) : ResponseBase(Code)
+{
+
 }

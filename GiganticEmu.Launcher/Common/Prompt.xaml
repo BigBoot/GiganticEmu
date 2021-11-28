@@ -1,0 +1,26 @@
+<Window x:Name="Promt" x:Class="GiganticEmu.Launcher.Prompt"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    mc:Ignorable="d"
+    Title="" Width="400" Height="Auto" SizeToContent="Height" WindowStartupLocation="CenterScreen" ResizeMode="CanResize" ShowInTaskbar="False" Loaded="Prompt_Loaded">
+    <Grid>
+        <DockPanel>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,0,0,5">
+                <Button x:Name="ButtonOK" Content="OK" Margin="0,5,5,5" MinWidth="80" IsDefault="True" Click="ButtonOK_Click" />
+                <Button x:Name="ButtonYes" Content="Yes" Margin="0,5,5,5" MinWidth="80" IsDefault="True" Click="ButtonYes_Click" />
+                <Button x:Name="ButtonNo" Content="No" Margin="0,5,5,5" MinWidth="80" IsCancel="True" Click="ButtonNo_Click" />
+                <Button x:Name="ButtonCancel" Content="Cancel" Margin="0,5,5,5" MinWidth="80" IsCancel="True" Click="ButtonCancel_Click" />
+            </StackPanel>
+            <DockPanel DockPanel.Dock="Bottom">
+                <TextBox x:Name="TextBlockInput" Margin="5" Height="24" />
+            </DockPanel>
+            <DockPanel>
+                <Image x:Name="ImageIcon" MaxWidth="64" MaxHeight="64" Margin="10" VerticalAlignment="Top" />
+                <TextBlock x:Name="TextBlockText" Text="Message" Margin="0,10,5,5" MinWidth="80" TextWrapping="Wrap" />
+            </DockPanel>
+        </DockPanel>
+    </Grid>
+</Window>

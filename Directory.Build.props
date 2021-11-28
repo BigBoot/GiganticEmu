@@ -4,6 +4,11 @@
     <NoWarn>1998;CS8524</NoWarn>
     <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
     <TargetFramework>net6.0</TargetFramework>
+    <BaseOutputPath>build/$(OS)/bin</BaseOutputPath>
+    <BaseIntermediateOutputPath>build/$(OS)/obj</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>build/$(OS)/obj</IntermediateOutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);build/**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="GitVersion.MsBuild" Version="5.8.1">

@@ -1,7 +1,6 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record FriendsRequestPostRequest()
 {
-    public record FriendsRequestPostRequest()
-    {
-        public string UserName { get; init; } = default!;
-    }
+    public string UserName { get; init; } = default!;
 }

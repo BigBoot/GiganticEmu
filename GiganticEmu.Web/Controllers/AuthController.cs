@@ -98,10 +98,8 @@ namespace Web.Controllers
         private static string GenerateKey(int length)
         {
             byte[] data = new byte[4 * length];
-            using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
-            {
-                crypto.GetBytes(data);
-            }
+            RandomNumberGenerator.Fill(data);
+
             StringBuilder result = new StringBuilder(length);
             for (int i = 0; i < length; i += 2)
             {

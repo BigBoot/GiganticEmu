@@ -8,6 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Icon="/icon.ico"
+    TitleBarIcon="/Resources/transparent.png"
     xmlns:reactiveui="http://reactiveui.net" ResizeMode="NoResize" Title="" Height="600" Width="1000" FadeContentIfInactive="False" BorderForegroundBrush="#1a7d93" KeyboardNavigation.TabNavigation="None" WindowStartupLocation="CenterScreen">
 
     <mde:MaterialWindow.BorderBackgroundBrush>

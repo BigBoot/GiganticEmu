@@ -5,47 +5,46 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 
-namespace GiganticEmu.Launcher
+namespace GiganticEmu.Launcher;
+
+public class RegisterViewModel : ReactiveObject
 {
-    public class RegisterViewModel : ReactiveObject
+    [Reactive]
+    public bool IsLoading { get; set; } = false;
+
+    [Reactive]
+    public UserData? User { get; set; } = null;
+
+    [Reactive]
+    public string UserName { get; set; } = "";
+
+    [Reactive]
+    public string Password { get; set; } = "";
+
+    [Reactive]
+    public string PasswordConfirm { get; set; } = "";
+
+    [Reactive]
+    public string Email { get; set; } = "";
+
+    [Reactive]
+    public ICollection<string> Errors { get; set; } = new List<string>();
+
+    public ReactiveCommand<Unit, Unit> Register { get; }
+
+    public RegisterViewModel()
     {
-        [Reactive]
-        public bool IsLoading { get; set; } = false;
+        Register = ReactiveCommand.CreateFromTask(DoRegister);
+    }
 
-        [Reactive]
-        public UserData? User { get; set; } = null;
-
-        [Reactive]
-        public string UserName { get; set; } = "";
-
-        [Reactive]
-        public string Password { get; set; } = "";
-
-        [Reactive]
-        public string PasswordConfirm { get; set; } = "";
-
-        [Reactive]
-        public string Email { get; set; } = "";
-
-        [Reactive]
-        public ICollection<string> Errors { get; set; } = new List<string>();
-
-        public ReactiveCommand<Unit, Unit> Register { get; }
-
-        public RegisterViewModel()
+    private async Task DoRegister()
+    {
+        IsLoading = true;
+        (User, Errors) = await Locator.Current.GetService<UserManager>()!.Register(UserName, Password, Email);
+        if (User?.AuthToken is string token)
         {
-            Register = ReactiveCommand.CreateFromTask(DoRegister);
+            await Locator.Current.GetService<CredentialStorage>()!.SaveToken(token);
         }
-
-        private async Task DoRegister()
-        {
-            IsLoading = true;
-            (User, Errors) = await Locator.Current.GetService<UserManager>()!.Register(UserName, Password, Email);
-            if (User?.AuthToken is string token)
-            {
-                await Locator.Current.GetService<CredentialStorage>()!.SaveToken(token);
-            }
-            IsLoading = false;
-        }
+        IsLoading = false;
     }
 }

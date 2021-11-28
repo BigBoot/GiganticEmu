@@ -1,7 +1,6 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record ResponseBase(RequestResult Code)
 {
-    public record ResponseBase(RequestResult Code)
-    {
-        public string Message { get; } = Code.GetDescription();
-    }
+    public string Message { get; } = Code.GetDescription();
 }

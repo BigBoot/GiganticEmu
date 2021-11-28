@@ -4,71 +4,70 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public enum RequestResult
 {
-    public enum RequestResult
+    [Description("success")]
+    Success,
+
+    [Description("invalid username or password")]
+    InvalidUser,
+
+    [Description("two factor authentication required")]
+    Require2FA,
+
+    [Description("unauthorized")]
+    Unauthorized,
+
+    [Description("account locked")]
+    AccountLocked,
+
+    [Description("error during registration")]
+    RegistrationError,
+
+    [Description("email not confirmed")]
+    EmailNotConfirmed,
+
+    [Description("no instance available")]
+    NoInstanceAvailable,
+
+    [Description("unknown username")]
+    UnknownUser,
+
+    [Description("the party is already full")]
+    SessionFull,
+
+    [Description("the invite is invalid")]
+    SessionInvalid,
+
+    [Description("invalid instance")]
+    InvalidInstance,
+
+    [Description("unable to start server")]
+    UnableToStartServer,
+}
+
+public static class RequestResultExtensions
+{
+    private static IDictionary<RequestResult, string> DESCRIPTIONS;
+
+    static RequestResultExtensions()
     {
-        [Description("success")]
-        Success,
-
-        [Description("invalid username or password")]
-        InvalidUser,
-
-        [Description("two factor authentication required")]
-        Require2FA,
-
-        [Description("unauthorized")]
-        Unauthorized,
-
-        [Description("account locked")]
-        AccountLocked,
-
-        [Description("error during registration")]
-        RegistrationError,
-
-        [Description("email not confirmed")]
-        EmailNotConfirmed,
-
-        [Description("no instance available")]
-        NoInstanceAvailable,
-
-        [Description("unknown username")]
-        UnknownUser,
-
-        [Description("the party is already full")]
-        SessionFull,
-
-        [Description("the invite is invalid")]
-        SessionInvalid,
-
-        [Description("invalid instance")]
-        InvalidInstance,
-
-        [Description("unable to start server")]
-        UnableToStartServer,
+        DESCRIPTIONS = Enum.GetValues<RequestResult>()
+            .ToDictionary(e => e, e => (e
+                .GetType()
+                .GetTypeInfo()
+                .GetMember(e.ToString())
+                .FirstOrDefault(member => member.MemberType == MemberTypes.Field)
+                ?.GetCustomAttributes(typeof(DescriptionAttribute), false)
+                ?.SingleOrDefault() as DescriptionAttribute)
+                ?.Description ?? e.ToString()
+            );
     }
 
-    public static class RequestResultExtensions
+    public static string GetDescription(this RequestResult e)
     {
-        private static IDictionary<RequestResult, string> DESCRIPTIONS;
-
-        static RequestResultExtensions()
-        {
-            DESCRIPTIONS = Enum.GetValues<RequestResult>()
-                .ToDictionary(e => e, e => (e
-                    .GetType()
-                    .GetTypeInfo()
-                    .GetMember(e.ToString())
-                    .FirstOrDefault(member => member.MemberType == MemberTypes.Field)
-                    ?.GetCustomAttributes(typeof(DescriptionAttribute), false)
-                    ?.SingleOrDefault() as DescriptionAttribute)
-                    ?.Description ?? e.ToString()
-                );
-        }
-
-        public static string GetDescription(this RequestResult e)
-        {
-            return DESCRIPTIONS[e];
-        }
+        return DESCRIPTIONS[e];
     }
 }

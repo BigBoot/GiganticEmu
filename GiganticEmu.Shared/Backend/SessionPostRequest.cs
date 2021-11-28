@@ -1,9 +1,8 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record SessionPostRequest()
 {
-    public record SessionPostRequest()
-    {
-        public string UserName { get; init; } = default!;
-        public string Password { get; init; } = default!;
-        public bool RememberMe { get; init; } = true;
-    }
+    public string UserName { get; init; } = default!;
+    public string Password { get; init; } = default!;
+    public bool RememberMe { get; init; } = true;
 }

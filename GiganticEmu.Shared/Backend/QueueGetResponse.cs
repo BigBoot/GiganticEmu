@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record QueueGetResponse(RequestResult Code) : ResponseBase(Code)
 {
-    public record QueueGetResponse(RequestResult Code) : ResponseBase(Code)
-    {
-        public ICollection<string> Players { get; init; } = default!;
-    }
+    public ICollection<string> Players { get; init; } = default!;
 }

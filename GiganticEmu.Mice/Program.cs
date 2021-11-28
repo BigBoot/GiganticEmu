@@ -5,31 +5,29 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace GiganticEmu.Mice
+namespace GiganticEmu.Mice;
+
+class Program
 {
-    class Program
+    static async Task Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            JsonExtensionMethods.DefaultOptions.Converters.Add(new DynamicJsonConverter());
-            JsonExtensionMethods.DefaultOptions.WriteIndented = false;
+        JsonExtensionMethods.DefaultOptions.Converters.Add(new DynamicJsonConverter());
+        JsonExtensionMethods.DefaultOptions.WriteIndented = false;
 
-            Task.Run(async () => await CreateHostBuilder(args).Build().RunAsync())
-                .GetAwaiter().GetResult();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) => new HostBuilder()
-            .ConfigureHostConfiguration(configHost => configHost.AddBackendHostConfiguration(args))
-            .ConfigureAppConfiguration((hostContext, configApp) => configApp.AddBackendAppConfiguration(args))
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.Configure<BackendConfiguration>(hostContext.Configuration.GetSection(BackendConfiguration.GiganticEmu));
-                services.AddApplicationDatabase();
-
-                services.AddMice();
-            })
-            .AddBackendLogging()
-            .UseConsoleLifetime();
+        await CreateHostBuilder(args).Build().RunAsync();
     }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) => new HostBuilder()
+        .ConfigureHostConfiguration(configHost => configHost.AddBackendHostConfiguration(args))
+        .ConfigureAppConfiguration((hostContext, configApp) => configApp.AddBackendAppConfiguration(args))
+        .ConfigureServices((hostContext, services) =>
+        {
+            services.Configure<BackendConfiguration>(hostContext.Configuration.GetSection(BackendConfiguration.GiganticEmu));
+            services.AddApplicationDatabase();
+
+            services.AddMice();
+        })
+        .AddBackendLogging()
+        .UseConsoleLifetime();
 }
 

@@ -1,7 +1,6 @@
-namespace GiganticEmu.Shared
-{
-    public record SessionDeleteRequest()
-    {
+namespace GiganticEmu.Shared;
 
-    }
+public record SessionDeleteRequest()
+{
+
 }

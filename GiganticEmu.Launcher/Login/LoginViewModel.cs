@@ -5,41 +5,40 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 
-namespace GiganticEmu.Launcher
+namespace GiganticEmu.Launcher;
+
+public class LoginViewModel : ReactiveObject
 {
-    public class LoginViewModel : ReactiveObject
+    [Reactive]
+    public bool IsLoading { get; set; } = false;
+
+    [Reactive]
+    public UserData? User { get; set; } = null;
+
+    [Reactive]
+    public string UserName { get; set; } = "";
+
+    [Reactive]
+    public string Password { get; set; } = "";
+
+    [Reactive]
+    public ICollection<string> Errors { get; set; } = new List<string>();
+
+    public ReactiveCommand<Unit, Unit> Login { get; }
+
+    public LoginViewModel()
     {
-        [Reactive]
-        public bool IsLoading { get; set; } = false;
+        Login = ReactiveCommand.CreateFromTask(DoLogin);
+    }
 
-        [Reactive]
-        public UserData? User { get; set; } = null;
-
-        [Reactive]
-        public string UserName { get; set; } = "";
-
-        [Reactive]
-        public string Password { get; set; } = "";
-
-        [Reactive]
-        public ICollection<string> Errors { get; set; } = new List<string>();
-
-        public ReactiveCommand<Unit, Unit> Login { get; }
-
-        public LoginViewModel()
+    private async Task DoLogin()
+    {
+        IsLoading = true;
+        (User, Errors) = await Locator.Current.GetService<UserManager>()!.Login(UserName, Password);
+        if (User?.AuthToken is string token)
         {
-            Login = ReactiveCommand.CreateFromTask(DoLogin);
+            await Locator.Current.GetService<CredentialStorage>()!.SaveToken(token);
         }
-
-        private async Task DoLogin()
-        {
-            IsLoading = true;
-            (User, Errors) = await Locator.Current.GetService<UserManager>()!.Login(UserName, Password);
-            if(User?.AuthToken is string token)
-            {
-                await Locator.Current.GetService<CredentialStorage>()!.SaveToken(token);
-            }
-            IsLoading = false;
-        }
+        IsLoading = false;
     }
 }

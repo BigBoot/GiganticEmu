@@ -1,7 +1,6 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record SessionGetResponse(RequestResult Code) : ResponseBase(Code)
 {
-    public record SessionGetResponse(RequestResult Code) : ResponseBase(Code)
-    {
-        public string? UserName { get; init; } = default!;
-    }
+    public string? UserName { get; init; } = default!;
 }

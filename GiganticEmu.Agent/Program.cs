@@ -5,34 +5,31 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace GiganticEmu.Agent
+namespace GiganticEmu.Agent;
+
+class Program
 {
-    class Program
+    static async Task Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            JsonExtensionMethods.DefaultOptions.WriteIndented = false;
+        JsonExtensionMethods.DefaultOptions.WriteIndented = false;
+        await CreateHostBuilder(new string[] { }).Build().RunAsync();
+    }
 
-            Task.Run(async () => await CreateHostBuilder(new string[] { }).Build().RunAsync())
-                .GetAwaiter().GetResult();
-        }
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                var configuration = new ConfigurationBuilder()
+                    .AddAgentConfiguration(args)
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .Build();
+                var agentConfiguration = new AgentConfiguration();
+                configuration.Bind(agentConfiguration, o => o.BindNonPublicProperties = true);
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    var configuration = new ConfigurationBuilder()
-                        .AddAgentConfiguration(args)
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .Build();
-                    var agentConfiguration = new AgentConfiguration();
-                    configuration.Bind(agentConfiguration, o => o.BindNonPublicProperties = true);
-
-                    webBuilder.UseConfiguration(configuration);
-                    webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls($"http://{agentConfiguration.BindInterface}:{agentConfiguration.WebPort}/");
-                }).UseConsoleLifetime();
-        }
+                webBuilder.UseConfiguration(configuration);
+                webBuilder.UseStartup<Startup>();
+                webBuilder.UseUrls($"http://{agentConfiguration.BindInterface}:{agentConfiguration.WebPort}/");
+            }).UseConsoleLifetime();
     }
 }

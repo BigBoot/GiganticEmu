@@ -1,15 +1,14 @@
 ﻿using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace GiganticEmu.Launcher
+namespace GiganticEmu.Launcher;
+
+public class LoginContainerViewModel : ReactiveObject
 {
-    public class LoginContainerViewModel : ReactiveObject
-    {
-        [Reactive]
-        public bool IsLoading { get; set; } = false;
+    [Reactive]
+    public bool IsLoading { get; set; } = false;
 
-        [Reactive]
-        public UserData? User { get; set; } = null;
+    [Reactive]
+    public UserData? User { get; set; } = null;
 
-    }
 }

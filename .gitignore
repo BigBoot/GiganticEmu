@@ -1,5 +1,4 @@
-[Bb]in/
-[Oo]bj/
+build/
 packages/
 dist/
 app.db

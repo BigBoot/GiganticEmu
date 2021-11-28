@@ -1,7 +1,6 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public record ServerPostResponse(RequestResult Code) : ResponseBase(Code)
 {
-    public record ServerPostResponse(RequestResult Code) : ResponseBase(Code)
-    {
-        public int Port { get; init; } = default!;
-    }
+    public int Port { get; init; } = default!;
 }

@@ -1,12 +1,11 @@
-namespace GiganticEmu.Shared
+namespace GiganticEmu.Shared;
+
+public enum UserStatus
 {
-    public enum UserStatus
-    {
-        InMatch,
-        InQueue,
-        InGame,
-        Online,
-        Offline,
-        Unknown
-    }
+    InMatch,
+    InQueue,
+    InGame,
+    Online,
+    Offline,
+    Unknown
 }
