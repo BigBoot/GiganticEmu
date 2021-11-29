@@ -10,18 +10,18 @@ namespace GiganticEmu.Shared.LegacyApi
         [JsonPropertyName("max_players")]
         public int? MaxPlayers { get; init; } = default!;
 
+        [JsonPropertyName("creature0")]
+        public string? Creature0 { get; init; } = default!;
+
         [JsonPropertyName("creature1")]
         public string? Creature1 { get; init; } = default!;
 
         [JsonPropertyName("creature2")]
         public string? Creature2 { get; init; } = default!;
 
-        [JsonPropertyName("creature3")]
-        public string? Creature3 { get; init; } = default!;
-
         public (string, string, string)? Creatures
         {
-            get => Creature1 != null && Creature2 != null && Creature3 != null ? (Creature1, Creature2, Creature3) : null;
+            get => Creature0 != null && Creature1 != null && Creature2 != null ? (Creature0, Creature1, Creature2) : null;
         }
     }
 }
