@@ -86,3 +86,17 @@ jobs:
           commit: ${{ github.sha }}
           tag: v${{ steps.version.outputs.informationalVersion }}
           prerelease: ${{ steps.version.outputs.preReleaseLabel  != '' }}
+
+      - name: Create Discord release notification
+        uses: rjstone/discord-webhook-notify@v1.0.4
+        if: ${{ steps.version.outputs.commitsSinceVersionSource == '0' }}
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: info
+          username: GiganticEmu
+          color: "#1a7d93"
+          avatarUrl: https://cdn.jsdelivr.net/gh/BigBoot/GiganticEmu@master/GiganticEmu.Agent/icon.png
+          description: "[Release v${{ steps.version.outputs.informationalVersion }}](https://github.com/BigBoot/GiganticEmu/releases/tag/v${{ steps.version.outputs.informationalVersion }})"
+          details: ${{ steps.changelog.outputs.description }}
+          footer: Release Notification
+
