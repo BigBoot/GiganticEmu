@@ -133,7 +133,14 @@ public class ServerManager
         }
 
         await File.WriteAllTextAsync(defGameIniPath, defGameIni);
-        process.StartInfo.ArgumentList.Add($"-defgameini={defGameIniPath}");
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            process.StartInfo.ArgumentList.Add($"-defgameini={defGameIniPath}");
+        }
+        else
+        {
+            process.StartInfo.ArgumentList.Add($"-defgameini=Z:{defGameIniPath.Replace('/', '\\')}");
+        }
 
         process.Start();
         _instances.Add(port, new Instance(process, adminPassword));
