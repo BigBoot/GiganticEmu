@@ -3,6 +3,7 @@ using GiganticEmu.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -95,6 +96,7 @@ public class MainContainerViewModel : ReactiveObject
 
     private async Task DoStartServer()
     {
+        var logger = Locator.Current.GetService<ILogger<MainContainerViewModel>>()!;
         var config = Locator.Current.GetService<LauncherConfiguration>()!;
         var path = Path.GetFullPath(Path.Join(config.Game));
 
@@ -127,7 +129,7 @@ public class MainContainerViewModel : ReactiveObject
                     webBuilder.UseConfiguration(configuration);
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls($"http://127.0.0.1:{agentConfiguration.WebPort}/");
-                }).Build().RunAsync());
+                }).Build().RunAsync()).LogExceptions(logger);
         }
 
         System.Diagnostics.Process.Start(new ProcessStartInfo

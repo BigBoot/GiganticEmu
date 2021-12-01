@@ -152,13 +152,13 @@ public class ServerManager
             _instances.Remove(port);
             _freePorts.Enqueue(port, port);
             File.Delete(defGameIniPath);
-        });
+        }).LogExceptions(_logger);
 
         _ = Task.Run(async () =>
         {
             await Task.Delay(TimeSpan.FromHours(1));
             process.Kill();
-        });
+        }).LogExceptions(_logger);
 
         return port;
     }

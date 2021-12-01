@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using GiganticEmu.Shared.Backend;
 using System.Collections.Generic;
+using GiganticEmu.Shared;
 
 public class MiceServer : BackgroundService
 {
@@ -41,27 +42,19 @@ public class MiceServer : BackgroundService
                 _logger.LogInformation("Mice Client connected...");
                 var _ = Task.Run(async () =>
                 {
-                    try
+                    using (var scope = _serviceProvider.CreateScope())
                     {
-                        using (var scope = _serviceProvider.CreateScope())
+                        var client = scope.ServiceProvider.GetRequiredService<MiceClient>();
+
+                        ConnectedClients.Add(client);
+                        client.ConnectionClosed += (sender, ev) =>
                         {
-                            var client = scope.ServiceProvider.GetRequiredService<MiceClient>();
+                            ConnectedClients.Remove(client);
+                        };
 
-                            ConnectedClients.Add(client);
-                            client.ConnectionClosed += (sender, ev) =>
-                            {
-                                ConnectedClients.Remove(client);
-                            };
-
-                            await client.Run(conn, cancellationToken);
-                        }
+                        await client.Run(conn, cancellationToken);
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "MiceClient exception");
-                    }
-                });
-
+                }).LogExceptions(_logger, "MiceClient exception");
             }
         }
         finally
