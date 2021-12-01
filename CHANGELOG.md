@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - improved logging for background tasks
 
+### Fixed 
+- GiganticEmu.Web && GiganticEmu.Mice docker container .net version
+
 ## [2.0.3] - 2021-11-29
 ### Fixed
 - Legacy/Fang api
