@@ -66,19 +66,13 @@ public class Startup
 
         app.UseRouting();
 
-        //app.UseAuthentication();
+        //app.UseAuthentication(); 
         //app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
         });
-
-        using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-        {
-            var context = serviceScope.ServiceProvider.GetService<ApplicationDatabase>();
-            context?.Database.Migrate();
-        }
 
     }
 }

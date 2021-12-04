@@ -28,8 +28,6 @@ public partial class App : Application
 
     public App()
     {
-        Settings.Load();
-
         Parser.Default.ParseArguments<Options>(Environment.GetCommandLineArgs())
                .WithParsed<Options>(o =>
                 {
@@ -50,10 +48,5 @@ public partial class App : Application
         {
             BaseAddress = new Uri(Locator.Current.GetService<LauncherConfiguration>()!.Host)
         }), typeof(IBackendApi));
-    }
-
-    private void Application_Exit(object sender, ExitEventArgs e)
-    {
-        Settings.Save();
     }
 }

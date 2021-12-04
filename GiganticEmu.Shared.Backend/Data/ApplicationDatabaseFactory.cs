@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -14,12 +15,19 @@ namespace GiganticEmu.Shared.Backend
         public ApplicationDatabase CreateDbContext()
         {
             var builder = new DbContextOptionsBuilder<ApplicationDatabase>()
-                .UseNpgsql(Environment.GetEnvironmentVariable("CONNECTIONSTRINGS__POSTGRES"), options =>
+                .UseNpgsql(Environment.GetEnvironmentVariable("CONNECTIONSTRINGS__POSTGRES")!, options =>
                 {
                     options.EnableRetryOnFailure();
                 });
 
-            return new ApplicationDatabase(builder.Options);
+            var db = new ApplicationDatabase(builder.Options);
+
+            if (db.Database.GetPendingMigrations().Count() > 0)
+            {
+                db.Database.Migrate();
+            }
+
+            return db;
         }
 
         public static void Main(string[] args)

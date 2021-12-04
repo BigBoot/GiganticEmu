@@ -1,4 +1,4 @@
-﻿using GiganticEmu.Agent;
+using GiganticEmu.Agent;
 using GiganticEmu.Shared;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -56,7 +56,7 @@ public class MainContainerViewModel : ReactiveObject
 
         var arcsdkMetadata = File.Exists(Path.Join(path, "ArcSDK.dll")) ? FileVersionInfo.GetVersionInfo(Path.Join(path, "ArcSDK.dll")) : null;
 
-        if (arcsdkMetadata == null || arcsdkMetadata.InternalName != "ArcSDK" || arcsdkMetadata.ProductVersion == null)
+        if (arcsdkMetadata == null || arcsdkMetadata.ProductName != "ArcSDK" || arcsdkMetadata.ProductVersion == null)
         {
             var result = MessageBox.Show("Unknown ArcSDK.dll version found.\nThis probably means this is your first time running MistforgeLauncher.\nMistforgeLauncher needs to replace the ArcSDK.dll with it's own version to continue.\n\nDo you want to continue?", "Unknown ArcSDK.dll version!", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes) return;

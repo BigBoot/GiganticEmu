@@ -5,9 +5,9 @@
 
   <ItemGroup>
     <PackageReference Include="Fetchgoods.Text.Json.Extensions" Version="0.1.0" />
-    <PackageReference Include="System.IO.Pipelines" Version="4.7.2" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.5" />
+    <PackageReference Include="System.IO.Pipelines" Version="6.0.0" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
