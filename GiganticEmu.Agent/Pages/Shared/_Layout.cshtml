@@ -84,14 +84,21 @@
                 <nav class="float-left">
                     <ul>
                         <li>
-                            <a href="#">Gigantic Control Panel @ViewData["AppVersion"]</a>
+                            <a href="https://github.com/BigBoot/GiganticEmu">GiganticEmu.Agent
+                                @GitVersionInformation.InformationalVersion @if
+                                (GitVersionInformation.CommitsSinceVersionSource != "0" ||
+                                GitVersionInformation.UncommittedChanges != "0")
+                                {
+                                    <text>(unofficial)</text>
+                                }
+                            </a>
                         </li>
                     </ul>
                 </nav>
                 <div class="float-right">
                     <ul>
                         <li>
-                            <a href="#">&copy;
+                            <a href="https://github.com/BigBoot">&copy;
                                 <script> document.write(new Date().getFullYear())</script> BigBoot
                             </a>
                         </li>

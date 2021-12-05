@@ -14,7 +14,7 @@ namespace GiganticEmu.Agent;
 
 public class ServerManager
 {
-    private record Instance(Process Process, string AdminPassword);
+    private record Instance(Process Process, string AdminPassword, string DefaultGameIniPath, int Port);
 
     private static Regex RE_CREATURE = new Regex(@"DefaultMinionLoadout\[(\d+)]=""\w*""", RegexOptions.Compiled | RegexOptions.Multiline);
     private static Regex RE_MAX_PLAYERS = new Regex(@"MaxPlayers=\d*", RegexOptions.Compiled | RegexOptions.Multiline);
@@ -30,7 +30,7 @@ public class ServerManager
     private readonly string _binaryPath;
     private readonly string _configPath;
 
-    public int RunningInstances { get => _instances.Count; }
+    public int RunningInstances { get => _configuration.MaxInstances - _freePorts.Count; }
 
     public ServerManager(ILogger<ServerManager> logger, IOptions<AgentConfiguration> configuration)
     {
@@ -51,8 +51,33 @@ public class ServerManager
             throw new NoInstanceAvailableException();
         }
 
-        var process = new Process();
 
+        Instance instance;
+        try
+        {
+            instance = await StartInstance(port, map, maxPlayers, creatures, useLobby);
+        }
+        catch (Exception)
+        {
+            _instances.Remove(port);
+            _freePorts.Enqueue(port, port);
+
+            throw;
+        }
+
+        if (instance != null)
+        {
+            _ = Task
+                .Run(async () => RunInstance(instance))
+                .LogExceptions(_logger);
+        }
+
+        return port;
+    }
+
+    private async Task<Instance> StartInstance(int port, string map, int? maxPlayers, (string, string, string)? creatures, bool useLobby)
+    {
+        var process = new Process();
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -143,24 +168,30 @@ public class ServerManager
         }
 
         process.Start();
-        _instances.Add(port, new Instance(process, adminPassword));
         ChildProcessTracker.AddProcess(process);
 
-        _ = Task.Run(async () =>
-        {
-            await process.WaitForExitAsync();
-            _instances.Remove(port);
-            _freePorts.Enqueue(port, port);
-            File.Delete(defGameIniPath);
-        }).LogExceptions(_logger);
+        var instance = new Instance(process, adminPassword, defGameIniPath, port);
+        _instances.Add(port, instance);
+        return instance;
+    }
 
-        _ = Task.Run(async () =>
+    private async Task RunInstance(Instance instance)
+    {
+        try
         {
-            await Task.Delay(TimeSpan.FromHours(1));
-            process.Kill();
-        }).LogExceptions(_logger);
-
-        return port;
+            var timeout = Task.Delay(TimeSpan.FromHours(1));
+            if (await Task.WhenAny(instance.Process.WaitForExitAsync(), timeout) == timeout)
+            {
+                instance.Process.Kill();
+                await instance.Process.WaitForExitAsync();
+            }
+        }
+        finally
+        {
+            _instances.Remove(instance.Port);
+            _freePorts.Enqueue(instance.Port, instance.Port);
+            File.Delete(instance.DefaultGameIniPath);
+        }
     }
 
     public async Task KillInstance(int port)

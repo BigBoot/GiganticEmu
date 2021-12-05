@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.5] - 2021-12-05
+### Added
+- Error page with Exception details to Gigantic.Agent
+
+### Changed
+- Made launching instances more resilient to errors
+
 
 ## [2.0.4] - 2021-12-04
 ### Fixed 
