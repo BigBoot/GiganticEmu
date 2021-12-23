@@ -38,10 +38,16 @@ string(TIMESTAMP CURRENT_YEAR "%Y")
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
+set(SUBHOOK_STATIC ON)
+set(SUBHOOK_TESTS OFF)
+add_subdirectory(subhook)
+set_property(TARGET subhook PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS src/*.h src/*.hpp)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.c src/*.cpp)
 set(FILES ${HEADERS} ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 
 add_library(${PROJECT_NAME} SHARED ${FILES})
+target_link_libraries(${PROJECT_NAME} subhook)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

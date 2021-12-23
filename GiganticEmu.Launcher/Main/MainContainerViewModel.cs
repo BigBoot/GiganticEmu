@@ -89,6 +89,7 @@ public class MainContainerViewModel : ReactiveObject
         process.StartInfo.ArgumentList.Add($"-emu:nickname={User?.UserName}");
         process.StartInfo.ArgumentList.Add($"-emu:username={User?.UserName}");
         process.StartInfo.ArgumentList.Add($"-emu:auth_token={User?.AuthToken}");
+        process.StartInfo.ArgumentList.Add($"-emu:language={Settings.GameLanguage}");
         process.StartInfo.ArgumentList.Add($"-emu:launch_code={(giganticMetadata.ProductBuildPart == 16601 ? 0 : 0xE0000019)}");
 
         process.Start();

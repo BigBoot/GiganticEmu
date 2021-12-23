@@ -21,6 +21,9 @@
 #include <locale>
 #include <codecvt>
 #include <shellapi.h>
+#include <WinNls.h>
+
+#include <subhook.h>
 
 PROCESS_INFORMATION pi;
 
@@ -28,6 +31,16 @@ std::wstring nickname;
 std::wstring username;
 std::wstring auth_token;
 int64_t launch_code;
+LCID lc_id = MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT);
+
+subhook::Hook Hook_GetUserDefaultLangID;
+
+typedef LANGID(WINAPI *TrueGetUserDefaultLangID)();
+
+LCID WINAPI GetUserDefaultLCID_Hooked()
+{
+    return lc_id;
+}
 
 void ArcPanic(const char *message)
 {
@@ -80,10 +93,24 @@ void Init()
             {
                 launch_code = std::stoi(std::wstring(szArglist[i] + wcslen(L"-emu:launch_code=")));
             }
+            if (wcsncmp(szArglist[i], L"-emu:language=INT", wcslen(L"-emu:language=INT")) == 0)
+            {
+                lc_id = MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT);
+            }
+            else if (wcsncmp(szArglist[i], L"-emu:language=DEU", wcslen(L"-emu:language=DEU")) == 0)
+            {
+                lc_id = MAKELCID(MAKELANGID(LANG_GERMAN, SUBLANG_GERMAN), SORT_DEFAULT);
+            }
+            else if (wcsncmp(szArglist[i], L"-emu:language=FRA", wcslen(L"-emu:language=FRA")) == 0)
+            {
+                lc_id = MAKELCID(MAKELANGID(LANG_FRENCH, SUBLANG_FRENCH), SORT_DEFAULT);
+            }
         }
     }
 
     LocalFree(szArglist);
+
+    Hook_GetUserDefaultLangID.Install((void *)GetUserDefaultLCID, (void *)GetUserDefaultLCID_Hooked);
 }
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID reserved)

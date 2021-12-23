@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -10,10 +11,20 @@ public enum MessageBoxType
 {
     MessageBox = 0,
     InputBox = 1,
+    ComboBox = 2,
 }
 
 public partial class Prompt : Window
 {
+    public record Entry
+    {
+        public string Text { get; init; }
+        public string Value { get; init; }
+
+        public Entry(string text, string? value)
+            => (Text, Value) = (text, value ?? text);
+    }
+
     public string? Text;
     public MessageBoxButton Button { get; set; } = MessageBoxButton.OK;
     public MessageBoxImage Image { get; set; } = MessageBoxImage.None;
@@ -44,6 +55,7 @@ public partial class Prompt : Window
         ButtonCancel.Visibility = Visibility.Collapsed;
 
         TextBlockInput.Visibility = Visibility.Collapsed;
+        ComboBox.Visibility = Visibility.Collapsed;
 
         base.Title = string.IsNullOrEmpty(Title) ? "" : Title;
         TextBlockText.Text = Text ?? "";
@@ -96,6 +108,10 @@ public partial class Prompt : Window
                 TextBlockInput.Text = DefaultResponse ?? "";
                 TextBlockInput.SelectAll();
                 TextBlockInput.Focus();
+                break;
+            case MessageBoxType.ComboBox:
+                ComboBox.Visibility = Visibility.Visible;
+                ComboBox.Focus();
                 break;
         }
 
@@ -155,6 +171,27 @@ public partial class Prompt : Window
         if (w.ShowDialog() == true && w.Result == MessageBoxResult.OK)
         {
             return w.TextBlockInput.Text;
+        }
+
+        return null;
+    }
+
+    public static string? ShowComboBox(IEnumerable<Entry> values, string text = "", string title = "", MessageBoxImage icon = MessageBoxImage.Information, string? defaultValue = null, Window? owner = null)
+    {
+        Prompt w = new Prompt();
+        if (!(owner == null)) { w.Owner = owner; w.Icon = owner.Icon; }
+        w.Type = MessageBoxType.ComboBox;
+        w.Text = text;
+        w.Title = title;
+        w.Button = MessageBoxButton.OKCancel;
+        w.Image = icon;
+        w.ComboBox.ItemsSource = values;
+        w.ComboBox.SelectedValue = values.FirstOrDefault(x => x.Value == defaultValue);
+        
+
+        if (w.ShowDialog() == true && w.Result == MessageBoxResult.OK)
+        {
+            return (w.ComboBox.SelectedValue as Entry)?.Value;
         }
 
         return null;

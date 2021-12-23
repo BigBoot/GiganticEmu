@@ -1,0 +1,3 @@
+[submodule "ArcSDK/subhook"]
+	path = ArcSDK/subhook
+	url = https://github.com/Zeex/subhook.git

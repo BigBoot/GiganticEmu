@@ -28,15 +28,17 @@ public partial class App : Application
 
     public App()
     {
+        Settings.Load();
+
         Parser.Default.ParseArguments<Options>(Environment.GetCommandLineArgs())
-               .WithParsed<Options>(o =>
+            .WithParsed<Options>(o =>
+            {
+                Locator.CurrentMutable.RegisterLazySingleton(() => new LauncherConfiguration()
                 {
-                    Locator.CurrentMutable.RegisterLazySingleton(() => new LauncherConfiguration()
-                    {
-                        Host = o.Host,
-                        Game = o.Game
-                    });
+                    Host = o.Host,
+                    Game = o.Game
                 });
+            });
 
         Locator.CurrentMutable.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
 
@@ -48,5 +50,10 @@ public partial class App : Application
         {
             BaseAddress = new Uri(Locator.Current.GetService<LauncherConfiguration>()!.Host)
         }), typeof(IBackendApi));
+    }
+
+    private void Application_Exit(object sender, ExitEventArgs e)
+    {
+        Settings.Save();
     }
 }

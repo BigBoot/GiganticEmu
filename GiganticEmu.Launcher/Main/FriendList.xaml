@@ -29,6 +29,7 @@
                                         <VirtualizingStackPanel Orientation="Vertical" />
                                     </ItemsPanelTemplate>
                                 </Menu.ItemsPanel>
+                                <MenuItem x:Name="ButtonSetGameLanguage" Header="Set game language" />
                                 <MenuItem x:Name="ButtonLogout" Header="Logout" />
                             </Menu>
                         </Border>
