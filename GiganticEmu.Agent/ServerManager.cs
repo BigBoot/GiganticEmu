@@ -179,7 +179,7 @@ public class ServerManager
     {
         try
         {
-            var timeout = Task.Delay(TimeSpan.FromHours(1));
+            var timeout = Task.Delay(TimeSpan.FromHours(2));
             if (await Task.WhenAny(instance.Process.WaitForExitAsync(), timeout) == timeout)
             {
                 instance.Process.Kill();
