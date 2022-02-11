@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using ReactiveUI;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -90,7 +92,11 @@ public partial class SetupGame
 
                     if (dlg.ShowDialog() == true)
                     {
-                        ViewModel.InstallPath = dlg.SelectedPath;
+                        ViewModel.InstallPath = dlg.SelectedPath switch
+                        {
+                          var path when Directory.Exists(path) && new DirectoryInfo(path).EnumerateFileSystemInfos().Any() => Path.Join(path, "Gigantic"),
+                          var path => path,
+                        };
                     }
                 })
                 .Subscribe()
