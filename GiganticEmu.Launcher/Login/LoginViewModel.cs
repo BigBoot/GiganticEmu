@@ -25,10 +25,12 @@ public class LoginViewModel : ReactiveObject
     public ICollection<string> Errors { get; set; } = new List<string>();
 
     public ReactiveCommand<Unit, Unit> Login { get; }
+    public ReactiveCommand<Unit, Unit> StartOffline { get; }
 
     public LoginViewModel()
     {
         Login = ReactiveCommand.CreateFromTask(DoLogin);
+        StartOffline = ReactiveCommand.CreateFromTask(DoStartOffline);
     }
 
     private async Task DoLogin()
@@ -40,5 +42,10 @@ public class LoginViewModel : ReactiveObject
             await Locator.Current.GetService<CredentialStorage>()!.SaveToken(token);
         }
         IsLoading = false;
+    }
+
+    private async Task DoStartOffline()
+    {
+        GameLauncher.StartGame(Settings.OfflineName, Settings.OfflineName);
     }
 }

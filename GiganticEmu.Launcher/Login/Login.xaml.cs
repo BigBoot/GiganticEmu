@@ -40,6 +40,11 @@ public partial class Login
                 view => view.ButtonLogin
             );
 
+            this.BindCommand(ViewModel,
+                viewModel => viewModel.StartOffline,
+                view => view.ButtonStartOffline
+            );
+
             Observable.FromEventPattern(TextPassword, nameof(TextPassword.PasswordChanged))
                 .Select(x => ((PasswordBox)x.Sender!).Password)
                 .Do(password => ViewModel.Password = password)

@@ -7,7 +7,15 @@ namespace GiganticEmu.Launcher;
 
 public class Settings
 {
-    public static String GameLanguage { get; set; } = "";
+    public enum Language
+    {
+        English,
+        German, 
+        French,
+    }
+    
+    public static Language GameLanguage { get; set; } = Language.English;
+    public static String OfflineName { get; set; } = "";
 
     public static void Load()
     {
@@ -16,11 +24,14 @@ public class Settings
         {
             var location = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GiganticEmu", "GiganticEmu.Launcher.json");
             var settings = JsonDocument.Parse(File.ReadAllText(location)).RootElement;
-            foreach (var property in typeof(Settings).GetProperties(System.Reflection.BindingFlags.Static))
+            foreach (var property in typeof(Settings).GetProperties(System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public))
             {
                 if (settings.TryGetProperty(property.Name, out var value))
                 {
-                    property.SetValue(null, JsonSerializer.Deserialize(value.GetRawText(), property.PropertyType));
+                    if (value.ValueKind != JsonValueKind.Null)
+                    {
+                        property.SetValue(null, JsonSerializer.Deserialize(value.GetRawText(), property.PropertyType));
+                    }
                 }
             }
         }

@@ -1,16 +1,16 @@
-﻿<local:ReactiveMaterialWindow x:Class="GiganticEmu.Launcher.MainWindow"
-    xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
-    xmlns:bc="clr-namespace:BlurryControls.Controls;assembly=BlurryControls"
-    xmlns:local="clr-namespace:GiganticEmu.Launcher" x:TypeArguments="local:AppViewModel"
+﻿<local:ReactiveMaterialWindow x:Class="GiganticEmu.Launcher.MainWindow" x:TypeArguments="local:AppViewModel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:bc="clr-namespace:BlurryControls.Controls;assembly=BlurryControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mde="https://spiegelp.github.io/MaterialDesignExtensions/winfx/xaml"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    mc:Ignorable="d"
     Icon="/icon.ico"
     TitleBarIcon="/Resources/transparent.png"
-    xmlns:reactiveui="http://reactiveui.net" ResizeMode="NoResize" Title="" Height="600" Width="1000" FadeContentIfInactive="False" BorderForegroundBrush="#1a7d93" KeyboardNavigation.TabNavigation="None" WindowStartupLocation="CenterScreen">
+    ResizeMode="NoResize" Title="" Height="600" Width="1000" FadeContentIfInactive="False" BorderForegroundBrush="#1a7d93" KeyboardNavigation.TabNavigation="None" WindowStartupLocation="CenterScreen">
 
     <mde:MaterialWindow.BorderBackgroundBrush>
         <ImageBrush x:Name="WindowBackgroundBrush" />
@@ -32,16 +32,26 @@
 
             <bc:BlurryUserControl VerticalAlignment="Stretch" HorizontalAlignment="Center" Background="#BFFFFFFF" Margin="30,15,30,30" Width="600" BlurContainer="{Binding ElementName=BlurContainer}" BlurRadius="100" Magnification="0">
                 <Border Padding="30">
-                    <DockPanel VerticalAlignment="Stretch">
-                        <TextBlock DockPanel.Dock="Top" FontSize="50" FontWeight="Bold" Margin="0 0 0 20" HorizontalAlignment="Center" Foreground="#1a7d93" FontFamily="/Resources/troika.otf#Troika" Text="Mistforge Launcher" />
+                    <Grid VerticalAlignment="Stretch">
+                        <DockPanel>
+                            <DockPanel Dock="Top">
+                                <Button x:Name="ButtonSettings" HorizontalAlignment="Right" Style="{DynamicResource MaterialDesignToolButton}" ToolTip="Settings">
+                                    <materialDesign:PackIcon Kind="Cog" />
+                                </Button>
+                            </DockPanel>
+                            <Canvas></Canvas>
+                        </DockPanel>
+                        <TextBlock x:Name="PageTitle" DockPanel.Dock="Top" FontSize="50" FontWeight="Bold" Margin="0 0 0 20" HorizontalAlignment="Center" Foreground="#1a7d93" FontFamily="/Resources/troika.otf#Troika" />
                         <Grid VerticalAlignment="Stretch">
                             <ProgressBar x:Name="ProgressLoading" IsIndeterminate="True" Value="0" Style="{StaticResource MaterialDesignCircularProgressBar}" Width="64" Height="64" d:IsHidden="true" />
                             <Grid x:Name="ContainerContent">
                                 <local:LoginContainer x:Name="PageLogin" />
                                 <local:MainContainer x:Name="PageMain" d:IsHidden="true" />
+                                <local:SettingsContainerView x:Name="PageSettings" d:IsHidden="true" />
+                                <local:SetupGame x:Name="PageSetupGame" d:IsHidden="true" />
                             </Grid>
                         </Grid>
-                    </DockPanel>
+                    </Grid>
                 </Border>
             </bc:BlurryUserControl>
 

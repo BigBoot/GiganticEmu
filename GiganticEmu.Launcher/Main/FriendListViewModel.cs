@@ -20,7 +20,7 @@ public class FriendListViewModel : ReactiveObject
     [Reactive]
     public UserData? User { get; set; } = null;
 
-    private SourceCache<FriendData, string> _friends = new SourceCache<FriendData, string>(x => x.UserName);
+    private SourceCache<FriendData, string> _friends = new(x => x.UserName);
     public IObservableCollection<FriendListEntryViewModel> Friends { get; } = new ObservableCollectionExtended<FriendListEntryViewModel>();
     public ReactiveCommand<string, Unit> AddFriend { get; }
     public ReactiveCommand<Unit, Unit> Logout { get; }

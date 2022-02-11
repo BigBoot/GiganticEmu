@@ -42,57 +42,7 @@ public class MainContainerViewModel : ReactiveObject
 
     private async Task DoStartGame()
     {
-        var config = Locator.Current.GetService<LauncherConfiguration>()!;
-        var github = Locator.Current.GetService<GitHub>()!;
-        var path = Path.GetFullPath(Path.Join(config.Game, "Binaries", "Win64"));
-
-        if (!File.Exists(Path.Join(path, "RxGame-Win64-Test.exe")))
-        {
-            MessageBox.Show($"{Path.Join(path, "RxGame-Win64-Test.exe")} not found!", "File not found!", MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-        }
-
-        var giganticMetadata = FileVersionInfo.GetVersionInfo(Path.Join(path, "RxGame-Win64-Test.exe"));
-
-        var arcsdkMetadata = File.Exists(Path.Join(path, "ArcSDK.dll")) ? FileVersionInfo.GetVersionInfo(Path.Join(path, "ArcSDK.dll")) : null;
-
-        if (arcsdkMetadata == null || arcsdkMetadata.ProductName != "ArcSDK" || arcsdkMetadata.ProductVersion == null)
-        {
-            var result = MessageBox.Show("Unknown ArcSDK.dll version found.\nThis probably means this is your first time running MistforgeLauncher.\nMistforgeLauncher needs to replace the ArcSDK.dll with it's own version to continue.\n\nDo you want to continue?", "Unknown ArcSDK.dll version!", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result != MessageBoxResult.Yes) return;
-
-            await github.DownloadFile(Version.ApplicationVersion, "ArcSDK.dll", path);
-        }
-        else
-        {
-            var arcSdkVersion = Version.Parse(arcsdkMetadata.ProductVersion);
-
-            if (Version.ApplicationVersion != arcSdkVersion)
-            {
-                var result = MessageBox.Show("Mismatched ArcSDK.dll version detected. The version of MistforgeLauncher and ArcSDK.dll should match or problems can occur.\n\nShould MistforgeLauncher replace your ArcSDK.dll with the correct version?", "Mismatched ArcSDK.dll version!", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
-                {
-                    await github.DownloadFile(Version.ApplicationVersion, "ArcSDK.dll", path);
-                }
-            }
-        }
-
-        var process = new Process();
-        process.StartInfo = new ProcessStartInfo
-        {
-            FileName = Path.Join(path, "RxGame-Win64-Test.exe")
-        };
-
-        process.StartInfo.ArgumentList.Add($"-ini:RxEngine:MotigaAuthIntegration.AuthUrlPrefix={config.Host}/,ArcIntegration.AuthUrlPrefix={config.Host}/");
-        process.StartInfo.ArgumentList.Add($"-log=GiganticEmu.Launcher.{User!.UserName}.log");
-
-        process.StartInfo.ArgumentList.Add($"-emu:nickname={User?.UserName}");
-        process.StartInfo.ArgumentList.Add($"-emu:username={User?.UserName}");
-        process.StartInfo.ArgumentList.Add($"-emu:auth_token={User?.AuthToken}");
-        process.StartInfo.ArgumentList.Add($"-emu:language={Settings.GameLanguage}");
-        process.StartInfo.ArgumentList.Add($"-emu:launch_code={(giganticMetadata.ProductBuildPart == 16601 ? 0 : 0xE0000019)}");
-
-        process.Start();
+        GameLauncher.StartGame(User?.UserName, User?.UserName, User?.AuthToken);
     }
 
     private async Task DoStartServer()
@@ -114,26 +64,10 @@ public class MainContainerViewModel : ReactiveObject
             _serverPort = ((IPEndPoint)l.LocalEndpoint).Port;
             l.Stop();
 
-
-            var _ = Task.Run(async () => Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    var configuration = new ConfigurationBuilder()
-                        .AddInMemoryCollection(new List<KeyValuePair<string, string>> {
-                                new KeyValuePair<string, string>(nameof(AgentConfiguration.WebPort), _serverPort?.ToString() ?? ""),
-                                new KeyValuePair<string, string>(nameof(AgentConfiguration.GiganticPath), path),
-                        })
-                        .Build();
-                    var agentConfiguration = new AgentConfiguration();
-                    configuration.Bind(agentConfiguration, o => o.BindNonPublicProperties = true);
-
-                    webBuilder.UseConfiguration(configuration);
-                    webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls($"http://127.0.0.1:{agentConfiguration.WebPort}/");
-                }).Build().RunAsync()).LogExceptions(logger);
+            GameLauncher.StartServer(_serverPort.Value);
         }
 
-        System.Diagnostics.Process.Start(new ProcessStartInfo
+        Process.Start(new ProcessStartInfo
         {
             FileName = $"http://127.0.0.1:{_serverPort}/",
             UseShellExecute = true,

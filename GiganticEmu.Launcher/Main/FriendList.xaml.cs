@@ -49,25 +49,6 @@ public partial class FriendList
                 .Where(x => x != null)
                 .InvokeCommand(this, x => x.ViewModel!.AddFriend!)
                 .DisposeWith(disposables);
-
-            Observable.FromEventPattern(ButtonSetGameLanguage, nameof(ButtonSetGameLanguage.Click))
-                .Select(_ => Prompt.ShowComboBox(
-                    values: new List<Prompt.Entry>
-                        {
-                            new Prompt.Entry("System Language", ""),
-                            new Prompt.Entry("English", "INT"),
-                            new Prompt.Entry("French", "FRA"),
-                            new Prompt.Entry("German", "DEU"),
-                        }, 
-                    title: "Set Game Language", 
-                    text: "Please select the desired language", 
-                    defaultValue: Settings.GameLanguage,
-                    icon: System.Windows.MessageBoxImage.None, 
-                    owner: App.Current.MainWindow
-                ))
-                .Where(x => x != null)
-                .Subscribe(x => Settings.GameLanguage = x!)
-                .DisposeWith(disposables);
         });
     }
 }

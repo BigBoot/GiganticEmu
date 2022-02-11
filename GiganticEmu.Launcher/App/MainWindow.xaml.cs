@@ -1,6 +1,8 @@
 ﻿using ReactiveUI;
 using System;
+using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -34,23 +36,50 @@ public partial class MainWindow
             .DisposeWith(disposables);
 
             this.OneWayBind(ViewModel,
-                viewModel => viewModel.User,
+                viewModel => viewModel.CurrentPage,
                 view => view.PageMain.Visibility,
-                value => value == null ? Visibility.Hidden : Visibility.Visible
+                value => value == AppViewModel.Page.Main ? Visibility.Visible : Visibility.Hidden
             )
             .DisposeWith(disposables);
 
             this.OneWayBind(ViewModel,
-                viewModel => viewModel.User,
-                view => view.PageLogin.Visibility,
-                value => value == null ? Visibility.Visible : Visibility.Hidden
-            )
-            .DisposeWith(disposables);
-
-            this.OneWayBind(ViewModel,
-                viewModel => viewModel.User,
+                viewModel => viewModel.CurrentPage,
                 view => view.FriendListColumn.Width,
-                value => value == null ? new GridLength(0) : new GridLength(1, GridUnitType.Star)
+                value => value == AppViewModel.Page.Main ?  new GridLength(1, GridUnitType.Star) : new GridLength(0)
+            )
+            .DisposeWith(disposables);
+
+            this.OneWayBind(ViewModel,
+                viewModel => viewModel.CurrentPage,
+                view => view.PageLogin.Visibility,
+                value => value == AppViewModel.Page.Login ? Visibility.Visible : Visibility.Hidden
+            )
+            .DisposeWith(disposables);
+
+            this.OneWayBind(ViewModel,
+                viewModel => viewModel.CurrentPage,
+                view => view.PageSettings.Visibility,
+                value => value == AppViewModel.Page.Settings ? Visibility.Visible : Visibility.Hidden
+            )
+            .DisposeWith(disposables);
+
+            this.OneWayBind(ViewModel,
+                viewModel => viewModel.CurrentPage,
+                view => view.PageSetupGame.Visibility,
+                value => value == AppViewModel.Page.SetupGame ? Visibility.Visible : Visibility.Hidden
+            )
+            .DisposeWith(disposables);
+
+            this.OneWayBind(ViewModel,
+                viewModel => viewModel.CurrentPage,
+                view => view.ButtonSettings.Visibility,
+                value => value is AppViewModel.Page.Login or AppViewModel.Page.Main ? Visibility.Visible : Visibility.Hidden
+            )
+            .DisposeWith(disposables);
+
+            this.Bind(ViewModel,
+                viewModel => viewModel.SettingsVisible,
+                view => view.PageSettings.ViewModel!.SettingsVisible
             )
             .DisposeWith(disposables);
 
@@ -71,6 +100,16 @@ public partial class MainWindow
                 view => view.FriendList.ViewModel!.User
             )
             .DisposeWith(disposables);
+
+            this.Bind(ViewModel,
+                viewModel => viewModel.PageTitle,
+                view => view.PageTitle.Text
+            ).DisposeWith(disposables);
+
+            Observable.FromEventPattern(ButtonSettings, nameof(ButtonSettings.Click))
+                .Select(x => Unit.Default)
+                .Subscribe(x => ViewModel.SettingsVisible = true)
+                .DisposeWith(disposables);
 
 
             //new ToastContentBuilder()
