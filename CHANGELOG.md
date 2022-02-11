@@ -42,11 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.4] - 2021-12-04
 ### Fixed 
 - Detection of default ArcSDK.dll
+- GiganticEmu.Web && GiganticEmu.Mice docker container .net version
+
 ### Changed
 - improved logging for background tasks
-
-### Fixed 
-- GiganticEmu.Web && GiganticEmu.Mice docker container .net version
 
 ## [2.0.3] - 2021-11-29
 ### Fixed
