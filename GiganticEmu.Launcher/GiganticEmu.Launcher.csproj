@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autoupdater.NET.Official" Version="1.7.0" />
     <PackageReference Include="BlurryControls.Net" Version="1.0.0" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Crc32.NET" Version="1.2.0" />

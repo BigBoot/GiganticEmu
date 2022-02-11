@@ -40,6 +40,8 @@ public partial class App : Application
                 });
             });
 
+        AutoUpdater.Check();
+
         Locator.CurrentMutable.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
 
         Locator.CurrentMutable.RegisterLazySingleton(() => new CredentialStorage());
