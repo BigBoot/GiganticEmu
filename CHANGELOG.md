@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.9] = 2022-02-11
+### Fixed
+- ArcSDK.dll compilation
+
 ## [2.0.8] - 2022-02-11
 ### Added 
 - Launcher setup mode
