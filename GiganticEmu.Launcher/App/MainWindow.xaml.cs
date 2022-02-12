@@ -45,7 +45,7 @@ public partial class MainWindow
             this.OneWayBind(ViewModel,
                 viewModel => viewModel.CurrentPage,
                 view => view.FriendListColumn.Width,
-                value => value == AppViewModel.Page.Main ?  new GridLength(1, GridUnitType.Star) : new GridLength(0)
+                value => value == AppViewModel.Page.Main ? new GridLength(1, GridUnitType.Star) : new GridLength(0)
             )
             .DisposeWith(disposables);
 
@@ -158,8 +158,9 @@ public partial class MainWindow
             //.Subscribe()
             //.DisposeWith(disposables);
 
-
             ViewModel.RestoreUser.Execute();
+
+            AutoUpdater.Check();
         });
     }
 }

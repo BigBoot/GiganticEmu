@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -6,6 +7,30 @@ namespace GiganticEmu.Launcher;
 
 public static class AutoUpdater
 {
+    private record GithubReleaseInfo
+    {
+        [JsonPropertyName("id")]
+        public long Id { get; set; } = default!;
+
+        [JsonPropertyName("tag_name")]
+        public string TagName { get; set; } = default!;
+
+        [JsonPropertyName("update_url")]
+        public string UpdateUrl { get; set; } = default!;
+
+        [JsonPropertyName("update_authenticity_token")]
+        public string UpdateAuthenticityToken { get; set; } = default!;
+
+        [JsonPropertyName("delete_url")]
+        public string DeleteUrl { get; set; } = default!;
+
+        [JsonPropertyName("delete_authenticity_token")]
+        public string DeleteAuthenticityToken { get; set; } = default!;
+
+        [JsonPropertyName("edit_url")]
+        public string EditUrl { get; set; } = default!;
+    }
+
     private class GithubAuth : AutoUpdaterDotNET.IAuthentication
     {
         public void Apply(ref AutoUpdaterDotNET.MyWebClient webClient)
@@ -33,30 +58,6 @@ public static class AutoUpdater
         }
     }
 
-    private record GithubReleaseInfo
-    {
-        [JsonPropertyName("id")]
-        public long Id { get; set; } = default!;
-
-        [JsonPropertyName("tag_name")]
-        public string TagName { get; set; } = default!;
-
-        [JsonPropertyName("update_url")]
-        public string UpdateUrl { get; set; } = default!;
-
-        [JsonPropertyName("update_authenticity_token")]
-        public string UpdateAuthenticityToken { get; set; } = default!;
-
-        [JsonPropertyName("delete_url")]
-        public string delete_url { get; set; } = default!;
-
-        [JsonPropertyName("delete_authenticity_token")]
-        public string DeleteAuthenticityToken { get; set; } = default!;
-
-        [JsonPropertyName("edit_url")]
-        public string EditUrl { get; set; } = default!;
-    }
-
     public static void Check()
     {
         AutoUpdaterDotNET.AutoUpdater.AppTitle = "Mistforge Launcher";
@@ -67,6 +68,21 @@ public static class AutoUpdater
             int.Parse(GitVersionInformation.Patch)
         );
 
+        try
+        {
+            System.Security.AccessControl.DirectorySecurity ds = new FileInfo(Environment.ProcessPath!)
+                .Directory!
+                .GetAccessControl();
+
+            AutoUpdaterDotNET.AutoUpdater.RunUpdateAsAdmin = false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            AutoUpdaterDotNET.AutoUpdater.RunUpdateAsAdmin = true;
+        }
+
+        AutoUpdaterDotNET.AutoUpdater.InstallationPath = new FileInfo(Environment.ProcessPath!).DirectoryName;
+
         AutoUpdaterDotNET.AutoUpdater.PersistenceProvider = new PersistanceProvider();
 
         AutoUpdaterDotNET.AutoUpdater.ParseUpdateInfoEvent += (args) =>
@@ -76,8 +92,9 @@ public static class AutoUpdater
             args.UpdateInfo = new AutoUpdaterDotNET.UpdateInfoEventArgs
             {
                 CurrentVersion = json.TagName.Substring(1),
-                ChangelogURL = $"https://github.com/BigBoot/GiganticEmu/releases/",
+                ChangelogURL = "https://github.com/BigBoot/GiganticEmu/releases",
                 DownloadURL = $"https://github.com/BigBoot/GiganticEmu/releases/download/{json.TagName}/MistforgeLauncher.exe",
+                InstallerArgs = $"--update-target=\"{Environment.ProcessPath!}\"",
             };
         };
 

@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Splat;
-using Version = GiganticEmu.Shared.Version;
 
 namespace GiganticEmu.Launcher;
 
@@ -37,23 +36,23 @@ public static class GameLauncher
 
         var arcsdkMetadata = File.Exists(Path.Join(path, "ArcSDK.dll")) ? FileVersionInfo.GetVersionInfo(Path.Join(path, "ArcSDK.dll")) : null;
 
-        if (arcsdkMetadata is not {ProductName: "ArcSDK"} || arcsdkMetadata.ProductVersion == null)
+        if (arcsdkMetadata is not { ProductName: "ArcSDK" } || arcsdkMetadata.ProductVersion == null)
         {
             var result = MessageBox.Show("Unknown ArcSDK.dll version found.\nThis probably means this is your first time running MistforgeLauncher.\nMistforgeLauncher needs to replace the ArcSDK.dll with it's own version to continue.\n\nDo you want to continue?", "Unknown ArcSDK.dll version!", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes) return;
 
-            await github.DownloadFile(Version.ApplicationVersion, "ArcSDK.dll", path);
+            await github.DownloadFile(SemVer.ApplicationVersion, "ArcSDK.dll", path);
         }
         else
         {
-            var arcSdkVersion = Version.Parse(arcsdkMetadata.ProductVersion);
+            var arcSdkVersion = SemVer.Parse(arcsdkMetadata.ProductVersion);
 
-            if (Version.ApplicationVersion != arcSdkVersion)
+            if (SemVer.ApplicationVersion != arcSdkVersion)
             {
                 var result = MessageBox.Show("Mismatched ArcSDK.dll version detected. The version of MistforgeLauncher and ArcSDK.dll should match or problems can occur.\n\nShould MistforgeLauncher replace your ArcSDK.dll with the correct version?", "Mismatched ArcSDK.dll version!", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
-                    await github.DownloadFile(Version.ApplicationVersion, "ArcSDK.dll", path);
+                    await github.DownloadFile(SemVer.ApplicationVersion, "ArcSDK.dll", path);
                 }
             }
         }
@@ -63,15 +62,15 @@ public static class GameLauncher
         {
             FileName = Path.Join(path, "RxGame-Win64-Test.exe")
         };
-        
-        process.StartInfo.ArgumentList.Add($"?name={nickname??"Offline"}");
+
+        process.StartInfo.ArgumentList.Add($"?name={nickname ?? "Offline"}");
 
         process.StartInfo.ArgumentList.Add($"-ini:RxEngine:MotigaAuthIntegration.AuthUrlPrefix={config.Host}/,ArcIntegration.AuthUrlPrefix={config.Host}/");
-        process.StartInfo.ArgumentList.Add($"-log=GiganticEmu.Launcher.{username??"offline"}.log");
+        process.StartInfo.ArgumentList.Add($"-log=GiganticEmu.Launcher.{username ?? "offline"}.log");
 
-        process.StartInfo.ArgumentList.Add($"-emu:nickname={nickname??"Offline"}");
-        process.StartInfo.ArgumentList.Add($"-emu:username={username??"Offline"}");
-        process.StartInfo.ArgumentList.Add($"-emu:auth_token={authToken??""}");
+        process.StartInfo.ArgumentList.Add($"-emu:nickname={nickname ?? "Offline"}");
+        process.StartInfo.ArgumentList.Add($"-emu:username={username ?? "Offline"}");
+        process.StartInfo.ArgumentList.Add($"-emu:auth_token={authToken ?? ""}");
         process.StartInfo.ArgumentList.Add(@$"-emu:language={Settings.GameLanguage switch
         {
             Settings.Language.English => "INT",
@@ -83,7 +82,7 @@ public static class GameLauncher
         process.Start();
         await process.WaitForExitAsync();
     }
-    
+
     public static void StartGame(string? username = null, string? nickname = null, string? authToken = null)
     {
         _ = Task.Run(async () => await GameLauncher.RunGame(username, nickname, authToken));

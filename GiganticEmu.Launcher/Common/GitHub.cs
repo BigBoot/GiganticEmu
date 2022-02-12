@@ -7,8 +7,7 @@ namespace GiganticEmu.Launcher;
 
 public class GitHub
 {
-
-    public async Task DownloadFile(Version version, string filename, string targetDir)
+    public async Task DownloadFile(SemVer version, string filename, string targetDir)
     {
         if (File.Exists(Path.Join(targetDir, filename)))
         {

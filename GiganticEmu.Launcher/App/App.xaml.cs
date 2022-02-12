@@ -1,9 +1,12 @@
 ﻿using CommandLine;
 using GiganticEmu.Shared;
+using Ookii.Dialogs.Wpf;
 using ReactiveUI;
 using Refit;
 using Splat;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Windows;
@@ -24,6 +27,9 @@ public partial class App : Application
 
         [Option('g', "game", Required = false, HelpText = "The path to the game.", Default = ".")]
         public string Game { get; set; } = default!;
+
+        [Option("update-target", Required = false, HelpText = "", Default = null, Hidden = true)]
+        public string? UpdateTarget { get; set; }
     }
 
     public App()
@@ -38,9 +44,33 @@ public partial class App : Application
                     Host = o.Host,
                     Game = o.Game
                 });
-            });
 
-        AutoUpdater.Check();
+                if (o.UpdateTarget is string updateTarget)
+                {
+                    var dlg = new ProgressDialog();
+
+                    dlg.WindowTitle = "Mistforge Launcher Update";
+                    dlg.Description = "Applying Update";
+                    dlg.ProgressBarStyle = ProgressBarStyle.MarqueeProgressBar;
+
+                    dlg.Show();
+
+                    var launcherLocation = Environment.ProcessPath!;
+
+                    using (var input = File.OpenRead(launcherLocation))
+                    using (var output = File.Create(updateTarget))
+                    {
+                        input.CopyTo(output);
+                    }
+
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = updateTarget,
+                        WorkingDirectory = new FileInfo(updateTarget).DirectoryName,
+                    });
+                    Application.Current.Shutdown(0);
+                }
+            });
 
         Locator.CurrentMutable.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
 

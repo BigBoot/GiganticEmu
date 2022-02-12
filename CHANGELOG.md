@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.11] - 2022-02-12
+### Added
+- Launcher auto update
+
 ## [2.0.10] - 2022-02-11
 ### Changed
 - Launcher setup create a subfolder when selecting a non empty folder
