@@ -1,0 +1,98 @@
+<rx:ReactiveWindow
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dialoghost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:material="using:Material.Icons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rx="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.MainWindow"
+    x:TypeArguments="local:AppViewModel"
+    mc:Ignorable="d"
+    Icon="/icon.ico"
+    Title="GiganticEmu.Launcher"
+    Height="600"
+    Width="1000"
+    ExtendClientAreaToDecorationsHint="True"
+    ExtendClientAreaChromeHints="NoChrome"
+    ExtendClientAreaTitleBarHeightHint="-1">
+
+    <dialoghost:DialogHost
+        x:Name="DialogHost"
+        CloseOnClickAway="False">
+        <dialoghost:DialogHost.DialogContent>
+            <Panel x:Name="DialogContent" />
+        </dialoghost:DialogHost.DialogContent>
+        <DockPanel>
+            <local:TitleBar
+                DockPanel.Dock="Top"
+                IsSeamless="True" />
+            <Grid
+                x:Name="FriendListContainer"
+                ColumnDefinitions="2* 1*">
+                <Panel Margin="30">
+                    <Grid
+                        Grid.Column="0"
+                        VerticalAlignment="Stretch"
+                        MaxWidth="600">
+                        <local:BlurBehind
+                            CornerRadius="12"
+                            Strength="30"
+                            Background="#C0FFFFFF" />
+                        <Panel
+                            VerticalAlignment="Stretch"
+                            Margin="30">
+                            <ProgressBar
+                                x:Name="ProgressLoading"
+                                Classes="Circle"
+                                IsIndeterminate="True"
+                                Value="0"
+                                Width="64"
+                                Height="64" />
+                            <DockPanel x:Name="ContainerContent">
+                                <RelativePanel
+                                    DockPanel.Dock="Top"
+                                    VerticalAlignment="Top">
+                                    <TextBlock
+                                        x:Name="PageTitle"
+                                        FontSize="50"
+                                        FontWeight="Bold"
+                                        Margin="0 0 0 0"
+                                        HorizontalAlignment="Center"
+                                        Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                        FontFamily="/Resources/troika.otf#Troika"
+                                        RelativePanel.AlignHorizontalCenterWithPanel="True" />
+                                    <Button
+                                        Classes="Flat"
+                                        x:Name="ButtonSettings"
+                                        Padding="6"
+                                        RelativePanel.RightOf="PageTitle">
+                                        <material:MaterialIcon Kind="Cog" />
+                                    </Button>
+                                </RelativePanel>
+                                <Panel
+                                    Margin="0"
+                                    VerticalAlignment="Stretch">
+                                    <local:LoginContainer x:Name="PageLogin" />
+                                    <local:MainContainer x:Name="PageMain" />
+                                    <local:SettingsContainerView x:Name="PageSettings" />
+                                    <local:SetupGame x:Name="PageSetupGame" />
+                                </Panel>
+                            </DockPanel>
+                        </Panel>
+                    </Grid>
+                </Panel>
+                <Panel
+                    Grid.Column="1"
+                    Margin="30">
+                    <local:BlurBehind
+                        CornerRadius="12"
+                        Strength="30"
+                        Background="#C0FFFFFF" />
+                    <local:FriendList x:Name="FriendList" />
+                </Panel>
+            </Grid>
+        </DockPanel>
+    </dialoghost:DialogHost>
+</rx:ReactiveWindow>

@@ -1,0 +1,25 @@
+﻿<rxui:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.MainContainer"
+    x:TypeArguments="local:MainContainerViewModel"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="600">
+
+    <DockPanel KeyboardNavigation.TabNavigation="Cycle">
+        <Button
+            x:Name="ButtonStartGame"
+            TabIndex="1"
+            DockPanel.Dock="Bottom"
+            Content="Start Game"
+            FontSize="32"
+            Margin="0 20"
+            Height="64" />
+        <Canvas />
+    </DockPanel>
+</rxui:ReactiveUserControl> 

@@ -1,0 +1,87 @@
+﻿<rxui:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:material="using:Material.Icons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.MainSettings"
+    x:TypeArguments="local:MainSettingsViewModel"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="600">
+
+    <Grid
+        KeyboardNavigation.TabNavigation="Cycle"
+        VerticalAlignment="Top"
+        ColumnDefinitions="* Auto *"
+        RowDefinitions="Auto Auto Auto">
+
+        <TextBlock
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            Margin="0 10 0 10"
+            Grid.Column="0"
+            Grid.Row="0">
+            Launcher Background
+        </TextBlock>
+        <material:MaterialIcon
+            Height="40"
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="10 0 20 0"
+            Kind="Information"
+            ToolTip.Tip="Set the launcher background image" />
+        <ComboBox
+            Name="LauncherBackground"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Width="200"
+            Grid.Column="2"
+            Grid.Row="0" />
+
+        <TextBlock
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            Margin="0 10 0 10"
+            Grid.Column="0"
+            Grid.Row="1">
+            Game Language
+        </TextBlock>
+        <material:MaterialIcon
+            Height="40"
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="10 0 20 0"
+            Kind="Information"
+            ToolTip.Tip="Override the game language" />
+        <ComboBox
+            Name="GameLanguage"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Width="200"
+            Grid.Column="2"
+            Grid.Row="1" />
+
+        <TextBlock
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            Grid.Column="0"
+            Grid.Row="2">Offline Name</TextBlock>
+        <material:MaterialIcon
+            Height="40"
+            Grid.Row="2"
+            Grid.Column="1"
+            Margin="10 0 20 0"
+            Kind="Information"
+            ToolTip.Tip="Set your name when playing in offline mode" />
+        <TextBox
+            Name="OfflineName"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Grid.Column="2"
+            Grid.Row="2"
+            Width="200" />
+    </Grid>
+</rxui:ReactiveUserControl> 

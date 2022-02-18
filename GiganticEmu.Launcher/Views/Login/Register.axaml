@@ -1,0 +1,76 @@
+﻿<rx:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rx="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.Register"
+    x:TypeArguments="local:RegisterViewModel"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="600">
+
+    <DockPanel KeyboardNavigation.TabNavigation="Cycle">
+        <TextBox
+            x:Name="TextUserName"
+            UseFloatingWatermark="True"
+            assists:TextFieldAssist.Label="Username"
+            Classes=""
+            TabIndex="1"
+            DockPanel.Dock="Top"
+            Margin="100 5" />
+        <TextBox
+            x:Name="TextEmail"
+            UseFloatingWatermark="True"
+            assists:TextFieldAssist.Label="Email"
+            Classes=""
+            TabIndex="2"
+            DockPanel.Dock="Top"
+            Margin="100 5" />
+        <TextBox
+            assists:TextFieldAssist.Label="Password"
+            PasswordChar="*"
+            UseFloatingWatermark="True"
+            Classes="revealPasswordButton"
+            TabIndex="3"
+            x:Name="TextPassword"
+            DockPanel.Dock="Top"
+            Margin="100 5" />
+        <TextBox
+            assists:TextFieldAssist.Label="Confirm Password"
+            PasswordChar="*"
+            UseFloatingWatermark="True"
+            Classes="revealPasswordButton"
+            TabIndex="4"
+            x:Name="TextPasswordConfirm"
+            DockPanel.Dock="Top"
+            Margin="100 5" />
+        <Button
+            x:Name="ButtonLogin"
+            TabIndex="6"
+            DockPanel.Dock="Bottom"
+            Margin="100,-5,100,0"
+            Content="Back to Login"
+            HorizontalAlignment="Center"
+            Classes="Flat" />
+        <Button
+            x:Name="ButtonRegister"
+            TabIndex="5"
+            DockPanel.Dock="Bottom"
+            Content="Register"
+            Margin="100 20" />
+        <TextBlock
+            x:Name="TextError"
+            DockPanel.Dock="Bottom"
+            FontSize="16"
+            Margin="0 0 0 0"
+            HorizontalAlignment="Center"
+            Foreground="Red"
+            Text=""
+            VerticalAlignment="Center"
+            TextWrapping="Wrap" />
+        <Canvas />
+    </DockPanel>
+</rx:ReactiveUserControl> 

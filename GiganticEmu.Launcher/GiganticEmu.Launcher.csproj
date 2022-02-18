@@ -1,44 +1,54 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
-    <UseWPF>true</UseWPF>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
+    <TrimMode>copyused</TrimMode>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-    <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
   </PropertyGroup>
 
   <ItemGroup>
-    <ApplicationDefinition Include="App\App.xaml" />
+    <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
+    <TrimmableAssembly Include="Avalonia.Themes.Default" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\**\*.*" />
-    <Resource Include="icon.ico" />
+    <AvaloniaResource Include="Resources\**\*.*" />
+    <AvaloniaResource Include="icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autoupdater.NET.Official" Version="1.7.0" />
-    <PackageReference Include="BlurryControls.Net" Version="1.0.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.12" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.12" />
+    <PackageReference Include="Avalonia" Version="0.10.12" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Crc32.NET" Version="1.2.0" />
     <PackageReference Include="CredentialManagement.Standard" Version="1.0.4" />
+    <PackageReference Include="DialogHost.Avalonia" Version="0.3.1" />
+    <PackageReference Include="DynamicData" Version="7.4.11" />
     <PackageReference Include="Flurl.Http" Version="3.2.2" />
+    <PackageReference Include="Flurl.Serialization.TextJson" Version="3.1.0" />
+    <PackageReference Include="KeepAChangeLogParser" Version="1.2.2" />
+    <PackageReference Include="Markdown.Avalonia.Tight" Version="0.10.10" />
+    <PackageReference Include="Material.Avalonia" Version="2.5.0.73-nightly" />
+    <PackageReference Include="Material.Icons.Avalonia" Version="1.0.2" />
     <PackageReference Include="MaterialDesignColors" Version="2.0.4" />
     <PackageReference Include="MaterialDesignExtensions" Version="3.3.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
-    <PackageReference Include="DynamicData" Version="7.4.11" />
-    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
-    <PackageReference Include="ReactiveUI" Version="17.1.17" />
+    <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
+    <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="ReactiveUI.Fody" Version="17.1.17" />
-    <PackageReference Include="ReactiveUI.WPF" Version="17.1.17" />
+    <PackageReference Include="ReactiveUI" Version="17.1.17" />
     <PackageReference Include="SharpZipLib" Version="1.3.3" />
     <PackageReference Include="Shellify" Version="0.4.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageReference Include="XamlNameReferenceGenerator" Version="1.3.4" />
 
     <ProjectReference Include="..\GiganticEmu.Shared\GiganticEmu.Shared.csproj" />
-    <ProjectReference Include="..\GiganticEmu.Agent\GiganticEmu.Agent.csproj" />
   </ItemGroup>
 </Project>

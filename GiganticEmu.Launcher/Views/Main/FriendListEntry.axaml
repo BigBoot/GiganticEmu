@@ -1,0 +1,127 @@
+﻿<rxui:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:material="using:Material.Icons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.FriendListEntry"
+    x:TypeArguments="local:FriendListEntryViewModel"
+    mc:Ignorable="d"
+    d:DesignHeight="75"
+    d:DesignWidth="300">
+    <Grid
+        RowDefinitions="* *"
+        ColumnDefinitions="auto * auto">
+
+        <Grid.Styles>
+            <Style Selector="Button">
+                <Setter
+                    Property="Width"
+                    Value="28" />
+                <Setter
+                    Property="Height"
+                    Value="28" />
+            </Style>
+        </Grid.Styles>
+        <Ellipse
+            Name="IconUser"
+            Height="64"
+            Width="64"
+            Grid.RowSpan="2"
+            Margin="5,0,10,0"
+            VerticalAlignment="Center"
+            Stroke="White"
+            StrokeThickness="3" />
+        <TextBlock
+            Name="TextUserName"
+            Grid.Column="1"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center" />
+        <StackPanel
+            Orientation="Horizontal"
+            Grid.Column="1"
+            Grid.Row="1"
+            Margin="0,5,0,10">
+            <material:MaterialIcon
+                Name="IconOnlineStatus"
+                Grid.RowSpan="2"
+                Width="12"
+                Height="12"
+                Kind="CheckboxBlankCircle"
+                Foreground="#00FF00"
+                Margin="0,0,3,0"
+                VerticalAlignment="Center" />
+            <TextBlock
+                Name="TextOnlineStatus"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel
+            Grid.RowSpan="2"
+            Grid.Column="2"
+            Orientation="Horizontal">
+            <Button
+                Name="ButtonInviteGroup"
+                Classes="Flat">
+                <material:MaterialIcon
+                    Grid.RowSpan="2"
+                    Width="16"
+                    Height="16"
+                    Kind="GamepadVariant"
+                    Foreground="#999999"
+                    VerticalAlignment="Center"
+                    ToolTip.Tip="Invite to group" />
+            </Button>
+            <Button
+                Name="ButtonJoinGroup"
+                Classes="Flat">
+                <material:MaterialIcon
+                    Grid.RowSpan="2"
+                    Width="16"
+                    Height="16"
+                    Kind="AlertCircle"
+                    Foreground="#999999"
+                    VerticalAlignment="Center"
+                    ToolTip.Tip="New join request" />
+            </Button>
+            <Button
+                Name="ButtonFriendAccept"
+                Classes="Flat">
+                <material:MaterialIcon
+                    Grid.RowSpan="2"
+                    Width="16"
+                    Height="16"
+                    Kind="ThumbUp"
+                    Foreground="#999999"
+                    VerticalAlignment="Center"
+                    ToolTip.Tip="Accept friend request" />
+            </Button>
+            <Button
+                Name="ButtonFriendDeny"
+                Classes="Flat">
+                <material:MaterialIcon
+                    Grid.RowSpan="2"
+                    Width="16"
+                    Height="16"
+                    Kind="ThumbDown"
+                    Foreground="#999999"
+                    VerticalAlignment="Center"
+                    ToolTip.Tip="Reject friend request" />
+            </Button>
+            <Button
+                Name="ButtonFriendDelete"
+                Classes="Flat">
+                <material:MaterialIcon
+                    Grid.RowSpan="2"
+                    Width="16"
+                    Height="16"
+                    Kind="AccountCancel"
+                    Foreground="#999999"
+                    VerticalAlignment="Center"
+                    ToolTip.Tip="Remove friend" />
+            </Button>
+        </StackPanel>
+    </Grid>
+</rxui:ReactiveUserControl> 

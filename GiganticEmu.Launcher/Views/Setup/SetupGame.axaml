@@ -1,0 +1,94 @@
+﻿<rxui:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:markdown="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.SetupGame"
+    x:TypeArguments="local:SetupGameViewModel"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="800">
+
+    <DockPanel
+        VerticalAlignment="Stretch"
+        Margin="0 0 0 0">
+        <DockPanel.Styles>
+            <Style Selector="Button.Browse">
+                <Setter
+                    Property="Padding"
+                    Value="16 0 16 0" />
+                <Setter
+                    Property="Height"
+                    Value="32" />
+            </Style>
+        </DockPanel.Styles>
+
+        <markdown:MarkdownScrollViewer DockPanel.Dock="Top">
+            The installer assumes you have already found and downloaded the correct build of Gigantic.
+
+            %{color:red}NOTE:%  
+            The Steam, Windows, and Arc store versions will not work.
+            If you do not have the build you can get more information in the FAQ channel
+            of the following Discord server  
+            [https://discord.gg/zbEeAgB](https://discord.gg/zbEeAgB).
+
+            The download will be verified before installing to ensure you have correct file.
+        </markdown:MarkdownScrollViewer>
+
+        <TextBlock
+            DockPanel.Dock="Top"
+            Margin="0 20 0 0">Select Gigantic-Core_de.zip</TextBlock>
+        <DockPanel DockPanel.Dock="Top">
+            <Button
+                x:Name="ButtonBrowseZipPath"
+                DockPanel.Dock="Right"
+                Classes="Browse">…</Button>
+            <TextBox x:Name="ZipPath" />
+        </DockPanel>
+
+        <TextBlock
+            DockPanel.Dock="Top"
+            Margin="0 20 0 0">Select installation directory</TextBlock>
+        <DockPanel DockPanel.Dock="Top">
+            <Button
+                Name="ButtonBrowseInstallpath"
+                DockPanel.Dock="Right"
+                Classes="Browse">…</Button>
+            <TextBox x:Name="InstallPath" />
+        </DockPanel>
+
+        <Button
+            x:Name="ButtonInstall"
+            TabIndex="3"
+            DockPanel.Dock="Bottom"
+            Content="Start installation"
+            IsEnabled="False"
+            Margin="100 40 100 0"
+            HorizontalAlignment="Stretch" />
+
+        <Grid
+            x:Name="ProgressContainer"
+            HorizontalAlignment="Stretch"
+            DockPanel.Dock="Bottom"
+            Margin="0 40 0 0">
+            <ProgressBar
+                Value="0.5"
+                Maximum="1.0"
+                Classes="notransitions"
+                x:Name="Progress"
+                Height="40" />
+            <TextBlock
+                Name="ProgressText"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="Verifying: 100%"
+                Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" />
+        </Grid>
+
+        <Canvas />
+    </DockPanel>
+</rxui:ReactiveUserControl> 

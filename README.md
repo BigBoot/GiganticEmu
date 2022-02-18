@@ -10,7 +10,7 @@ A backend emulator for the game Gigantic by Motiga.
 
 
 ## GiganticEmu.Launcher (Mistforge Launcher)
-A WPF based launcher application for connecting to the emulated backend.
+Avalonia based launcher application for connecting to the emulated backend.
 
 ![GiganticEmu.Launcher](GiganticEmu.Launcher/screenshot.png)
 

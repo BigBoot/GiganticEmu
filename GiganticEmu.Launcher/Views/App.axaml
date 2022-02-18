@@ -1,0 +1,41 @@
+<Application
+    xmlns="https://github.com/avaloniaui"
+    xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+    xmlns:ctb="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
+    xmlns:markdown="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+    xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
+    xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.App">
+
+    <Application.Resources>
+        <themes:BundledTheme
+            BaseTheme="Light"
+            PrimaryColor="Teal"
+            SecondaryColor="Amber" />
+    </Application.Resources>
+
+    <Application.Styles>
+        <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml" />
+        <StyleInclude Source="avares://Material.Avalonia/Material.Avalonia.Templates.xaml" />
+        <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
+        <Style Selector=":is(Control)">
+            <Setter
+                Property="assists:ButtonAssist.ClickFeedbackColor"
+                Value="WHITE" />
+        </Style>
+        <Style Selector=":is(ctb|CTextBlock)">
+            <Setter
+                Property="TextBlock.FontWeight"
+                Value="Normal" />
+            <Setter
+                Property="TextBlock.FontFamily"
+                Value="avares://Material.Styles/Fonts/Roboto#Roboto, Noto Sans TC, Noto Sans SC, Noto Sans JP, Noto Sans KR, Noto Sans, Arial" />
+        </Style>
+        <Style Selector="markdown|MarkdownScrollViewer">
+            <Setter
+                Property="Margin"
+                Value="-5" />
+        </Style>
+    </Application.Styles>
+</Application>

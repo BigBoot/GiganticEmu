@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "GiganticEmu.Launcher": {
-      "commandName": "Project",
-      "commandLineArgs": "-h \"http://127.0.0.1:3000\" -g \"G:\\gigantic_server\\FRANKENBUILD\""
-    }
-  }
-}

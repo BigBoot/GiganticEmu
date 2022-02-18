@@ -20,6 +20,11 @@ public record SemVer : IComparable<SemVer>, IEquatable<SemVer>
         _inner = inner;
     }
 
+    public SemVer(int major, int minor = 0, int patch = 0, string prerelease = "", string buildMetadata = "")
+    {
+        _inner = new SemVersion(major, minor, patch, prerelease, buildMetadata);
+    }
+
     public int CompareTo(SemVer? other)
     {
         if (other == null) return 1;

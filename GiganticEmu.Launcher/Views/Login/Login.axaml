@@ -1,0 +1,71 @@
+﻿<rx:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rx="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.Login"
+    x:TypeArguments="local:LoginViewModel"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="600">
+
+    <DockPanel KeyboardNavigation.TabNavigation="Cycle">
+        <Button
+            x:Name="ButtonStartOffline"
+            TabIndex="4"
+            DockPanel.Dock="Bottom"
+            Margin="100,-5,100,0"
+            Content="Start Gigantic in offline mode"
+            HorizontalAlignment="Center"
+            Classes="Flat" />
+        <Button
+            x:Name="ButtonRegister"
+            TabIndex="4"
+            DockPanel.Dock="Bottom"
+            Margin="100,-5,100,0"
+            Content="Register"
+            HorizontalAlignment="Center"
+            Classes="Flat" />
+        <Button
+            x:Name="ButtonLogin"
+            TabIndex="3"
+            DockPanel.Dock="Bottom"
+            Content="Log in"
+            Margin="100 20"
+            HorizontalAlignment="Stretch" />
+        <TextBlock
+            x:Name="TextError"
+            DockPanel.Dock="Bottom"
+            FontSize="16"
+            Margin="0 0 0 0"
+            HorizontalAlignment="Center"
+            Foreground="Red"
+            Text=""
+            VerticalAlignment="Center"
+            TextWrapping="Wrap" />
+        <Canvas
+            DockPanel.Dock="Bottom"
+            Height="50" />
+        <TextBox
+            assists:TextFieldAssist.Label="Password"
+            PasswordChar="*"
+            UseFloatingWatermark="True"
+            Classes="revealPasswordButton"
+            TabIndex="2"
+            x:Name="TextPassword"
+            DockPanel.Dock="Bottom"
+            Margin="100 5" />
+        <TextBox
+            TabIndex="1"
+            UseFloatingWatermark="True"
+            assists:TextFieldAssist.Label="Username"
+            Classes=""
+            x:Name="TextUserName"
+            DockPanel.Dock="Bottom"
+            Margin="100 5" />
+        <Canvas />
+    </DockPanel>
+</rx:ReactiveUserControl> 

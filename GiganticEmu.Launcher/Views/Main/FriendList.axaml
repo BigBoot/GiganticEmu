@@ -1,0 +1,81 @@
+<rxui:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:material="using:Material.Icons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:system="clr-namespace:System;assembly=netstandard"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.FriendList"
+    x:TypeArguments="local:FriendListViewModel"
+    mc:Ignorable="d"
+    d:DesignHeight="400"
+    d:DesignWidth="350">
+    <Grid RowDefinitions="auto *">
+        <Grid.Resources>
+            <DataTemplate x:Key="ListEntryTemplate">
+                <local:FriendListEntry />
+            </DataTemplate>
+        </Grid.Resources>
+
+        <DockPanel Margin="0 0 15 0">
+            <Button
+                Classes="Flat"
+                Name="ButtonAddFriend"
+                DockPanel.Dock="Right"
+                Margin="15,10,0,10"
+                Padding="5 0">
+                <material:MaterialIcon
+                    Grid.RowSpan="2"
+                    Kind="AccountPlus" />
+            </Button>
+            <Button
+                Classes="Flat"
+                Name="ButtonUserName"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                Margin="15,10,0,10"
+                FontSize="16">
+                <StackPanel>
+                    <TextBlock
+                        Name="TextUserName"
+                        Text="TheLegend27 ▼"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left" />
+                    <Popup
+                        Name="PopupUser"
+                        IsOpen="{Binding IsChecked, ElementName=ButtonUserName}"
+                        PlacementTarget="{Binding ElementName=ButtonUserName}"
+                        StaysOpen="False">
+                        <Border
+                            BorderBrush="{DynamicResource PrimaryHueMidBrush}"
+                            BorderThickness="1,1,1,1">
+                            <StackPanel
+                                Name="UserMenu"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                MinWidth="150"
+                                Background="{DynamicResource MaterialDesignPaper}">
+                                <Button
+                                    Classes="Flat"
+                                    Name="ButtonLogout"
+                                    Click="OnLogoutClicked">Logout</Button>
+                            </StackPanel>
+                        </Border>
+                    </Popup>
+                </StackPanel>
+            </Button>
+        </DockPanel>
+
+        <ScrollViewer
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto"
+            Grid.Row="1"
+            Padding="12">
+            <ItemsRepeater
+                Name="ListFriends"
+                ItemTemplate="{StaticResource ListEntryTemplate}" />
+        </ScrollViewer>
+    </Grid>
+</rxui:ReactiveUserControl> 

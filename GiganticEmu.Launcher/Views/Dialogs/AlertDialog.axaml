@@ -1,0 +1,40 @@
+<rx:ReactiveUserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:GiganticEmu.Launcher"
+  xmlns:material="using:Material.Icons.Avalonia"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:rx="http://reactiveui.net"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GiganticEmu.Launcher.AlertDialog"
+  x:TypeArguments="local:AlertDialogViewModel"
+  mc:Ignorable="d"
+  d:DesignWidth="300"
+  d:DesignHeight="150">
+
+  <Grid RowDefinitions="Auto * Auto">
+    <Grid
+      ColumnDefinitions="Auto *"
+      Grid.Row="0"
+      Margin="0 0 0 10">
+      <material:MaterialIcon
+        x:Name="Icon"
+        Grid.Column="0" />
+      <TextBlock
+        x:Name="Title"
+        Grid.Column="1"
+        Classes="Headline6"
+        VerticalAlignment="Center" />
+    </Grid>
+    <TextBlock
+      x:Name="Text"
+      Classes="Body1"
+      Grid.Row="1" />
+    <StackPanel
+      x:Name="Buttons"
+      HorizontalAlignment="Right"
+      Grid.Row="2"
+      Margin="0 10 0 0"
+      Orientation="Horizontal" />
+  </Grid>
+</rx:ReactiveUserControl>
