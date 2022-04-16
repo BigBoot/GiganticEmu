@@ -37,6 +37,10 @@
                 <TabItem.Header>General</TabItem.Header>
                 <local:MainSettings x:Name="PageMainSettings" />
             </TabItem>
+            <TabItem>
+                <TabItem.Header>Linux</TabItem.Header>
+                <local:LinuxSettings x:Name="PageLinuxSettings" />
+            </TabItem>
         </TabControl>
     </DockPanel>
 </rxui:ReactiveUserControl> 

@@ -7,7 +7,7 @@ using Splat;
 
 namespace GiganticEmu.Launcher;
 
-public class MainSettingsViewModel : ReactiveObject, SettingsContainerViewModel.SettingsPageViewModel
+public class MainSettingsViewModel : ReactiveObject, SettingsContainerViewModel.ISettingsPageViewModel
 {
     [Reactive]
     public Settings.BackgroundImage LauncherBackground { get; set; }

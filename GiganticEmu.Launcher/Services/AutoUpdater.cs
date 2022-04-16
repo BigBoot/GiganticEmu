@@ -23,9 +23,9 @@ public class AutoUpdater
     {
         var config = Locator.Current.RequireService<LauncherConfiguration>();
         var github = Locator.Current.RequireService<GitHub>();
-        var filename = "MistforgeLauncher.exe";
+        var filename = $"MistforgeLauncher{PlatformUtils.ExecutableExtension}";
         var targetDir = config.Game;
-        var targetFileName = "_upd.MistforgeLauncher.exe";
+        var targetFileName = $"_upd.MistforgeLauncher{PlatformUtils.ExecutableExtension}";
         var observable = new BehaviorSubject<double>(0.0);
 
         _ = Task.Run(async () =>

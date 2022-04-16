@@ -12,6 +12,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
+using GiganticEmu.Shared;
 
 namespace GiganticEmu.Launcher;
 
@@ -184,24 +185,25 @@ public class SetupGameViewModel : ReactiveObject
         {
             var launcherLocation = Environment.ProcessPath!;
             await using var input = File.OpenRead(launcherLocation);
-            await using var output = File.Create(Path.Join(InstallPath!, "MistforgeLauncher.exe"));
+            await using var output = File.Create(Path.Join(InstallPath!, $"MistforgeLauncher{PlatformUtils.ExecutableExtension}"));
             await input.CopyToAsync(output);
         });
 
-        if (await CreateShortcut.Handle(Unit.Default))
-        {
-            var desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            var filename = Path.Combine(desktopFolder, "Mistforge Launcher.lnk");
-            var target = Path.Join(InstallPath!, "MistforgeLauncher.exe");
+        if (PlatformUtils.IsWindows)
+            if (await CreateShortcut.Handle(Unit.Default))
+            {
+                var desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                var filename = Path.Combine(desktopFolder, "Mistforge Launcher.lnk");
+                var target = Path.Join(InstallPath!, $"MistforgeLauncher{PlatformUtils.ExecutableExtension}");
 
-            Lnk.Create(filename, target);
-        }
+                Lnk.Create(filename, target);
+            }
 
         CurrentTask = null;
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = Path.Join(InstallPath!, "MistforgeLauncher.exe"),
+            FileName = Path.Join(InstallPath!, $"MistforgeLauncher{PlatformUtils.ExecutableExtension}"),
             WorkingDirectory = InstallPath,
         });
 

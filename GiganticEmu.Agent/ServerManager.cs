@@ -79,7 +79,7 @@ public class ServerManager
     {
         var process = new Process();
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (PlatformUtils.IsWindows)
         {
             process.StartInfo = new ProcessStartInfo
             {
@@ -158,7 +158,7 @@ public class ServerManager
         }
 
         await File.WriteAllTextAsync(defGameIniPath, defGameIni);
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (PlatformUtils.IsWindows)
         {
             process.StartInfo.ArgumentList.Add($"-defgameini={defGameIniPath}");
         }

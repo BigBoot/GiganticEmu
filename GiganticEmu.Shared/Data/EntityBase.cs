@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace GiganticEmu.Shared.Backend
+namespace GiganticEmu.Shared
 {
     public abstract class EntityBase
     {

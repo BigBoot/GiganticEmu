@@ -10,7 +10,7 @@ namespace GiganticEmu.Launcher;
 
 public class SettingsContainerViewModel : ReactiveObject
 {
-    public interface SettingsPageViewModel
+    public interface ISettingsPageViewModel
     {
         public ReactiveCommand<Unit, Unit> Apply { get; }
         public ReactiveCommand<Unit, Unit> Reset { get; }
@@ -20,7 +20,7 @@ public class SettingsContainerViewModel : ReactiveObject
     public bool SettingsVisible { get; set; } = false;
 
     [Reactive]
-    public ICollection<SettingsPageViewModel> Pages { get; set; } = new List<SettingsPageViewModel>();
+    public ICollection<ISettingsPageViewModel> Pages { get; set; } = new List<ISettingsPageViewModel>();
 
     public ReactiveCommand<Unit, Unit> SaveSettings { get; }
 

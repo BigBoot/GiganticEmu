@@ -25,6 +25,12 @@ public class Settings
         Halloween,
     }
 
+    public enum CompatiblityTool
+    {
+        Proton,
+        Wine,
+    }
+
     public BehaviorSubject<Language> GameLanguage { get; } = new(Language.English);
 
     public BehaviorSubject<String> OfflineName { get; } = new("");
@@ -34,6 +40,12 @@ public class Settings
     public BehaviorSubject<SemVer?> AutoUpdaterSkippedVersion { get; } = new(null);
 
     public BehaviorSubject<BackgroundImage> Background { get; } = new(BackgroundImage.Leiran);
+
+    public BehaviorSubject<CompatiblityTool> LinuxCompatiblityTool { get; } = new(CompatiblityTool.Proton);
+
+    public BehaviorSubject<bool> LinuxEnableGameMode { get; } = new(false);
+
+    public BehaviorSubject<bool> LinuxEnableMangoHud { get; } = new(false);
 
     public async Task Load()
     {

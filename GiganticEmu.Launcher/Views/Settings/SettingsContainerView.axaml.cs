@@ -3,8 +3,8 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
+using GiganticEmu.Shared;
 
 namespace GiganticEmu.Launcher;
 
@@ -27,10 +27,13 @@ public partial class SettingsContainerView : ReactiveUserControl<SettingsContain
                 .InvokeCommand(this, x => x.ViewModel!.SaveSettings)
                 .DisposeWith(disposables);
 
-            ViewModel.Pages = new[] { PageMainSettings }
-                .Select(page => page.ViewModel)
-                .OfType<SettingsContainerViewModel.SettingsPageViewModel>()
-                .ToList();
+            PageLinuxSettings.Parent!.IsVisible = PlatformUtils.IsLinux;
+
+            ViewModel.Pages = new SettingsContainerViewModel.ISettingsPageViewModel[]
+            {
+                PageMainSettings.ViewModel!,
+                PageLinuxSettings.ViewModel!,
+            }.ToList();
         });
     }
 }

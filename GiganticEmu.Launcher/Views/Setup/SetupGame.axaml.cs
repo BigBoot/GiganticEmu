@@ -106,15 +106,16 @@ public partial class SetupGame : ReactiveUserControl<SetupGameViewModel>
                 .DisposeWith(disposables);
 
             Observable.FromEventPattern(ButtonBrowseInstallpath, nameof(ButtonBrowseInstallpath.Click))
-                .Select(_ => new OpenFolderDialog
-                {
-                    Title = "Select installation directory",
-                })
-                .Do(dlg =>
+                .Select(_ => Unit.Default)
+                .InvokeCommand(ReactiveCommand.CreateFromTask(async (_) =>
                 {
                     if (this.GetWindow() is Window window)
                     {
-                        ViewModel.InstallPath = dlg.ShowAsync(window).Result switch
+                        var dlg = new OpenFolderDialog
+                        {
+                            Title = "Select installation directory",
+                        };
+                        ViewModel.InstallPath = await dlg.ShowAsync(window) switch
                         {
                             string path when Directory.Exists(path) &&
                                              new DirectoryInfo(path).EnumerateFileSystemInfos().Any() => Path.Join(path,
@@ -123,29 +124,30 @@ public partial class SetupGame : ReactiveUserControl<SetupGameViewModel>
                             _ => ViewModel.InstallPath,
                         };
                     }
-                })
-                .Subscribe()
+                }))
                 .DisposeWith(disposables);
 
             Observable.FromEventPattern(ButtonBrowseZipPath, nameof(ButtonBrowseZipPath.Click))
-                .Select(_ => new OpenFileDialog
-                {
-                    Filters =
-                    {
-                        new FileDialogFilter {Name = "Gigantic-Core_de.zip", Extensions = {"zip"}}
-                    }
-                })
-                .Do(dlg =>
+                .Select(_ => Unit.Default)
+                .InvokeCommand(ReactiveCommand.CreateFromTask(async (_) =>
                 {
                     if (this.GetWindow() is Window window)
                     {
-                        if (dlg.ShowAsync(window).Result is { Length: > 0 } files)
+                        var dlg = new OpenFileDialog
+                        {
+                            Title = "Select Gigantic-Core_de.zip",
+                            Filters =
+                            {
+                                new FileDialogFilter {Name = "Gigantic-Core_de.zip", Extensions = {"zip"}}
+                            }
+                        };
+
+                        if (await dlg.ShowAsync(window) is { Length: > 0 } files)
                         {
                             ViewModel.ZipPath = files[0];
-                        }
+                        };
                     }
-                })
-                .Subscribe()
+                }))
                 .DisposeWith(disposables);
 
             ViewModel.VerificationFailed.RegisterHandler(async interaction =>

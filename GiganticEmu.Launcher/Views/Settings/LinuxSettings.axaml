@@ -6,8 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rxui="http://reactiveui.net"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:Class="GiganticEmu.Launcher.MainSettings"
-    x:TypeArguments="local:MainSettingsViewModel"
+    x:Class="GiganticEmu.Launcher.LinuxSettings"
+    x:TypeArguments="local:LinuxSettingsViewModel"
     mc:Ignorable="d"
     d:DesignHeight="450"
     d:DesignWidth="600">
@@ -16,7 +16,7 @@
         KeyboardNavigation.TabNavigation="Cycle"
         VerticalAlignment="Top"
         ColumnDefinitions="* Auto *"
-        RowDefinitions="Auto Auto Auto Auto Auto">
+        RowDefinitions="Auto Auto Auto">
 
         <TextBlock
             VerticalAlignment="Center"
@@ -24,7 +24,7 @@
             Margin="0 10 0 10"
             Grid.Column="0"
             Grid.Row="0">
-            Launcher Background
+            Compatiblity Tool
         </TextBlock>
         <material:MaterialIcon
             Height="40"
@@ -32,9 +32,9 @@
             Grid.Column="1"
             Margin="10 0 20 0"
             Kind="Information"
-            ToolTip.Tip="Set the launcher background image" />
+            ToolTip.Tip="Select compatibility tool for launching the game. Currently supported are proton and wine (needs to be available on PATH)" />
         <ComboBox
-            Name="LauncherBackground"
+            Name="CompatibilityTool"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Width="200"
@@ -47,7 +47,7 @@
             Margin="0 10 0 10"
             Grid.Column="0"
             Grid.Row="1">
-            Game Language
+            Enable GameMode
         </TextBlock>
         <material:MaterialIcon
             Height="40"
@@ -55,9 +55,9 @@
             Grid.Column="1"
             Margin="10 0 20 0"
             Kind="Information"
-            ToolTip.Tip="Override the game language" />
-        <ComboBox
-            Name="GameLanguage"
+            ToolTip.Tip="Enable FeralInteractive's GameMode (needs to be available on PATH)" />
+        <CheckBox
+            Name="GameMode"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Width="200"
@@ -67,21 +67,24 @@
         <TextBlock
             VerticalAlignment="Center"
             HorizontalAlignment="Right"
+            Margin="0 10 0 10"
             Grid.Column="0"
-            Grid.Row="2">Offline Name</TextBlock>
+            Grid.Row="2">
+            Enable MangoHud
+        </TextBlock>
         <material:MaterialIcon
             Height="40"
             Grid.Row="2"
             Grid.Column="1"
             Margin="10 0 20 0"
             Kind="Information"
-            ToolTip.Tip="Set your name when playing in offline mode" />
-        <TextBox
-            Name="OfflineName"
+            ToolTip.Tip="Enable MangoHud (needs to be available on PATH)" />
+        <CheckBox
+            Name="MangoHud"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
+            Width="200"
             Grid.Column="2"
-            Grid.Row="2"
-            Width="200" />
+            Grid.Row="2" />
     </Grid>
 </rxui:ReactiveUserControl> 

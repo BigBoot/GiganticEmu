@@ -52,22 +52,34 @@ public static class AvaloniaExtensions
 
     public static async Task<string?> ShowAlertDialog(this IControl control, Func<AlertDialogViewModel, Task> setup)
     {
-        return await ShowDialog<string, AlertDialogViewModel>(control, new AlertDialog(), setup);
+        return await Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            return await ShowDialog<string, AlertDialogViewModel>(control, new AlertDialog(), setup);
+        });
     }
 
     public static async Task<string?> ShowInputDialog(this IControl control, Func<InputDialogViewModel, Task> setup)
     {
-        return await ShowDialog<string, InputDialogViewModel>(control, new InputDialog(), setup);
+        return await Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            return await ShowDialog<string, InputDialogViewModel>(control, new InputDialog(), setup);
+        });
     }
 
     public static async Task<UpdateDialogViewModel.Result> ShowUpdateDialog(this IControl control, Func<UpdateDialogViewModel, Task> setup)
     {
-        return await ShowDialog<UpdateDialogViewModel.Result, UpdateDialogViewModel>(control, new UpdateDialog(), setup);
+        return await Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            return await ShowDialog<UpdateDialogViewModel.Result, UpdateDialogViewModel>(control, new UpdateDialog(), setup);
+        });
     }
 
     public static async Task<bool> ShowProgressDialog(this IControl control, Func<ProgressDialogViewModel, Task> setup)
     {
-        return await ShowDialog<bool, ProgressDialogViewModel>(control, new ProgressDialog(), setup);
+        return await Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            return await ShowDialog<bool, ProgressDialogViewModel>(control, new ProgressDialog(), setup);
+        });
     }
 
     public static void Shutdown(this Application application, int exitCode = 0)

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -27,6 +28,10 @@ public class LoginViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> Login { get; }
     public ReactiveCommand<Unit, Unit> StartOffline { get; }
 
+    public Interaction<DialogContent, Unit> OnError { get; } = new();
+
+    public Interaction<DialogContent, bool> OnConfirm { get; } = new();
+
     public LoginViewModel()
     {
         Login = ReactiveCommand.CreateFromTask(DoLogin);
@@ -48,6 +53,10 @@ public class LoginViewModel : ReactiveObject
     {
         var settings = Locator.Current.RequireService<Settings>();
         var launcher = Locator.Current.RequireService<GameLauncher>();
-        launcher.StartGame(settings.OfflineName.Value, settings.OfflineName.Value);
+        launcher.StartGame(new GameLauncher.InteractionHandler
+        {
+            OnConfirm = async content => await OnConfirm.Handle(content),
+            OnError = async content => await OnError.Handle(content),
+        }, settings.OfflineName.Value, settings.OfflineName.Value);
     }
 }

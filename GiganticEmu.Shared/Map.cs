@@ -13,7 +13,7 @@ public record Map
             new Map { Id = "lv_mistforge",     Name = "Sanctum Falls" },
             new Map { Id = "lv_valley",        Name = "Sirens Strand" },
             new Map { Id = "lv_wizardwoods",   Name = "Ember Grove (Unfinished/Prototype)" },
-            new Map { Id = "lv_canyonnight",   Name = "Ghost Reef (Unfinished/Prototype)" },
+            new Map { Id = "lv_canyonnight",   Name = "Ghost Reef Night (Unfinished/Prototype)" },
             new Map { Id = "lv_skycityv2",     Name = "Sky City V2 (Unfinished/Prototype)" },
             new Map { Id = "lv_skytuga",       Name = "Sky Tuga (Unfinished/Prototype)" },
         }.ToDictionary(x => x.Id);
