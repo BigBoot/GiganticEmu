@@ -98,7 +98,7 @@ public class LegacyApiController : ControllerBase
 
     [HttpPost("admin_pw")]
     [Produces("application/json")]
-    public async Task<IActionResult> PostAdminPW(KillRequest req)
+    public async Task<IActionResult> PostAdminPW(AdminPWRequest req)
     {
         try
         {
