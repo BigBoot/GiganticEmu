@@ -24,7 +24,7 @@ public class MatchmakingService : IHostedService, IDisposable
     private IDbContextFactory<ApplicationDatabase> _databaseFactory;
     private MiceServer _mice;
     private BackendConfiguration _configuration;
-    private IList<(BackendConfiguration.Agent, IAgentApi)> _agents;
+    private IList<(BackendConfiguration.AgentConfig, IAgentApi)> _agents;
 
     public record Session()
     {

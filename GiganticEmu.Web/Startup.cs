@@ -1,14 +1,15 @@
 using System;
 using System.Text.Json.Serialization;
+using FluentEmail.MailKitSmtp;
 using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MimeKit;
 
 namespace GiganticEmu.Web;
 
@@ -23,6 +24,9 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        var config = new BackendConfiguration();
+        Configuration.GetSection(BackendConfiguration.GiganticEmu).Bind(config);
+
         services.Configure<BackendConfiguration>(Configuration.GetSection(BackendConfiguration.GiganticEmu));
 
         services.AddApplicationDatabase();
@@ -30,6 +34,18 @@ public class Startup
         services.AddIdentity<User, IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDatabase>()
             .AddDefaultTokenProviders();
+
+        var fromAddress = MailboxAddress.Parse(config.Email.From);
+        services.AddFluentEmail(fromAddress.Address, fromAddress.Name)
+            .AddMailKitSender(new SmtpClientOptions
+            {
+                Server = config.Email.SmtpServer,
+                UseSsl = true,
+                Port = config.Email.SmtpPort,
+                RequiresAuthentication = true,
+                User = config.Email.SmtpUsername,
+                Password = config.Email.SmtpPassword,
+            });
 
         services.Configure<IdentityOptions>(c =>
         {
@@ -49,6 +65,8 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();

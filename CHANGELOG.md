@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Launcher: Native linux support (Launch game using proton/wine)
 - Launcher: Support for FeralInteractive's GameMode and MangoHud on linux
+- Launcher: Password reset
+- Agent: Add "UseLobby" configuration
 
 ### Changed
 - Launcher: Switched from WPF to Avalonia

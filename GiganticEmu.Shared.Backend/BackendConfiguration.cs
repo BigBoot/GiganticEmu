@@ -11,11 +11,20 @@ namespace GiganticEmu.Shared.Backend
     {
         public const string GiganticEmu = "GiganticEmu";
 
-        public class Agent
+        public class AgentConfig
         {
             public string Host { get; set; } = default!;
             public string Region { get; set; } = "NA";
             public string ApiKey { get; set; } = default!;
+        }
+
+        public class EmailConfig
+        {
+            public string From { get; set; } = default!;
+            public string SmtpServer { get; set; } = default!;
+            public int SmtpPort { get; set; } = 465;
+            public string SmtpUsername { get; set; } = default!;
+            public string SmtpPassword { get; set; } = default!;
         }
 
         public string SalsaCK { get; set; } = default!;
@@ -24,7 +33,8 @@ namespace GiganticEmu.Shared.Backend
         public int MicePort { get; set; } = 4000;
         public string MiceHost { get; set; } = "localhost";
         public int GameVersion { get; set; } = 301530;
-        public ICollection<Agent> Agents { get; set; } = new List<Agent>();
+        public EmailConfig Email { get; set; } = new EmailConfig();
+        public ICollection<AgentConfig> Agents { get; set; } = new List<AgentConfig>();
         public int NumPlayers { get; set; } = 10;
         public string? ApiKey { get; set; }
         public ICollection<string> Maps { get; set; } = new List<string> { "LV_Canyon", "LV_Mistforge", "LV_Valley" };

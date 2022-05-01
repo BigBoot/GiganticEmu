@@ -18,5 +18,7 @@
         Width="480">
         <local:Login x:Name="PageLogin" />
         <local:Register x:Name="PageRegister" />
+        <local:ForgotPassword x:Name="PageForgotPassword" />
+        <local:ResetPassword x:Name="PageResetPassword" />
     </Panel>
 </rx:ReactiveUserControl> 

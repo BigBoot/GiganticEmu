@@ -1,19 +1,21 @@
 ﻿using ReactiveUI;
 using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
-
+using System.Reactive.Linq;
+using System.Reactive.Disposables;
+using System.Reactive;
 
 namespace GiganticEmu.Launcher;
 
-public partial class Register : ReactiveUserControl<RegisterViewModel>
+public partial class ForgotPassword : ReactiveUserControl<ForgotPasswordViewModel>
 {
-    public event EventHandler? LoginClicked;
-    public Register()
+    public event EventHandler? CancelClicked;
+    public event EventHandler? ResetSuccesfull;
+
+    public ForgotPassword()
     {
         InitializeComponent();
-        ViewModel = new RegisterViewModel();
+        ViewModel = new ForgotPasswordViewModel();
 
         this.WhenActivated(disposables =>
         {
@@ -21,12 +23,6 @@ public partial class Register : ReactiveUserControl<RegisterViewModel>
                 viewModel => viewModel.UserName,
                 view => view.TextUserName.Text
             );
-
-            this.Bind(ViewModel,
-                viewModel => viewModel.Email,
-                view => view.TextEmail.Text
-            );
-
             this.OneWayBind(ViewModel,
                 viewModel => viewModel.Errors,
                 view => view.TextError.Text,
@@ -40,30 +36,31 @@ public partial class Register : ReactiveUserControl<RegisterViewModel>
             );
 
             this.BindCommand(ViewModel,
-                viewModel => viewModel.Register,
-                view => view.ButtonRegister
+                viewModel => viewModel.Reset,
+                view => view.ButtonReset
             );
 
-            this.Bind(ViewModel,
-                viewModel => viewModel.Password,
-                view => view.TextPassword.Text
-            );
-
-            this.Bind(ViewModel,
-                viewModel => viewModel.PasswordConfirm,
-                view => view.TextPasswordConfirm.Text
-            );
-
-            Observable.FromEventPattern(ButtonLogin, nameof(ButtonLogin.Click))
+            Observable.FromEventPattern(ButtonCancel, nameof(ButtonCancel.Click))
                 .Do(_ =>
                 {
-                    if (LoginClicked is EventHandler handler)
+                    if (CancelClicked is EventHandler handler)
                     {
                         handler.Invoke(this, new EventArgs());
                     }
                 })
                 .Subscribe()
                 .DisposeWith(disposables);
+
+
+            ViewModel.OnResetSuccesfull.RegisterHandler(async interaction =>
+            {
+                if (ResetSuccesfull is EventHandler handler)
+                {
+                    handler.Invoke(this, new EventArgs());
+                }
+                interaction.SetOutput(Unit.Default);
+            });
+
         });
     }
 }

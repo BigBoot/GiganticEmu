@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Mixins;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.ReactiveUI;
@@ -19,6 +21,8 @@ namespace GiganticEmu.Launcher
         {
             InitializeComponent();
             ViewModel = new AppViewModel();
+
+            this.AttachDevTools(new KeyGesture(Key.F11));
 
             this.WhenActivated(disposables =>
             {

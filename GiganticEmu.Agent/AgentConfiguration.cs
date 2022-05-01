@@ -14,6 +14,7 @@ public class AgentConfiguration
     public int WebPort { get; set; } = 8080;
     public string[] DefaultCreatures { get; set; } = new string[] { "bloomer", "cerb", "cyclops" };
     public string? WinePath { get; set; } = null;
+    public bool UseLobby { get; set; } = false;
 
     #region GCP config.json compatibility
     private string? api_key

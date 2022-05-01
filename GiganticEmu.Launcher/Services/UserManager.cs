@@ -187,4 +187,54 @@ public class UserManager
             return new LoginResult(null, new List<string> { ex.Message });
         }
     }
+
+    public async Task<GeneralResult> ResetPassword(string username)
+    {
+        try
+        {
+            var result = await _api.ResetPassword(new UserPWDeleteRequest
+            {
+                UserName = username,
+            });
+
+            if (result.Code == RequestResult.Success)
+            {
+                return new GeneralResult(new List<string>());
+            }
+            else
+            {
+                return new GeneralResult(new List<string> { result.Message });
+            }
+        }
+        catch (Exception ex)
+        {
+            return new GeneralResult(new List<string> { ex.Message });
+        }
+    }
+
+    public async Task<GeneralResult> ChangePassword(string username, string token, string password)
+    {
+        try
+        {
+            var result = await _api.ChangePassword(new UserPWPostRequest
+            {
+                UserName = username,
+                Token = token,
+                NewPassword = password,
+            });
+
+            if (result.Code == RequestResult.Success)
+            {
+                return new GeneralResult(new List<string>());
+            }
+            else
+            {
+                return new GeneralResult(result.Errors?.Select(err => $"{err.Message} [{err.Code}]").ToList() ?? new List<string> { result.Message });
+            }
+        }
+        catch (Exception ex)
+        {
+            return new GeneralResult(new List<string> { ex.Message });
+        }
+    }
 }

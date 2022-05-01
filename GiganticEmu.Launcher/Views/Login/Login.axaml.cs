@@ -11,6 +11,8 @@ namespace GiganticEmu.Launcher;
 public partial class Login : ReactiveUserControl<LoginViewModel>
 {
     public event EventHandler? RegisterClicked;
+    public event EventHandler? ForgotPasswordClicked;
+
 
     public Login()
     {
@@ -55,6 +57,17 @@ public partial class Login : ReactiveUserControl<LoginViewModel>
                 .Do(_ =>
                 {
                     if (RegisterClicked is EventHandler handler)
+                    {
+                        handler.Invoke(this, new EventArgs());
+                    }
+                })
+                .Subscribe()
+                .DisposeWith(disposables);
+
+            Observable.FromEventPattern(ButtonResetPassword, nameof(ButtonResetPassword.Click))
+                .Do(_ =>
+                {
+                    if (ForgotPasswordClicked is EventHandler handler)
                     {
                         handler.Invoke(this, new EventArgs());
                     }

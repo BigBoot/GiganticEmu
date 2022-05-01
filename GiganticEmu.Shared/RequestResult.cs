@@ -46,6 +46,16 @@ public enum RequestResult
 
     [Description("unable to start server")]
     UnableToStartServer,
+
+    [Description("the token is not valid")]
+    InvalidToken,
+
+    [Description("password reset failed")]
+    ResetPWError,
+
+    [Description("failed to send email")]
+    FailedToSendEmail,
+
 }
 
 public static class RequestResultExtensions

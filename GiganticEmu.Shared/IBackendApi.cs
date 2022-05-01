@@ -18,6 +18,12 @@ public interface IBackendApi
     [Post("/user")]
     Task<UserPostResponse> Register([Body] UserPostRequest request);
 
+    [Delete("/user/pw")]
+    Task<UserPWDeleteResponse> ResetPassword([Body] UserPWDeleteRequest request);
+
+    [Post("/user/pw")]
+    Task<UserPWPostResponse> ChangePassword([Body] UserPWPostRequest request);
+
     [Get("/friends")]
     Task<FriendsGetResponse> GetFriends();
 

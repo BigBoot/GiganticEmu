@@ -31,9 +31,9 @@ public class ApiController : ControllerBase
         return Ok(new VersionGetResponse(RequestResult.Success)
         {
             ApiVersion = API_VERSION,
-            AgentVersionMajor = 0,
-            AgentVersionMinor = 0,
-            AgentVersionPatch = 0
+            AgentVersionMajor = SemVer.ApplicationVersion.Major,
+            AgentVersionMinor = SemVer.ApplicationVersion.Minor,
+            AgentVersionPatch = SemVer.ApplicationVersion.Patch,
         });
     }
 
@@ -41,7 +41,7 @@ public class ApiController : ControllerBase
     [Produces("application/json")]
     public async Task<IActionResult> PostServer(ServerPostRequest start)
     {
-        var port = await _serverManager.StartInstance(start.Map);
+        var port = await _serverManager.StartInstance(start.Map, useLobby: _configuration.UseLobby);
         return Ok(new ServerPostResponse(port == 0 ? RequestResult.NoInstanceAvailable : RequestResult.Success)
         {
             Port = port
