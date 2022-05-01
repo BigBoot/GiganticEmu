@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.1.0] - 2022-05-01
 ### Added
 - Launcher: Native linux support (Launch game using proton/wine)
 - Launcher: Support for FeralInteractive's GameMode and MangoHud on linux
