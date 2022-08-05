@@ -25,17 +25,29 @@ if ($IsWindows)
 
 
 dotnet publish -r win8-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:DebugType=None -p:DebugSymbols=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true -c Release -o build/win-x64 GiganticEmu.Launcher/GiganticEmu.Launcher.csproj
-strip build/win-x64/GiganticEmu.Launcher.exe
+if (Get-Command "strip" -ErrorAction SilentlyContinue) 
+{ 
+    strip build/win-x64/GiganticEmu.Launcher.exe
+}
 Copy-Item -Path build/win-x64/GiganticEmu.Launcher.exe -Destination $Destination/MistforgeLauncher.exe
 
 dotnet publish -r linux-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:DebugType=None -p:DebugSymbols=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true -c Release -o build/linux-x64 GiganticEmu.Launcher/GiganticEmu.Launcher.csproj
-strip build/linux-x64/GiganticEmu.Launcher
+if (Get-Command "strip" -ErrorAction SilentlyContinue) 
+{ 
+    strip build/linux-x64/GiganticEmu.Launcher
+}
 Copy-Item -Path build/linux-x64/GiganticEmu.Launcher -Destination $Destination/MistforgeLauncher
 
 dotnet publish -r win-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:DebugType=None -p:DebugSymbols=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true -c Release -o build/win-x64 GiganticEmu.Agent/GiganticEmu.Agent.csproj
-strip build/win-x64/GiganticEmu.Agent.exe
+if (Get-Command "strip" -ErrorAction SilentlyContinue) 
+{ 
+    strip build/win-x64/GiganticEmu.Agent.exe
+}
 Copy-Item -Path build/win-x64/GiganticEmu.Agent.exe -Destination $Destination/GiganticEmu.Agent.exe
 
 dotnet publish -r linux-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=false -p:DebugType=None -p:DebugSymbols=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true -c Release -o build/linux-x64 GiganticEmu.Agent/GiganticEmu.Agent.csproj
-strip build/linux-x64/GiganticEmu.Agent
+if (Get-Command "strip" -ErrorAction SilentlyContinue) 
+{ 
+    strip build/linux-x64/GiganticEmu.Agent
+}
 Copy-Item -Path build/linux-x64/GiganticEmu.Agent -Destination $Destination/GiganticEmu.Agent
