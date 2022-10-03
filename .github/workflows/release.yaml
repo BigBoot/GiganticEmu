@@ -95,14 +95,6 @@ jobs:
       - name: Parse Changelog
         id: changelog
         uses: coditory/changelog-parser@v1
-        
-      - name: Strip executables
-        run: |
-          strip dist/MistforgeLauncher.exe
-          strip dist/MistforgeLauncher
-          strip dist/GiganticEmu.Agent.exe
-          strip dist/GiganticEmu.Agent
-          strip dist/ArcSDK.dll
 
       - name: Create Release
         uses: ncipollo/release-action@v1
