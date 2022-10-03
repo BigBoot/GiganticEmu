@@ -29,6 +29,7 @@ public class ServerManager
     private readonly string _gamePath;
     private readonly string _binaryPath;
     private readonly string _configPath;
+    private readonly string _instanceConfigPath;
 
     public int RunningInstances { get => _configuration.MaxInstances - _freePorts.Count; }
 
@@ -41,6 +42,7 @@ public class ServerManager
         _gamePath = _configuration.GiganticPath ?? Directory.GetCurrentDirectory();
         _binaryPath = Path.GetFullPath(Path.Join(_gamePath, "Binaries", "Win64"));
         _configPath = Path.GetFullPath(Path.Join(_gamePath, "RxGame", "Config"));
+        _instanceConfigPath = _configuration.InstanceConfigPath ?? _configPath;
     }
 
     public async Task<int> StartInstance(string map, int? maxPlayers = null, (string, string, string)? creatures = null, bool useLobby = false)
@@ -120,7 +122,7 @@ public class ServerManager
         process.StartInfo.ArgumentList.Add($"-forcelogflush");
 
         var defGameIni = await File.ReadAllTextAsync(Path.Join(_configPath, "DefaultGame.ini"));
-        var defGameIniPath = Path.GetFullPath(Path.Join(_configPath, $"_DefaultGame_{port}.ini"));
+        var defGameIniPath = Path.GetFullPath(Path.Join(_instanceConfigPath, $"_DefaultGame_{port}.ini"));
 
         var adminPassword = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 16)
             .Select(s => s[RANDOM.Next(s.Length)]).ToArray());
