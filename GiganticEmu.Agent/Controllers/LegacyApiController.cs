@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using GiganticEmu.Shared;
 using GiganticEmu.Shared.LegacyApi;
@@ -123,5 +124,31 @@ public class LegacyApiController : ControllerBase
             Timestamp = req.Timestamp,
             Events = new object[0],
         });
+    }
+    
+    [HttpPost("result")]
+    [Produces("application/json")]
+    public async Task<IActionResult> PostResult(ResultRequest req)
+    {
+        try
+        {
+            var logManager = new LogManager(req.Id);
+            if (logManager.IsRecent())
+            {
+                return Ok(new ResultResponse()
+                {
+                    Winner = logManager.GetWinner()
+                });
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            return BadRequest();
+        }
+
     }
 }
