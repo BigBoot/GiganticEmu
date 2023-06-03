@@ -31,7 +31,7 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult Get(string token)
         {
-            var redirectUrl = Flurl.Url.Encode(Url.ActionLink(nameof(GetResponse)));
+            var redirectUrl = Flurl.Url.Encode(Url.ActionLink(nameof(GetResponse), protocol: Request.Scheme));
             return Redirect($"https://discord.com/oauth2/authorize?response_type=code&client_id={_configuration.Discord.ClientId}&scope=identify&state={token}&redirect_uri={redirectUrl}&prompt=consent");
         }
 
@@ -84,7 +84,7 @@ namespace Web.Controllers
                     client_id = _configuration.Discord.ClientId,
                     client_secret = _configuration.Discord.ClientSecret,
                     code = code,
-                    redirect_uri = Url.ActionLink(nameof(GetResponse)),
+                    redirect_uri = Url.ActionLink(nameof(GetResponse), protocol: Request.Scheme),
                     grant_type = "authorization_code"
                 })
                 .ReceiveJson();

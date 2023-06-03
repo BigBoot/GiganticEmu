@@ -9,7 +9,6 @@ using GiganticEmu.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -48,7 +47,7 @@ public class RegisterController : Controller
     {
         var token = Crypt.CreateSecureRandomString();
         HttpContext.Session.SetString(SESSION_KEY_DISCORD_STATE, token);
-        var redirectUrl = Flurl.Url.Encode(Url.ActionLink(nameof(GetDiscord)));
+        var redirectUrl = Flurl.Url.Encode(Url.ActionLink(nameof(GetDiscord), protocol: Request.Scheme));
         return Redirect($"https://discord.com/oauth2/authorize?response_type=code&client_id={_configuration.Discord.ClientId}&scope=identify&state={token}&redirect_uri={redirectUrl}&prompt=consent");
     }
 
@@ -70,7 +69,7 @@ public class RegisterController : Controller
                     client_id = _configuration.Discord.ClientId,
                     client_secret = _configuration.Discord.ClientSecret,
                     code = code,
-                    redirect_uri = Url.ActionLink(nameof(GetDiscord)),
+                    redirect_uri = Url.ActionLink(nameof(GetDiscord), protocol: Request.Scheme),
                     grant_type = "authorization_code"
                 })
                 .ReceiveJson();
