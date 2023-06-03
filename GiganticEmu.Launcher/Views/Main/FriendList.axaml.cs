@@ -16,6 +16,11 @@ public partial class FriendList : ReactiveUserControl<FriendListViewModel>
         ViewModel?.Logout?.Execute().Wait();
         PopupUser.IsOpen = false;
     }
+    public void OnLinkDiscordClicked(object sender, RoutedEventArgs args)
+    {
+        ViewModel?.LinkDiscord?.Execute();
+        PopupUser.IsOpen = false;
+    }
 
     public FriendList()
     {

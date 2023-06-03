@@ -28,7 +28,7 @@ namespace Web.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Get([FromHeader(Name = "X-API-KEY")] string token)
         {
-            var db = _databaseFactory.CreateDbContext();
+            using var db = _databaseFactory.CreateDbContext();
 
             var user = await db.Users
                 .Where(user => user.AuthToken == token)
@@ -41,7 +41,7 @@ namespace Web.Controllers
 
             var friendRequests = await db.Friends
                 .Where(friend => friend.FriendUserId == user.Id && friend.Accepted == false)
-                .Select(friend => new FriendsGetResponse.FriendRequestData(friend.User.UserName, CreateIconHash(friend.User.Email)))
+                .Select(friend => new FriendsGetResponse.FriendRequestData(friend.User.UserName!, CreateIconHash(friend.User.Email!)))
                 .ToListAsync();
 
             var invites = await db.GroupInvites
@@ -54,10 +54,10 @@ namespace Web.Controllers
                 .Where(friend => friend.UserId == user.Id)
                 .Include(friend => friend.FriendUser)
                 .Select(friend => new FriendsGetResponse.FriendData(
-                    friend.FriendUser.UserName,
+                    friend.FriendUser.UserName!,
                     friend.Accepted,
                     friend.Status,
-                    CreateIconHash(friend.FriendUser.Email),
+                    CreateIconHash(friend.FriendUser.Email!),
                     canInvite,
                     invites.Contains(friend.FriendUser.UserName)
                 ))
@@ -78,7 +78,7 @@ namespace Web.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> PostRequest(FriendsInvitePostRequest request, [FromHeader(Name = "X-API-KEY")] string token)
         {
-            var db = _databaseFactory.CreateDbContext();
+            using var db = _databaseFactory.CreateDbContext();
 
             var user = await db.Users
                           .Where(user => user.AuthToken == token)
@@ -125,7 +125,7 @@ namespace Web.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> PostInvite(FriendsInvitePostRequest request, [FromHeader(Name = "X-API-KEY")] string token)
         {
-            var db = _databaseFactory.CreateDbContext();
+            using var db = _databaseFactory.CreateDbContext();
 
             var user = await db.Users
                           .Where(user => user.AuthToken == token)
@@ -189,7 +189,7 @@ namespace Web.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Delete(FriendsDeleteRequest request, [FromHeader(Name = "X-API-KEY")] string token)
         {
-            var db = _databaseFactory.CreateDbContext();
+            using var db = _databaseFactory.CreateDbContext();
 
             var user = await db.Users
                           .Where(user => user.AuthToken == token)

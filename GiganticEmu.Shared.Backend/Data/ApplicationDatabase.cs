@@ -10,6 +10,7 @@ namespace GiganticEmu.Shared.Backend
     {
         public DbSet<Friend> Friends { get; set; } = default!;
         public DbSet<GroupInvite> GroupInvites { get; set; } = default!;
+        public DbSet<ReportToken> ReportTokens { get; set; } = default!;
 
         public ApplicationDatabase(DbContextOptions<ApplicationDatabase> options)
             : base(options)

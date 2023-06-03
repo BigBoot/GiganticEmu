@@ -5,6 +5,7 @@ using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -52,11 +53,18 @@ public class Startup
             c.User.RequireUniqueEmail = false;
         });
 
-        services.AddControllers()
+        services.Configure<RouteOptions>(c =>
+        {
+            c.LowercaseUrls = true;
+        });
+
+        services.AddSession();
+        services.AddControllersWithViews()
             .AddJsonOptions(c =>
             {
                 c.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
+
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "Web", Version = "v1" });
@@ -83,6 +91,8 @@ public class Startup
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseSession();
 
         //app.UseAuthentication(); 
         //app.UseAuthorization();

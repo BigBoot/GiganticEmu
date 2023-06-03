@@ -11,6 +11,7 @@ public class UserManager
 {
     public record LoginResult(UserData? User, ICollection<string> Errors);
     public record FriendsResult(ICollection<FriendData>? Friends, ICollection<string> Errors);
+    public record LinkDiscordResult(string? Token, ICollection<string> Errors);
     public record GeneralResult(ICollection<string> Errors);
 
     public bool IsAuthenticated { get => _auth.AuthToken != null; }
@@ -235,6 +236,26 @@ public class UserManager
         catch (Exception ex)
         {
             return new GeneralResult(new List<string> { ex.Message });
+        }
+    }
+
+    public async Task<LinkDiscordResult> LinkDiscord()
+    {
+        try
+        {
+            var result = await _api.LinkDiscord(new DiscordPostTokenRequest { });
+            if (result.Code == RequestResult.Success && result.Token is string token)
+            {
+                return new LinkDiscordResult(result.Token, new List<string>());
+            }
+            else
+            {
+                return new LinkDiscordResult(null, new List<string> { result.Message });
+            }
+        }
+        catch (Exception ex)
+        {
+            return new LinkDiscordResult(null, new List<string> { ex.Message });
         }
     }
 }

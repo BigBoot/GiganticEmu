@@ -24,6 +24,7 @@ public class Startup
         services.Configure<AgentConfiguration>(Configuration, o => o.BindNonPublicProperties = true);
 
         services.AddSingleton<ServerManager>();
+        services.AddSingleton<LogManager>();
 
         services.AddControllers()
             .AddJsonOptions(c =>

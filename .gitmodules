@@ -1,3 +1,6 @@
 [submodule "ArcSDK/subhook"]
 	path = ArcSDK/subhook
 	url = https://github.com/Zeex/subhook.git
+[submodule "GiganticEmu.Skill/glicko2-csharp"]
+	path = GiganticEmu.Skill/glicko2-csharp
+	url = https://github.com/MaartenStaa/glicko2-csharp.git

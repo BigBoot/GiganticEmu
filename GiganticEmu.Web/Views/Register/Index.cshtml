@@ -1,0 +1,49 @@
+@model GiganticEmu.Web.RegisterUser
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+
+<h1>GiganticEmu Registration Form</h1>
+<hr />
+<div class="row">
+    <div class="col-md-9">
+        <form asp-controller="Register" asp-action="Post" method="post">
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Pwd" class="control-label"></label>
+                <input asp-for="Pwd" class="form-control" type="password" />
+                <span asp-validation-for="Pwd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPwd" class="control-label"></label>
+                <input asp-for="ConfirmPwd" class="form-control" type="password" />
+                <span asp-validation-for="ConfirmPwd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <br />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Save User Details" class="btn btn-primary" />
+            </div>
+            <b> @ViewBag.message </b>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

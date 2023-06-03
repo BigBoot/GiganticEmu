@@ -36,7 +36,7 @@ namespace Web.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Post([FromHeader(Name = "Host")] string host, [FromForm(Name = "arc_token")] string token, [FromForm(Name = "v")] int version)
         {
-            var db = _databaseFactory.CreateDbContext();
+            using var db = _databaseFactory.CreateDbContext();
 
             var user = await db.Users.Where(user => user.AuthToken == token).FirstOrDefaultAsync();
 

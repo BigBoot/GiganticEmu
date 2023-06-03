@@ -42,6 +42,9 @@ public class DatabaseCleanupService : IHostedService, IDisposable
             user.AuthToken = null;
             user.AuthTokenExpires = null;
         }
+
+        _database.RemoveRange(await _database.ReportTokens.Where(token => token.ValidUntil <= DateTimeOffset.Now).ToListAsync());
+
         await _database.SaveChangesAsync();
         await transaction.CommitAsync();
     }

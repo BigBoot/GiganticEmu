@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
     <nullable>enable</nullable>
-    <NoWarn>1998;CS8524;ACONS02</NoWarn>
+    <NoWarn>$(NoWarn);1998;CS8524;ACONS02;CS1998</NoWarn>
     <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <BaseOutputPath>build/$(OS)/bin</BaseOutputPath>
     <BaseIntermediateOutputPath>build/$(OS)/obj</BaseIntermediateOutputPath>
     <IntermediateOutputPath>build/$(OS)/obj</IntermediateOutputPath>
@@ -11,7 +11,7 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);build/**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild" Version="5.8.1">
+    <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

@@ -199,7 +199,7 @@ public class MiceClient
                             .Where(x => x.SessionId == user.SessionId)
                             .ToDictionaryAsync(x => x.MotigaId, x => new
                             {
-                                username = x.UserName,
+                                username = x.UserName!,
                                 member_settings = x.MemberSettings.FromJsonTo<dynamic>()
                             });
 

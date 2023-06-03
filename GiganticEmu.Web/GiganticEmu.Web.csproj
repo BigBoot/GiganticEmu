@@ -1,6 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,13 +12,14 @@
     <PackageReference Include="Fetchgoods.Text.Json.Extensions" Version="0.1.0" />
     <PackageReference Include="FluentEmail.Core" Version="3.0.2" />
     <PackageReference Include="FluentEmail.MailKit" Version="3.0.2" />
-    <PackageReference Include="System.Text.Json" Version="6.0.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="System.Text.Json" Version="7.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GiganticEmu.Shared\GiganticEmu.Shared.csproj" />
     <ProjectReference Include="..\GiganticEmu.Shared.Backend\GiganticEmu.Shared.Backend.csproj" />
+    <ProjectReference Include="..\GiganticEmu.Skill\GiganticEmu.Skill.csproj" />
   </ItemGroup>
 
 </Project>

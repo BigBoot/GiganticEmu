@@ -32,7 +32,7 @@ namespace Web.Controllers
         {
             if (token != null)
             {
-                var db = _databaseFactory.CreateDbContext();
+                using var db = _databaseFactory.CreateDbContext();
 
                 var user = await db.Users
                    .Where(user => user.AuthToken == token)
@@ -88,7 +88,7 @@ namespace Web.Controllers
         {
             if (token != null)
             {
-                var db = _databaseFactory.CreateDbContext();
+                using var db = _databaseFactory.CreateDbContext();
 
                 var user = await db.Users
                     .Where(user => user.AuthToken == token)

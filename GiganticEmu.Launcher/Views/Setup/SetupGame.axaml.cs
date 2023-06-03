@@ -136,9 +136,9 @@ public partial class SetupGame : ReactiveUserControl<SetupGameViewModel>
                         var dlg = new OpenFileDialog
                         {
                             Title = "Select Gigantic-Core_de.zip",
-                            Filters =
+                            Filters = new()
                             {
-                                new FileDialogFilter {Name = "Gigantic-Core_de.zip", Extensions = {"zip"}}
+                                new FileDialogFilter { Name = "Gigantic-Core_de.zip", Extensions = { "zip" } }
                             }
                         };
 

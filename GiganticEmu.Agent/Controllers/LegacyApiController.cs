@@ -61,7 +61,7 @@ public class LegacyApiController : ControllerBase
     {
         try
         {
-            var port = await _serverManager.StartInstance(req.Map, req.MaxPlayers, req.Creatures, _configuration.UseLobby);
+            var port = await _serverManager.StartInstance(req.Map, req.MaxPlayers, req.Creatures, _configuration.UseLobby, req.ReportUrl);
 
             return Ok(new StartResponse
             {

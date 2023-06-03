@@ -59,6 +59,10 @@
                                 Background="{DynamicResource MaterialDesignPaper}">
                                 <Button
                                     Classes="Flat"
+                                    Name="ButtonDiscord"
+                                    Click="OnLinkDiscordClicked">Link Discord Account</Button>
+                                <Button
+                                    Classes="Flat"
                                     Name="ButtonLogout"
                                     Click="OnLogoutClicked">Logout</Button>
                             </StackPanel>

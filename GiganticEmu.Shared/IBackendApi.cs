@@ -35,4 +35,7 @@ public interface IBackendApi
 
     [Post("/friends/invite")]
     Task<FriendsInvitePostResponse> SendInvite([Body] FriendsInvitePostRequest request);
+
+    [Post("/discord/token")]
+    Task<DiscordPostTokenResponse> LinkDiscord([Body] DiscordPostTokenRequest request);
 }

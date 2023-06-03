@@ -12,7 +12,7 @@ public record SemVer : IComparable<SemVer>, IEquatable<SemVer>
     public int Patch { get => _inner.Patch; }
     public string? PreRelease { get => _inner.Prerelease != "" ? _inner.Prerelease : null; }
     public bool IsPreRelease { get => PreRelease is not null; }
-    public string? BuildMetadata { get => _inner.Build != "" ? _inner.Build : null; }
+    public string? BuildMetadata { get => _inner.Metadata != "" ? _inner.Metadata : null; }
     public bool HasBuildMetadata { get => BuildMetadata is not null; }
 
     private SemVer(SemVersion inner)
@@ -22,7 +22,7 @@ public record SemVer : IComparable<SemVer>, IEquatable<SemVer>
 
     public SemVer(int major, int minor = 0, int patch = 0, string prerelease = "", string buildMetadata = "")
     {
-        _inner = new SemVersion(major, minor, patch, prerelease, buildMetadata);
+        _inner = SemVersion.ParsedFrom(major, minor, patch, prerelease, buildMetadata);
     }
 
     public int CompareTo(SemVer? other)
@@ -53,12 +53,12 @@ public record SemVer : IComparable<SemVer>, IEquatable<SemVer>
 
     public static SemVer Parse(string version)
     {
-        return new SemVer(SemVersion.Parse(version));
+        return new SemVer(SemVersion.Parse(version, SemVersionStyles.Any));
     }
 
     public static SemVer? TryParse(string version)
     {
-        if (SemVersion.TryParse(version, out var inner))
+        if (SemVersion.TryParse(version, SemVersionStyles.Any, out var inner))
         {
             return new SemVer(inner);
         }

@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GiganticEmu.Shared;
 using GiganticEmu.Shared.Backend;
+using GiganticEmu.Web;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -26,16 +27,18 @@ namespace Web.Controllers
         }
 
         [HttpGet]
+        [RequireApiKey]
         [Produces("application/json")]
         public async Task<IActionResult> Get([FromHeader(Name = "X-API-Key")] string? token)
         {
             if (_configuration.ApiKey != null && token == _configuration.ApiKey)
             {
-                var db = _databaseFactory.CreateDbContext();
+                using var db = _databaseFactory.CreateDbContext();
 
                 var players = await db.Users
                     .Where(user => user.InQueue == true)
                     .Select(user => user.UserName)
+                    .OfType<string>()
                     .ToListAsync();
 
                 return Ok(new QueueGetResponse(RequestResult.Success)

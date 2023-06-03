@@ -24,11 +24,13 @@ public class FriendListViewModel : ReactiveObject
     public IObservableCollection<FriendListEntryViewModel> Friends { get; } = new ObservableCollectionExtended<FriendListEntryViewModel>();
     public ReactiveCommand<string, Unit> AddFriend { get; }
     public ReactiveCommand<Unit, Unit> Logout { get; }
+    public ReactiveCommand<Unit, Unit> LinkDiscord { get; }
 
     public FriendListViewModel()
     {
         AddFriend = ReactiveCommand.CreateFromTask<string>(DoAddFriend);
         Logout = ReactiveCommand.CreateFromTask(DoLogout);
+        LinkDiscord = ReactiveCommand.CreateFromTask(DoLinkDiscord);
 
         _friends.Connect()
             .AutoRefresh()
@@ -71,6 +73,17 @@ public class FriendListViewModel : ReactiveObject
         IsLoading = true;
         await Locator.Current.RequireService<CredentialStorage>().ClearToken();
         User = null;
+        IsLoading = false;
+    }
+
+    private async Task DoLinkDiscord()
+    {
+        IsLoading = true;
+        var result = await Locator.Current.RequireService<UserManager>().LinkDiscord();
+        if (result.Token != null)
+        {
+            OpenBrower.OpenBrowser($"{Locator.Current.RequireService<LauncherConfiguration>().Host}/discord?token={result.Token}");
+        }
         IsLoading = false;
     }
 }

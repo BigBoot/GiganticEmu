@@ -4,20 +4,28 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Flurl;
 using Flurl.Http;
+using Flurl.Serialization.TextJson;
+using Microsoft.Extensions.Caching.Memory;
 using Polly;
 using Polly.Caching.Memory;
-using ReactiveUI;
-using Splat;
 
-namespace GiganticEmu.Launcher;
+namespace GiganticEmu.Shared;
 
 public static class HttpExtensions
 {
     public record PollyFlurlRequest(IFlurlRequest Request, IAsyncPolicy Policy);
+
+    private static MemoryCacheProvider? CACHE_PROVIDER = new MemoryCacheProvider(new MemoryCache(new MemoryCacheOptions()));
+
+    static HttpExtensions()
+    {
+        FlurlHttp.Configure(settings => settings.WithTextJsonSerializer(new JsonSerializerOptions { }));
+    }
 
     private static bool IsTransientError(FlurlHttpException exception)
     {
@@ -37,7 +45,7 @@ public static class HttpExtensions
 
     public static PollyFlurlRequest Cached(this PollyFlurlRequest request, TimeSpan? t = null)
         => new PollyFlurlRequest(request.Request, request.Policy.WrapAsync(Policy.CacheAsync(
-                cacheProvider: Locator.Current.RequireService<MemoryCacheProvider>(),
+                cacheProvider: CACHE_PROVIDER,
                 ttl: t ?? TimeSpan.FromMinutes(1),
                 cacheKeyStrategy: _ => request.Request.Url
             )));

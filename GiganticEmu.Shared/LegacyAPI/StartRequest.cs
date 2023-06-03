@@ -19,6 +19,9 @@ namespace GiganticEmu.Shared.LegacyApi
         [JsonPropertyName("creature2")]
         public string? Creature2 { get; init; } = default!;
 
+        [JsonPropertyName("report_url")]
+        public string? ReportUrl { get; init; } = default!;
+
         public (string, string, string)? Creatures
         {
             get => Creature0 != null && Creature1 != null && Creature2 != null ? (Creature0, Creature1, Creature2) : null;

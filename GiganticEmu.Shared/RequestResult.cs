@@ -56,6 +56,9 @@ public enum RequestResult
     [Description("failed to send email")]
     FailedToSendEmail,
 
+    [Description("no user exists with the given Discord id")]
+    UnknownDiscordId,
+
 }
 
 public static class RequestResultExtensions

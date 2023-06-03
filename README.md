@@ -1,4 +1,4 @@
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/BigBoot/GiganticEmu/build/master) 
+![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/BigBoot/GiganticEmu/release.yaml?branch=main) 
 ![GitHub](https://img.shields.io/github/license/BigBoot/GiganticEmu)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BigBoot/GiganticEmu)
 ![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/BigBoot/GiganticEmu?include_prereleases&label=pre-release)
@@ -33,7 +33,7 @@ Implements the TCP based MICE protocol used by the client to talk to the backend
 Requirements:
 * MSVC 2019 (e.g. Visual Studio 2019 with C++ Build Tools)
 * CMake
-* .NET SDK 5.0
+* .NET SDK 7.0
 * Powershell 7.x
 
 ```

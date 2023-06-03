@@ -11,7 +11,7 @@ namespace GiganticEmu.Shared.Backend.Migrations
 {
     [DbContext(typeof(ApplicationDatabase))]
     [Migration("20210611153614_init")]
-    partial class init
+    partial class @init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -27,6 +27,13 @@ namespace GiganticEmu.Shared.Backend
             public string SmtpPassword { get; set; } = default!;
         }
 
+        public class DiscordConfig
+        {
+            public string? ClientId { get; set; } = null;
+            public string? ClientSecret { get; set; } = null;
+            public string? ReportWebhookUrl { get; set; }
+        }
+
         public string SalsaCK { get; set; } = default!;
         public string BindInterface { get; set; } = "127.0.0.1";
         public int WebPort { get; set; } = 3000;
@@ -38,6 +45,7 @@ namespace GiganticEmu.Shared.Backend
         public int NumPlayers { get; set; } = 10;
         public string? ApiKey { get; set; }
         public ICollection<string> Maps { get; set; } = new List<string> { "LV_Canyon", "LV_Mistforge", "LV_Valley" };
+        public DiscordConfig Discord { get; set; } = new DiscordConfig();
     }
 
     public static class BackendConfigurationExtensions

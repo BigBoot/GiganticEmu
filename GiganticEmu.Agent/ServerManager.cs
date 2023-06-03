@@ -6,9 +6,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Flurl.Http;
 using GiganticEmu.Shared;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Polly;
 
 namespace GiganticEmu.Agent;
 
@@ -24,6 +26,7 @@ public class ServerManager
 
     private readonly ILogger<ServerManager> _logger;
     private readonly AgentConfiguration _configuration;
+    private readonly LogManager _logManager;
     private readonly PriorityQueue<int, int> _freePorts;
     private readonly IDictionary<int, Instance> _instances;
     private readonly string _gamePath;
@@ -33,10 +36,11 @@ public class ServerManager
 
     public int RunningInstances { get => _configuration.MaxInstances - _freePorts.Count; }
 
-    public ServerManager(ILogger<ServerManager> logger, IOptions<AgentConfiguration> configuration)
+    public ServerManager(ILogger<ServerManager> logger, IOptions<AgentConfiguration> configuration, LogManager logManager)
     {
         _logger = logger;
         _configuration = configuration.Value;
+        _logManager = logManager;
         _freePorts = new PriorityQueue<int, int>(Enumerable.Range(_configuration.ServerPort, _configuration.MaxInstances).Select(i => (i, i)));
         _instances = new Dictionary<int, Instance>();
         _gamePath = _configuration.GiganticPath ?? Directory.GetCurrentDirectory();
@@ -45,14 +49,13 @@ public class ServerManager
         _instanceConfigPath = _configuration.InstanceConfigPath ?? _configPath;
     }
 
-    public async Task<int> StartInstance(string map, int? maxPlayers = null, (string, string, string)? creatures = null, bool useLobby = false)
+    public async Task<int> StartInstance(string map, int? maxPlayers = null, (string, string, string)? creatures = null, bool useLobby = false, string? reportUrl = null)
     {
         int port;
         if (!_freePorts.TryDequeue(out port, out _))
         {
             throw new NoInstanceAvailableException();
         }
-
 
         Instance instance;
         try
@@ -70,7 +73,7 @@ public class ServerManager
         if (instance != null)
         {
             _ = Task
-                .Run(async () => RunInstance(instance))
+                .Run(async () => RunInstance(instance, reportUrl))
                 .LogExceptions(_logger);
         }
 
@@ -169,15 +172,20 @@ public class ServerManager
             process.StartInfo.ArgumentList.Add($"-defgameini=Z:{defGameIniPath.Replace('/', '\\')}");
         }
 
+        await _logManager.DeleteLog(port);
+
         process.Start();
-        ChildProcessTracker.AddProcess(process);
+        if (PlatformUtils.IsWindows)
+        {
+            ChildProcessTracker.AddProcess(process);
+        }
 
         var instance = new Instance(process, adminPassword, defGameIniPath, port);
         _instances.Add(port, instance);
         return instance;
     }
 
-    private async Task RunInstance(Instance instance)
+    private async Task RunInstance(Instance instance, string? reportUrl)
     {
         try
         {
@@ -187,6 +195,37 @@ public class ServerManager
                 instance.Process.Kill();
                 await instance.Process.WaitForExitAsync();
             }
+
+            if (reportUrl != null)
+            {
+                try
+                {
+                    var result = await _logManager.GetMatchResult(instance.Port);
+                    await reportUrl
+                        .WithPolly(policy => policy.RetryAsync(3))
+                        .PostJsonAsync(new ReportPostRequest
+                        {
+                            Result = result,
+                            Server = _configuration.Title,
+                        })
+                        .ReceiveJson<ReportPostResponse>();
+                }
+                catch (LogParseException e)
+                {
+                    await reportUrl
+                        .WithPolly(policy => policy.RetryAsync(3))
+                        .PostJsonAsync(new ReportPostRequest
+                        {
+                            ParseError = e.Message,
+                            Server = _configuration.Title,
+                        })
+                        .ReceiveJson<ReportPostResponse>();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, null);
         }
         finally
         {

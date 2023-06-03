@@ -1,0 +1,29 @@
+@model GiganticEmu.Web.RegisterUser
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+
+<h1>GiganticEmu Registration Form</h1>
+<hr />
+<div class="row">
+    <div class="col-md-9">
+        <form asp-action="PostDiscord">
+            <div class="form-group">
+                Account created succesfully, you can close this windows now!
+            </div>
+            <br />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <br />
+            <b> @ViewBag.message </b>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

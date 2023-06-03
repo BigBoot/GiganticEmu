@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace GiganticEmu.Launcher;
+namespace GiganticEmu.Shared;
 
 public class ProgressStream : Stream
 {

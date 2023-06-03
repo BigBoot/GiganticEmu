@@ -65,9 +65,6 @@ namespace GiganticEmu.Launcher
 
             Locator.CurrentMutable.RegisterLazySingleton<IAssetLoader>(() => new AvaloniaAssetLoader());
 
-            Locator.CurrentMutable.RegisterLazySingleton(() => new MemoryCache(new MemoryCacheOptions()));
-            Locator.CurrentMutable.RegisterLazySingleton(() => new MemoryCacheProvider(Locator.Current.RequireService<MemoryCache>()));
-
             Locator.CurrentMutable.RegisterLazySingleton(() => new ApiTokenHandler());
             Locator.CurrentMutable.RegisterLazySingleton(() => new AutoUpdater());
             Locator.CurrentMutable.RegisterLazySingleton(() => new CredentialStorage());
@@ -83,8 +80,6 @@ namespace GiganticEmu.Launcher
                 }), typeof(IBackendApi));
 
             Task.Run(async () => Locator.Current.RequireService<Settings>().Load()).Wait();
-
-            FlurlHttp.Configure(settings => settings.WithTextJsonSerializer(new JsonSerializerOptions { }));
         }
 
         private void HandleCmdLine()

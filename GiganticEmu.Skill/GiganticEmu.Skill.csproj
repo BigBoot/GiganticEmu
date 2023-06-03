@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <Compile Remove="glicko2-csharp/Properties/AssemblyInfo.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+    </ItemGroup>
+</Project>
