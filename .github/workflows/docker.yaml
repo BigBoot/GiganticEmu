@@ -18,6 +18,8 @@ jobs:
         project: ["Web", "Mice"]
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - run: git fetch --prune --unshallow --tag
 
