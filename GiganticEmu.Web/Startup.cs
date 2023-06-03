@@ -4,6 +4,7 @@ using FluentEmail.MailKitSmtp;
 using GiganticEmu.Shared.Backend;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +30,12 @@ public class Startup
         Configuration.GetSection(BackendConfiguration.GiganticEmu).Bind(config);
 
         services.Configure<BackendConfiguration>(Configuration.GetSection(BackendConfiguration.GiganticEmu));
+
+        services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders =
+                ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        });
 
         services.AddApplicationDatabase();
 
@@ -74,6 +81,8 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+        app.UseForwardedHeaders();
 
         if (env.IsDevelopment())
         {
