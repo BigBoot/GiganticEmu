@@ -34,7 +34,7 @@ namespace GiganticEmu.Shared.Backend.Migrations
                 table: "AspNetUsers",
                 type: "double precision",
                 nullable: false,
-                defaultValue: 0.0);
+                defaultValue: 1500.0);
 
             migrationBuilder.AddColumn<double>(
                 name: "SkillRating",
