@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.3] - 2023-06-04
+### Fixed
+- Actually fix winning team detection
+- Fixed default value for SkillDeviation
+- Fix Launcher AutoUpdater on linux
+
 ## [2.2.2] - 2023-06-03
 ### Fixed
 - Winning team detection
