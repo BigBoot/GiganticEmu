@@ -68,17 +68,36 @@ namespace Web.Controllers
             await db.AddAsync(new ReportToken() { Token = reportToken });
             await db.SaveChangesAsync();
 
-            var mapParticipant = (Participant participant) => new MatchPostResponse.Player(
-                Name: participant.Name,
-                DiscordId: participant.Id.ToString(),
-                MatchToken: participant.MatchToken
-            );
-
             return Ok(new MatchPostResponse(RequestResult.Success)
             {
-                Team1 = new MatchPostResponse.Team(team1.Select(mapParticipant).ToList(), team1.Average(x => x.Rating)),
-                Team2 = new MatchPostResponse.Team(team2.Select(mapParticipant).ToList(), team2.Average(x => x.Rating)),
+                Team1 = new MatchPostResponse.Team(team1.Select(x => x.Id.ToString()).ToList(), team1.Average(x => x.Rating)),
+                Team2 = new MatchPostResponse.Team(team2.Select(x => x.Id.ToString()).ToList(), team2.Average(x => x.Rating)),
                 ReportToken = reportToken,
+            });
+        }
+
+        [HttpPost("token")]
+        [RequireApiKey]
+        [Produces("application/json")]
+        public async Task<IActionResult> PostToken(MatchTokenPostRequest request)
+        {
+            var id = long.Parse(request.DiscordId);
+
+            using var db = _databaseFactory.CreateDbContext();
+            var user = await db.Users.SingleOrDefaultAsync(x => x.DiscordId == id);
+
+            if (user == null)
+            {
+                return Ok(new ResponseBase(RequestResult.UnknownUser));
+            }
+
+            user.MatchToken = Crypt.CreateSecureRandomString(10);
+            await db.SaveChangesAsync();
+
+            return Ok(new MatchTokenPostResponse(RequestResult.Success)
+            {
+                MatchToken = user.MatchToken,
+                Name = user.UserName!,
             });
         }
 
