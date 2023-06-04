@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reactive.Subjects;
@@ -30,14 +31,19 @@ public class AutoUpdater
 
         _ = Task.Run(async () =>
         {
-            await github.DownloadFile(version, filename, targetDir, targetFileName, progress => observable.OnNext(progress));
+            var resultFile = await github.DownloadFile(version, filename, targetDir, targetFileName, progress => observable.OnNext(progress));
+            if (PlatformUtils.IsLinux)
+            {
+                var unixFileInfo = new Mono.Unix.UnixFileInfo(resultFile);
+                unixFileInfo.FileAccessPermissions = unixFileInfo.FileAccessPermissions | Mono.Unix.FileAccessPermissions.UserExecute;
+            }
             observable.OnCompleted();
 
             new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = Path.Join(targetDir, targetFileName),
+                    FileName = resultFile,
                     WorkingDirectory = targetDir,
                 },
             }.Start();
@@ -80,17 +86,28 @@ public class AutoUpdater
         App.Current?.Shutdown();
     }
 
-    public async Task<UpdateInfo?> CheckForUpdate()
+    public async Task<UpdateInfo?> CheckForUpdate(bool forceUpdate = false)
     {
         var github = Locator.Current.RequireService<GitHub>();
 
-        if (await github.GetLatestRelease() is GitHub.ReleaseInfo info)
+        if (await github.GetLatestRelease() is GitHub.ReleaseInfo info && SemVer.TryParse(Regex.Replace(info.TagName, "^v", "")) is SemVer latest)
         {
-            if (SemVer.TryParse(Regex.Replace(info.TagName, "^v", "")) is SemVer latest && latest > SemVer.ApplicationVersion)
+
+            if (latest > SemVer.ApplicationVersion)
             {
                 if (await GetChangelog(latest) is { } changelog)
                 {
                     return new UpdateInfo(latest, changelog);
+                }
+            }
+            else
+            {
+                if (forceUpdate)
+                {
+                    return new UpdateInfo(latest, new GitHub.Changelog(new List<GitHub.Changelog.Version>() {
+                        new GitHub.Changelog.Version(SemVer.ApplicationVersion, DateTime.Now, new List<GitHub.Changelog.Section>() {
+                            new GitHub.Changelog.Section("Forced Update", new List<string>() {  "Nothing" })
+                    })}));
                 }
             }
         }

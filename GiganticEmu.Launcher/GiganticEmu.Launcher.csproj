@@ -36,6 +36,7 @@
     <PackageReference Include="Markdown.Avalonia.Tight" Version="0.10.14" />
     <PackageReference Include="Material.Avalonia" Version="2.5.1" />
     <PackageReference Include="Material.Icons.Avalonia" Version="1.1.10" />
+    <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageReference Include="PeNet" Version="3.0.0" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.44" />
     <PackageReference Include="ReactiveUI" Version="18.4.44" />

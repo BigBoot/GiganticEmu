@@ -34,6 +34,9 @@ namespace GiganticEmu.Launcher
 
             [Option('g', "game", Required = false, HelpText = "The path to the game.", Default = ".")]
             public string Game { get; set; } = default!;
+
+            [Option('u', "update", Required = false, HelpText = "Force an update of the Launcher.", Default = false)]
+            public bool ForceUpdate { get; set; } = default!;
         }
 
         public override void Initialize()
@@ -92,7 +95,8 @@ namespace GiganticEmu.Launcher
                     Locator.CurrentMutable.RegisterLazySingleton(() => new LauncherConfiguration()
                     {
                         Host = o.Host,
-                        Game = o.Game
+                        Game = o.Game,
+                        ForceUpdate = o.ForceUpdate,
                     });
                 });
         }

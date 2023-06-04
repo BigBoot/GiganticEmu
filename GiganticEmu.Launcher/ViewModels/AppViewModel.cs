@@ -102,6 +102,7 @@ public class AppViewModel : ReactiveObject
     private async Task DoCheckForUpdate()
     {
         var updater = Locator.Current.RequireService<AutoUpdater>();
+        var config = Locator.Current.RequireService<LauncherConfiguration>();
 
         if (await updater.IsUpdatePending())
         {
@@ -110,7 +111,7 @@ public class AppViewModel : ReactiveObject
             return;
         }
 
-        if (await updater.CheckForUpdate() is { } update)
+        if (await updater.CheckForUpdate(config.ForceUpdate) is { } update)
         {
             var result = await OnUpdateAvailable.Handle(update);
 

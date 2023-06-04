@@ -84,9 +84,9 @@ public class GitHub
         return null;
     }
 
-    public async Task DownloadFile(SemVer version, string filename, string targetDir, string? targetFileName = null, Action<double>? progressCallback = null)
+    public async Task<string> DownloadFile(SemVer version, string filename, string targetDir, string? targetFileName = null, Action<double>? progressCallback = null)
     {
-        await $"https://github.com/BigBoot/GiganticEmu/releases/download/v{version.ToString()}/{filename}"
+        return await $"https://github.com/BigBoot/GiganticEmu/releases/download/v{version.ToString()}/{filename}"
             .WithPolly(policy => policy.RetryAsync(3))
             .DownloadFileAsync(targetDir, targetFileName ?? filename, progressCallback: progressCallback);
     }
