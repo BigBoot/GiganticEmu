@@ -11,7 +11,7 @@ namespace GiganticEmu.Agent;
 
 public class LogManager
 {
-    private static Regex RE_PLAYER_JOIN_TOKEN = new Regex(@"Join request: :\d+\/MainMenu\?Name=(?<PlayerName>.+?)\?MatchToken=(?<MatchToken>.+?)\?Team=\d", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
+    private static Regex RE_PLAYER_JOIN_TOKEN = new Regex(@"Join request: :\d+\/MainMenu\?Name=(?<PlayerName>.+?)\?MatchToken=(?<MatchToken>.+?)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
     private static Regex RE_TEAM_SIZE = new Regex(@"Rx_General: TeamSize:  (?<size>\d+)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
     private static Regex RE_TEAM_PLAYER = new Regex(@"Rx_General: -- (?<name>.+?) \((?<id>\d+)\)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
     private static Regex RE_WINNER = new Regex($@"(?<=ScriptLog: \(RXPAWN_)(?<entity>{String.Join("|", Guardian.ALL_GUARDIANS.Select(x => x.CodeName))})(?=_CONTENT_0\) RXPAWN::DYING:DESTROYED)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
