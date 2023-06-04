@@ -82,8 +82,8 @@ public class LogManager
                         var match = RE_WINNER.Match(line);
                         winner = match.Groups["entity"].Value.ToLowerInvariant() switch
                         {
-                            "griffin" => MatchResult.Team.Team1,
-                            "naga" => MatchResult.Team.Team2,
+                            "griffin" => MatchResult.Team.Team2,
+                            "naga" => MatchResult.Team.Team1,
                             _ => null,
                         };
                     }
