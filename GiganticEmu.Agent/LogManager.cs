@@ -15,6 +15,7 @@ public class LogManager
     private static Regex RE_TEAM_SIZE = new Regex(@"Rx_General: TeamSize:  (?<size>\d+)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
     private static Regex RE_TEAM_PLAYER = new Regex(@"Rx_General: -- (?<name>.+?) \((?<id>\d+)\)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
     private static Regex RE_WINNER = new Regex($@"(?<=ScriptLog: \(RXPAWN_)(?<entity>{String.Join("|", Guardian.ALL_GUARDIANS.Select(x => x.CodeName))})(?=_CONTENT_0\) RXPAWN::DYING:DESTROYED)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
+    private static Regex RE_REG_QUERY = new Regex(@"^\s+Personal\s+REG_SZ\s+(?<Path>.*)$", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
     private async Task<string> GetLogFile(int port)
     {
@@ -26,23 +27,30 @@ public class LogManager
         }
         else
         {
-            var windowsPath = await Process.Start(new ProcessStartInfo
+            var regValue = await Process.Start(new ProcessStartInfo
             {
                 FileName = "wine",
-                ArgumentList = { "cmd", "/C", "echo %USERPROFILE%\\Documents" },
+                ArgumentList = { "reg", "query", @"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders", "/v", "Personal" },
                 UseShellExecute = false,
                 RedirectStandardOutput = true
             })!.StandardOutput.ReadToEndAsync()!;
 
-            var unixPath = await Process.Start(new ProcessStartInfo
+            var match = RE_REG_QUERY.Match(regValue);
+
+            if (!match.Success)
+            {
+                throw new LogParseException($"Failed to get 'My Documents' path from registry.");
+            }
+
+            var windowsPath = match.Groups["Path"].Value.Trim();
+
+            basePath = (await Process.Start(new ProcessStartInfo
             {
                 FileName = "winepath",
                 ArgumentList = { "-u", windowsPath.Trim() },
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-            })!.StandardOutput.ReadToEndAsync();
-
-            basePath = unixPath.Trim();
+            })!.StandardOutput.ReadToEndAsync()).Trim();
         }
 
         return Path.GetFullPath(Path.Join(basePath, "My Games", "Gigantic", "RxGame", "Logs", $"GiganticEmu.Agent.{port}.log"));

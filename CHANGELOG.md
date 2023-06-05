@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.4] - 2023-06-05
+### Fixed
+- Fix log path for linux Agent
+
 ## [2.2.3] - 2023-06-04
 ### Fixed
 - Actually fix winning team detection
