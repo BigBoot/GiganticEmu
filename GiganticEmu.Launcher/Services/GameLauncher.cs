@@ -7,6 +7,7 @@ using PeNet;
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using Semver;
 
 namespace GiganticEmu.Launcher;
 
@@ -18,11 +19,38 @@ public class GameLauncher
         public Func<DialogContent, Task<bool>> OnConfirm { get; init; } = async (_) => false;
     }
 
-    public static bool GameFound =>
-        File.Exists(Path.Join(Locator.Current.RequireService<LauncherConfiguration>().Game, "Binaries", "Win64",
-            "RxGame-Win64-Test.exe"));
+    public static string? GameExe = null;
+    public static bool GameFound => GameExe != null;
+    public static int GiganticBuild = 0;
+    private static PeNet.Header.Resource.StringTable? GiganticMetadata = null;
 
-    public async Task RunGame(InteractionHandler interactions, string? username = null, string? nickname = null, string? authToken = null)
+    static GameLauncher()
+    {
+        foreach (var exe in new[] { "RxGame-Win64-Test.exe", "RxGame-Arc-Win64-Test.exe" })
+        {
+            if (File.Exists(Path.Join(Locator.Current.RequireService<LauncherConfiguration>().Game, "Binaries", "Win64", exe)))
+            {
+                GameExe = Path.Join(Locator.Current.RequireService<LauncherConfiguration>().Game, "Binaries", "Win64", exe);
+                break;
+            }
+        }
+
+        if (GameExe != null)
+        {
+            GiganticMetadata = new PeFile(GameExe)?.Resources?.VsVersionInfo?.StringFileInfo?.StringTable?.FirstOrDefault();
+        }
+
+        if (File.Exists(Path.Join(Locator.Current.RequireService<LauncherConfiguration>().Game, "Binaries", "build.properties")))
+        {
+            var buildprop = Path.Join(Locator.Current.RequireService<LauncherConfiguration>().Game, "Binaries", "build.properties");
+            GiganticBuild = File.ReadAllLines(buildprop)
+                .Where(line => line.ToLowerInvariant().StartsWith("changelistbuiltfrom="))
+                .Select(line => int.Parse(line.Substring(line.IndexOf('=') + 1)))
+                .FirstOrDefault();
+        }
+    }
+
+    public async Task RunGame(InteractionHandler interactions, string? username = null, string? nickname = null, string? authToken = null, string? host = null, int? team = null)
     {
         var config = Locator.Current.RequireService<LauncherConfiguration>();
         var settings = Locator.Current.RequireService<Settings>();
@@ -31,8 +59,7 @@ public class GameLauncher
 
         try
         {
-
-            if (!File.Exists(Path.Join(path, "RxGame-Win64-Test.exe")))
+            if (GameExe == null)
             {
                 await interactions.OnError(new DialogContent
                 {
@@ -42,44 +69,46 @@ public class GameLauncher
                 return;
             }
 
-            var giganticMetadata = new PeFile(Path.Join(path, "RxGame-Win64-Test.exe"))?.Resources?.VsVersionInfo?.StringFileInfo?.StringTable?.FirstOrDefault();
-
-            var arcsdkMetadata = File.Exists(Path.Join(path, "ArcSDK.dll")) ? new PeFile(Path.Join(path, "ArcSDK.dll"))?.Resources?.VsVersionInfo?.StringFileInfo?.StringTable?.FirstOrDefault() : null;
-
-            if (arcsdkMetadata is not { ProductName: "ArcSDK" } || arcsdkMetadata.ProductVersion == null)
+            if (GiganticBuild < GameUtils.BUILD_THROWBACK_EVENT)
             {
-                var result = await interactions.OnConfirm(new DialogContent
-                {
-                    Title = "Unknown ArcSDK.dll version!",
-                    Text = "Unknown ArcSDK.dll version found.\nThis probably means this is your first time running MistforgeLauncher.\nMistforgeLauncher needs to replace the ArcSDK.dll with it's own version to continue.\n\nDo you want to continue?"
-                });
+                var arcsdkMetadata = File.Exists(Path.Join(path, "ArcSDK.dll")) ? new PeFile(Path.Join(path, "ArcSDK.dll"))?.Resources?.VsVersionInfo?.StringFileInfo?.StringTable?.FirstOrDefault() : null;
 
-                if (!result)
-                {
-                    return;
-                }
-
-                await github.DownloadFile(SemVer.ApplicationVersion, "ArcSDK.dll", path);
-            }
-            else
-            {
-                var arcSdkVersion = SemVer.Parse(arcsdkMetadata.ProductVersion);
-
-                if (SemVer.ApplicationVersion != arcSdkVersion)
+                if (arcsdkMetadata is not { ProductName: "ArcSDK" } || arcsdkMetadata.ProductVersion == null)
                 {
                     var result = await interactions.OnConfirm(new DialogContent
                     {
-                        Title = "Mismatched ArcSDK.dll version!",
-                        Text = "Mismatched ArcSDK.dll version detected. The version of MistforgeLauncher and ArcSDK.dll should match or problems can occur.\n\nShould MistforgeLauncher replace your ArcSDK.dll with the correct version?"
+                        Title = "Unknown ArcSDK.dll version!",
+                        Text = "Unknown ArcSDK.dll version found.\nThis probably means this is your first time running MistforgeLauncher.\nMistforgeLauncher needs to replace the ArcSDK.dll with it's own version to continue.\n\nDo you want to continue?"
                     });
-                    if (result)
+
+                    if (!result)
                     {
-                        await github.DownloadFile(SemVer.ApplicationVersion, "ArcSDK.dll", path);
+                        return;
+                    }
+
+                    await github.DownloadFile(SemVer.ApplicationVersion, "ArcSDK.dll", path);
+                }
+                else
+                {
+                    var arcSdkVersion = SemVer.Parse(arcsdkMetadata.ProductVersion);
+
+                    if (SemVer.ApplicationVersion != arcSdkVersion)
+                    {
+                        var result = await interactions.OnConfirm(new DialogContent
+                        {
+                            Title = "Mismatched ArcSDK.dll version!",
+                            Text = "Mismatched ArcSDK.dll version detected. The version of MistforgeLauncher and ArcSDK.dll should match or problems can occur.\n\nShould MistforgeLauncher replace your ArcSDK.dll with the correct version?"
+                        });
+                        if (result)
+                        {
+                            await github.DownloadFile(SemVer.ApplicationVersion, "ArcSDK.dll", path);
+                        }
                     }
                 }
             }
 
             var commands = new List<string>();
+            var query = new List<string>();
 
             var process = new Process();
 
@@ -97,29 +126,40 @@ public class GameLauncher
 
                 commands.AddRange(settings.LinuxCompatiblityTool.Value switch
                 {
-                    Settings.CompatiblityTool.Proton => new[] { "proton", "run" },
                     Settings.CompatiblityTool.Wine => new[] { "wine" },
-
                 });
             }
 
-            commands.Add(Path.Join(path, "RxGame-Win64-Test.exe"));
-            commands.Add($"?name={nickname ?? "Offline"}");
+            commands.Add(GameExe);
 
-            commands.Add($"-ini:RxEngine:MotigaAuthIntegration.AuthUrlPrefix={config.Host}/,ArcIntegration.AuthUrlPrefix={config.Host}/");
-            commands.Add($"-log=GiganticEmu.Launcher.{username ?? "offline"}.log");
+            query.Add($"?name={nickname ?? "Offline"}");
 
-            commands.Add($"-emu:nickname={nickname ?? "Offline"}");
-            commands.Add($"-emu:username={username ?? "Offline"}");
-            commands.Add($"-emu:auth_token={authToken ?? ""}");
-            commands.Add(@$"-emu:language={settings.GameLanguage.Value switch
+            if (team != null)
             {
-                Settings.Language.English => "INT",
-                Settings.Language.German => "DEU",
-                Settings.Language.French => "FRA",
-            }}");
-            commands.Add($"-emu:launch_code={(giganticMetadata?.ProductVersion == "1, 0, 16601, 0" ? 0 : 0xE0000019)}");
+                query.Add($"?team={team}");
+            }
 
+            if (host != null)
+            {
+                commands.Add(host + string.Join("", query));
+            }
+
+            if (GiganticBuild < GameUtils.BUILD_THROWBACK_EVENT)
+            {
+                commands.Add($"-ini:RxEngine:MotigaAuthIntegration.AuthUrlPrefix={config.Host}/,ArcIntegration.AuthUrlPrefix={config.Host}/");
+                commands.Add($"-log=GiganticEmu.Launcher.{username ?? "offline"}.log");
+
+                commands.Add($"-emu:nickname={nickname ?? "Offline"}");
+                commands.Add($"-emu:username={username ?? "Offline"}");
+                commands.Add($"-emu:auth_token={authToken ?? ""}");
+                commands.Add(@$"-emu:language={settings.GameLanguage.Value switch
+                {
+                    Settings.Language.English => "INT",
+                    Settings.Language.German => "DEU",
+                    Settings.Language.French => "FRA",
+                }}");
+                commands.Add($"-emu:launch_code={(GiganticMetadata?.ProductVersion == "1, 0, 16601, 0" ? 0 : 0xE0000019)}");
+            }
 
             process.StartInfo = new ProcessStartInfo
             {
@@ -144,8 +184,8 @@ public class GameLauncher
         }
     }
 
-    public void StartGame(InteractionHandler interactions, string? username = null, string? nickname = null, string? authToken = null)
+    public void StartGame(InteractionHandler interactions, string? username = null, string? nickname = null, string? authToken = null, string? host = null, int? team = null)
     {
-        _ = Task.Run(async () => await RunGame(interactions, username, nickname, authToken));
+        _ = Task.Run(async () => await RunGame(interactions, username, nickname, authToken, host, team));
     }
 }

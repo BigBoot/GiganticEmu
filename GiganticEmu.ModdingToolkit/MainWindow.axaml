@@ -1,0 +1,68 @@
+<Window xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+  xmlns:local="clr-namespace:GiganticEmu.ModdingToolkit"
+  mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+  Width="800" Height="450"
+  x:Class="GiganticEmu.ModdingToolkit.MainWindow"
+  Title="GiganticEmu.ModdingToolkit">
+  <dialogHost:DialogHost IsOpen="false" x:Name="dialog">
+      <dialogHost:DialogHost.DialogContent>
+        <DockPanel Margin="20">
+          <Button x:Name="dialogOk" DockPanel.Dock="Bottom" HorizontalAlignment="Center" Margin="0,8,0,0">Ok</Button>
+          <ProgressBar x:Name="dialogProgress" IsVisible="false" DockPanel.Dock="Bottom" Margin="0 10" Height="32"  ShowProgressText="True" ProgressTextFormat="{} {0}/{3} ({1:0}%)" />
+          <TextBlock x:Name="dialogText"></TextBlock>
+        </DockPanel>
+      </dialogHost:DialogHost.DialogContent>
+    <TabControl>
+      <TabItem>
+        <TabItem.Header>
+          <TextBlock VerticalAlignment="Center">Mods</TextBlock>
+        </TabItem.Header>
+        <DockPanel Margin="20">
+          <TextBlock Margin="0 5" DockPanel.Dock="Top">Choose mods to apply:</TextBlock>
+          <Button DockPanel.Dock="Bottom" HorizontalAlignment="Center"  Click="OnApplyClicked">Apply selected mods!</Button>
+          <ListBox x:Name="mods">
+            <ListBox.Styles>
+              <Style Selector="ListBoxItem">
+                <Setter Property="Padding" Value="0,0,0,0"/>
+              </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="local:ModEntry">
+                <DockPanel PointerPressed="OnModClicked" Background="Transparent">
+                  <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Enabled}"></CheckBox>
+                  <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center" Text="{Binding Mod.Author, StringFormat='Author: {0}'}"/>
+                  <TextBlock VerticalAlignment="Center" Text="{Binding Mod.Description}"/>
+                </DockPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </TabItem>
+      <TabItem>
+        <TabItem.Header>
+          <TextBlock VerticalAlignment="Center">Tools</TextBlock>
+        </TabItem.Header>
+        <StackPanel>
+          <TextBlock Margin="0,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            Backups are automatically created before decompressing a package (i.e. for applying mods).
+          </TextBlock>
+          <Button Click="OnRestoreBackupsClicked">Restore backups!</Button>
+          <TextBlock  Margin="0,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            Uncompresses all packages, this is mainly useful for creating mods.<LineBreak/>
+            Note: The uncompressed package require ~25GB of storage, make sure you have enough free space!
+          </TextBlock>
+          <Button Click="OnDecompressAllClicked">Uncompress all packages!</Button>
+          <TextBlock  Margin="0,8,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            Uncompresses all packages and decompiles all scripts, this is mainly usefull for creating mods.<LineBreak/>
+            Note: The uncompressed package require ~25GB of storage, make sure you have enough free space!
+          </TextBlock>
+          <Button Click="OnDecompileAllClicked">Decompile all packages!</Button>
+        </StackPanel>
+      </TabItem>
+    </TabControl>
+  </dialogHost:DialogHost>
+</Window>

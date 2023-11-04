@@ -1,10 +1,8 @@
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using GiganticEmu.Shared;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -19,6 +17,7 @@ public class AppViewModel : ReactiveObject
         Main,
         Settings,
         SetupGame,
+        Connect,
     }
 
     [Reactive]
@@ -32,6 +31,9 @@ public class AppViewModel : ReactiveObject
 
     [Reactive]
     public bool SetupGameVisible { get; set; }
+
+    [Reactive]
+    public int? GameBuild { get; set; }
 
     [ObservableAsProperty]
     public Page CurrentPage { get; } = Page.Login;
@@ -57,15 +59,18 @@ public class AppViewModel : ReactiveObject
         CheckForUpdate = ReactiveCommand.CreateFromTask(DoCheckForUpdate);
 
         SetupGameVisible = !GameLauncher.GameFound;
+        GameBuild = GameLauncher.GiganticBuild;
 
         this.WhenAnyValue(
             x => x.User,
             x => x.SettingsVisible,
             x => x.SetupGameVisible,
-            (user, settings, setupGame) => (user, settings, setupGame) switch
+            x => x.GameBuild,
+            (user, settings, setupGame, gameBuild) => (user, settings, setupGame, gameBuild) switch
             {
                 { settings: true } => Page.Settings,
                 { setupGame: true } => Page.SetupGame,
+                { gameBuild: >= GameUtils.BUILD_THROWBACK_EVENT } => Page.Connect,
                 { user: { } } => Page.Main,
                 _ => Page.Login,
             }

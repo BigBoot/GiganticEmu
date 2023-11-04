@@ -1,0 +1,18 @@
+{
+    "$schema": "https://raw.githubusercontent.com/BigBoot/GiganticEmu/master/GiganticEmu.ModdingToolkit/Resources/GiganticEmu.Mod.Schema.json",
+    "Description": "Fix Guardians not spawning on dedicated servers",
+    "Author": "BigBoot",
+    "Builds": [
+        510547
+    ],
+    "Patches": [
+        {
+            "Type": "PatchFunctionHEX",
+            "File": "RxGame.upk",
+            "Class": "RxGameInfo",
+            "Function": "InitializeGameOnFirstTick",
+            "Before": "9B 38 3A 19 01 A4 F3 FF FF 09 00 0A FD FF FF 00 01 0A FD FF FF 38 3A 24 01 16",
+            "After": "9B 38 3A 19 01 A4 F3 FF FF 09 00 0A FD FF FF 00 01 0A FD FF FF 38 3A 24 04 16"
+        }
+    ]
+}

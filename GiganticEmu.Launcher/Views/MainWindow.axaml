@@ -77,7 +77,8 @@
                                     <local:LoginContainer x:Name="PageLogin" />
                                     <local:MainContainer x:Name="PageMain" />
                                     <local:SettingsContainerView x:Name="PageSettings" />
-                                    <local:SetupGame x:Name="PageSetupGame" />
+                                    <local:SetupGame x:Name="PageSetupGame"/>
+                                    <local:Connect x:Name="PageConnect" />
                                 </Panel>
                             </DockPanel>
                         </Panel>

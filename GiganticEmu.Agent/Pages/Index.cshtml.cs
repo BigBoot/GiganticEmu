@@ -17,7 +17,7 @@ namespace GiganticEmu.Agent.Pages
         public int MaxInstances { get => _configuration.MaxInstances; }
         public int RunningInstances { get => _serverManager.RunningInstances; }
         public int AvailableInstances { get => MaxInstances - RunningInstances; }
-        public ICollection<Map> Maps { get => Map.ALL_MAPS.Values; }
+        public ICollection<Map> Maps { get; init; }
         public ICollection<Creature> Creatures { get => Creature.ALL_CREATURES.Values; }
         public string[] DefaultCreatures { get => _configuration.DefaultCreatures; }
         public string? Instance = null;
@@ -27,11 +27,13 @@ namespace GiganticEmu.Agent.Pages
             _logger = logger;
             _configuration = configuration.Value;
             _serverManager = serverManager;
+            Maps = Map.GetMaps(GameUtils.GetGameBuild(_configuration.GiganticPath).GetAwaiter().GetResult()).Values;
         }
 
         public async Task OnPostAsync(string map, int maxPlayers, string creature0, string creature1, string creature2)
         {
-            var port = await _serverManager.StartInstance(map, maxPlayers, (creature0, creature1, creature2));
+            var useLobby = await GameUtils.GetGameBuild(_configuration.GiganticPath) >= GameUtils.BUILD_THROWBACK_EVENT;
+            var port = await _serverManager.StartInstance(map, maxPlayers, (creature0, creature1, creature2), useLobby);
             Instance = $"{_configuration.ServerHost}:{port}";
         }
     }

@@ -51,8 +51,7 @@ public class ServerManager
 
     public async Task<int> StartInstance(string map, int? maxPlayers = null, (string, string, string)? creatures = null, bool useLobby = false, string? reportUrl = null)
     {
-        int port;
-        if (!_freePorts.TryDequeue(out port, out _))
+        if (!_freePorts.TryDequeue(out int port, out _))
         {
             throw new NoInstanceAvailableException();
         }
@@ -82,6 +81,23 @@ public class ServerManager
 
     private async Task<Instance> StartInstance(int port, string map, int? maxPlayers, (string, string, string)? creatures, bool useLobby)
     {
+        useLobby = false;
+
+        string? binary = null;
+        foreach (var exe in new[] { "RxGame-Win64-Test.exe", "RxGame-Arc-Win64-Test.exe" })
+        {
+            if (File.Exists(Path.Join(_binaryPath, exe)))
+            {
+                binary = Path.Join(_binaryPath, exe);
+                break;
+            }
+        }
+
+        if (binary == null)
+        {
+            throw new UnableToStartServerException("Unable to find game exe, please make sure the path in your configuration file is correct...");
+        }
+
         var process = new Process();
 
         if (PlatformUtils.IsWindows)
@@ -113,12 +129,12 @@ public class ServerManager
                 WorkingDirectory = _gamePath,
             };
 
-            process.StartInfo.ArgumentList.Add(Path.Join(_binaryPath, "RxGame-Win64-Test.exe"));
+            process.StartInfo.ArgumentList.Add(binary);
         }
 
         process.StartInfo.ArgumentList.Add($"server");
 
-        process.StartInfo.ArgumentList.Add(useLobby ? "lobby" : map);
+        process.StartInfo.ArgumentList.Add((useLobby ? "lobby" : map) + "?listen=true");
 
         process.StartInfo.ArgumentList.Add($"-port={port}");
         process.StartInfo.ArgumentList.Add($"-log=GiganticEmu.Agent.{port}.log");

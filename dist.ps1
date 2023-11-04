@@ -35,3 +35,10 @@ Copy-Item -Path build/win-x64/GiganticEmu.Agent.exe -Destination $Destination/Gi
 
 dotnet publish -r linux-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=false -p:DebugType=None -p:DebugSymbols=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true -c Release -o build/linux-x64 GiganticEmu.Agent/GiganticEmu.Agent.csproj
 Copy-Item -Path build/linux-x64/GiganticEmu.Agent -Destination $Destination/GiganticEmu.Agent
+
+dotnet publish -r win-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:DebugType=None -p:DebugSymbols=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true -c Release -o build/win-x64 GiganticEmu.ModdingToolkit/GiganticEmu.ModdingToolkit.csproj
+Copy-Item -Path build/win-x64/GiganticEmu.ModdingToolkit.exe -Destination $Destination/GiganticEmu.ModdingToolkit.exe
+
+dotnet publish -r linux-x64 -p:PublishSingleFile=true -p:PublishReadyToRun=false -p:DebugType=None -p:DebugSymbols=false --self-contained true -p:IncludeNativeLibrariesForSelfExtract=true -c Release -o build/linux-x64 GiganticEmu.ModdingToolkit/GiganticEmu.ModdingToolkit.csproj
+Copy-Item -Path build/linux-x64/GiganticEmu.ModdingToolkit -Destination $Destination/GiganticEmu.ModdingToolkit
+

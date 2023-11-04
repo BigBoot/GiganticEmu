@@ -91,7 +91,7 @@ void Init()
             }
             if (wcsncmp(szArglist[i], L"-emu:launch_code=", wcslen(L"-emu:launch_code=")) == 0)
             {
-                launch_code = std::stoi(std::wstring(szArglist[i] + wcslen(L"-emu:launch_code=")));
+                launch_code = std::stol(std::wstring(szArglist[i] + wcslen(L"-emu:launch_code=")));
             }
             if (wcsncmp(szArglist[i], L"-emu:language=INT", wcslen(L"-emu:language=INT")) == 0)
             {

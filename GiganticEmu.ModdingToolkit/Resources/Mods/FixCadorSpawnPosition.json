@@ -1,0 +1,24 @@
+{
+    "$schema": "https://raw.githubusercontent.com/BigBoot/GiganticEmu/master/GiganticEmu.ModdingToolkit/Resources/GiganticEmu.Mod.Schema.json",
+    "Description": "Fixes Cadors spawn position by taking his height into account",
+    "Author": "CrazyMetic",
+    "Builds": [
+        510547
+    ],
+    "Patches": [
+        {
+            "Type": "PatchObjectHEX",
+            "File": "DYNPAWN_Adept_SF.upk",
+            "Object": "skAdept2_Charge_Skill",
+            "Before": "E3 01 00 00 00 00 00 00 3F 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+            "After": "E3 01 00 00 00 00 00 00 3F 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01"
+        },
+        {
+            "Type": "PatchObjectHEX",
+            "File": "DYNPAWN_Adept_SF.upk",
+            "Object": "skAdept2_Charge_Skill",
+            "Before": "1F 06 00 00 00 00 00 00 D1 04 00 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 A0 40",
+            "After": "1F 06 00 00 00 00 00 00 D1 04 00 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 7A 43"
+        }
+    ]
+}

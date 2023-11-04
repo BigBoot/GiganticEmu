@@ -1,0 +1,132 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "HexString": {
+            "type": "string",
+            "pattern": "^(?:[0-9A-Fa-f]{2}\\s?)+$"
+        },
+        "PatchHEX": {
+            "description": "Base for patches replacing a hex pattern with another.",
+            "type": "object",
+            "properties": {
+                "File": {
+                    "type": "string",
+                    "description": "The name of the file being patched."
+                },
+                "Before": {
+                    "$ref": "#/definitions/HexString",
+                    "description": "The hexadecimal representation of the code before the patch."
+                },
+                "After": {
+                    "$ref": "#/definitions/HexString",
+                    "description": "The hexadecimal representation of the code after the patch."
+                },
+                "Behavior": {
+                    "type": "string",
+                    "enum": [
+                        "First",
+                        "Last",
+                        "All",
+                        "Single"
+                    ],
+                    "description": "The Behavior when the pattern matches more than once in the input.",
+                    "default": "Single"
+                }
+            },
+            "required": [
+                "File",
+                "Before",
+                "After"
+            ]
+        },
+        "PatchFunctionHEX": {
+            "description": "Patches a class method by replacing a hex pattern with another.",
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/PatchHEX"
+                }
+            ],
+            "properties": {
+                "Type": {
+                    "type": "string",
+                    "const": "PatchFunctionHEX"
+                },
+                "Class": {
+                    "type": "string",
+                    "description": "The name of the class within the file being patched."
+                },
+                "Function": {
+                    "type": "string",
+                    "description": "The name of the function or method being patched."
+                }
+            },
+            "required": [
+                "Type",
+                "Class",
+                "Function"
+            ]
+        },
+        "PatchObjectHEX": {
+            "description": "Patches a class method by replacing a hex pattern with another.",
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/PatchHEX"
+                }
+            ],
+            "properties": {
+                "Type": {
+                    "type": "string",
+                    "const": "PatchObjectHEX"
+                },
+                "Object": {
+                    "type": "string",
+                    "description": "The name of the object within the file being patched."
+                }
+            },
+            "required": [
+                "Type",
+                "Object"
+            ]
+        }
+    },
+    "type": "object",
+    "properties": {
+        "Description": {
+            "type": "string",
+            "description": "A brief description of the fix or change."
+        },
+        "Author": {
+            "type": "string",
+            "description": "The name of the author who made the fix or change."
+        },
+        "Builds": {
+            "type": "array",
+            "description": "An array of build numbers associated with the fix or change.",
+            "items": {
+                "type": "integer"
+            }
+        },
+        "Patches": {
+            "type": "array",
+            "description": "An array of patches applied to the game.",
+            "items": {
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/PatchFunctionHEX"
+                    },
+                    {
+                        "$ref": "#/definitions/PatchObjectHEX"
+                    }
+                ]
+            }
+        }
+    },
+    "required": [
+        "Description",
+        "Author",
+        "Builds",
+        "Patches"
+    ]
+}

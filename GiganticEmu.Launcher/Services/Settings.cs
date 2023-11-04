@@ -27,7 +27,6 @@ public class Settings
 
     public enum CompatiblityTool
     {
-        Proton,
         Wine,
     }
 
@@ -35,13 +34,15 @@ public class Settings
 
     public BehaviorSubject<String> OfflineName { get; } = new("");
 
+    public BehaviorSubject<String> LastHost { get; } = new("");
+
     public BehaviorSubject<DateTime?> AutoUpdaterRemindLater { get; } = new(null);
 
     public BehaviorSubject<SemVer?> AutoUpdaterSkippedVersion { get; } = new(null);
 
     public BehaviorSubject<BackgroundImage> Background { get; } = new(BackgroundImage.Leiran);
 
-    public BehaviorSubject<CompatiblityTool> LinuxCompatiblityTool { get; } = new(CompatiblityTool.Proton);
+    public BehaviorSubject<CompatiblityTool> LinuxCompatiblityTool { get; } = new(CompatiblityTool.Wine);
 
     public BehaviorSubject<bool> LinuxEnableGameMode { get; } = new(false);
 
@@ -77,12 +78,12 @@ public class Settings
     public async Task Save()
     {
         var getter = typeof(BehaviorSubject<>).GetProperty("Value")!;
-        var dir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var dir = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GiganticEmu");
         var settings = typeof(Settings)
             .GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public)
             .ToDictionary(p => p.Name, p => p.PropertyType.GetProperty("Value")!.GetValue(p.GetValue(this)));
 
         Directory.CreateDirectory(dir);
-        await File.WriteAllTextAsync(Path.Join(dir, "GiganticEmu", "GiganticEmu.Launcher.json"), JsonSerializer.Serialize(settings));
+        await File.WriteAllTextAsync(Path.Join(dir, "GiganticEmu.Launcher.json"), JsonSerializer.Serialize(settings));
     }
 }

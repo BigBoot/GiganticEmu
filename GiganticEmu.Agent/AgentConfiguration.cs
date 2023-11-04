@@ -1,3 +1,4 @@
+using GiganticEmu.Shared;
 using Microsoft.Extensions.Configuration;
 
 namespace GiganticEmu.Agent;
@@ -15,7 +16,6 @@ public class AgentConfiguration
     public string[] DefaultCreatures { get; set; } = new string[] { "bloomer", "cerb", "cyclops" };
     public string? WinePath { get; set; } = null;
     public string? InstanceConfigPath { get; set; } = null;
-    public bool UseLobby { get; set; } = false;
 
     #region GCP config.json compatibility
     private string? api_key

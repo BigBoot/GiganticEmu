@@ -61,7 +61,8 @@ public class LegacyApiController : ControllerBase
     {
         try
         {
-            var port = await _serverManager.StartInstance(req.Map, req.MaxPlayers, req.Creatures, _configuration.UseLobby, req.ReportUrl);
+            var useLobby = await GameUtils.GetGameBuild(_configuration.GiganticPath) >= GameUtils.BUILD_THROWBACK_EVENT;
+            var port = await _serverManager.StartInstance(req.Map, req.MaxPlayers, req.Creatures, useLobby, req.ReportUrl);
 
             return Ok(new StartResponse
             {

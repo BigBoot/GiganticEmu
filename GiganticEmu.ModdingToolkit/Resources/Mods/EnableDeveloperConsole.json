@@ -1,0 +1,26 @@
+{
+    "$schema": "https://raw.githubusercontent.com/BigBoot/GiganticEmu/master/GiganticEmu.ModdingToolkit/Resources/GiganticEmu.Mod.Schema.json",
+    "Description": "Enable the developer console",
+    "Author": "BigBoot",
+    "Builds": [
+        510547
+    ],
+    "Patches": [
+        {
+            "Type": "PatchFunctionHEX",
+            "File": "RxGame.upk",
+            "Class": "RxPlayerController",
+            "Function": "IsDeveloper",
+            "Before": "04 19 51 19 01 37 F3 FF FF 09 00 9F F4 FF FF",
+            "After": "0B 19 51 19 01 37 F3 FF FF 09 00 9F F4 FF FF"
+        },
+        {
+            "Type": "PatchFunctionHEX",
+            "File": "RxGame.upk",
+            "Class": "RxPlayerController",
+            "Function": "IsDeveloper",
+            "Before": "04 28 04 3A 96 55 00 00",
+            "After": "04 27 04 3A 96 55 00 00"
+        }
+    ]
+}

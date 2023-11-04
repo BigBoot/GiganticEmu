@@ -41,7 +41,8 @@ public class ApiController : ControllerBase
     [Produces("application/json")]
     public async Task<IActionResult> PostServer(ServerPostRequest start)
     {
-        var port = await _serverManager.StartInstance(start.Map, useLobby: _configuration.UseLobby);
+        var useLobby = await GameUtils.GetGameBuild(_configuration.GiganticPath) >= GameUtils.BUILD_THROWBACK_EVENT;
+        var port = await _serverManager.StartInstance(start.Map, useLobby: useLobby);
         return Ok(new ServerPostResponse(port == 0 ? RequestResult.NoInstanceAvailable : RequestResult.Success)
         {
             Port = port

@@ -1,0 +1,17 @@
+{
+    "$schema": "https://raw.githubusercontent.com/BigBoot/GiganticEmu/master/GiganticEmu.ModdingToolkit/Resources/GiganticEmu.Mod.Schema.json",
+    "Description": "Adds CD Back to Rutger's Burrow",
+    "Author": "CrazyMetic",
+    "Builds": [
+        510547
+    ],
+    "Patches": [
+        {
+            "Type": "PatchObjectHEX",
+            "File": "DYNPAWN_Stoneskin_SF.upk",
+            "Object": "skStoneskin3_Burrow_Skill_Teleport",
+            "Before": "61 06 00 00 00 00 00 00 60 04 00 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 00 00",
+            "After": "4D 04 00 00 00 00 00 00 60 04 00 00 00 00 00 00 04 00 00 00 00 00 00 00 00 00 A0 41"
+        }
+    ]
+}
