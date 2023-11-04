@@ -81,8 +81,6 @@ public class ServerManager
 
     private async Task<Instance> StartInstance(int port, string map, int? maxPlayers, (string, string, string)? creatures, bool useLobby)
     {
-        useLobby = false;
-
         string? binary = null;
         foreach (var exe in new[] { "RxGame-Win64-Test.exe", "RxGame-Arc-Win64-Test.exe" })
         {

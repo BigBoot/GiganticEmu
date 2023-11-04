@@ -25,7 +25,7 @@ public record Map
             new Map { Id = "lv_mistforge",     Name = "[Clash] Sanctum Falls" },
             new Map { Id = "lv_valley",        Name = "[Clash] Sirens Strand" },
             new Map { Id = "lv_wizardwoods",   Name = "[Clash] Ember Grove" },
-            new Map { Id = "lv_skycityv2",     Name = "[Clash] Sky City V2" },
+            new Map { Id = "lv_skycity2",      Name = "[Clash] Sky City" },
             new Map { Id = "lv_modcity",       Name = "[Clash] Sky Tuga" },
 
             new Map { Id = "rs_canyon2",        Name = "[Rush] Ghost Reef" },
