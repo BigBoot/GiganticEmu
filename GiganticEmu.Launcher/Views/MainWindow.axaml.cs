@@ -88,7 +88,7 @@ namespace GiganticEmu.Launcher
                 this.OneWayBind(ViewModel,
                         viewModel => viewModel.CurrentPage,
                         view => view.ButtonSettings.IsVisible,
-                        value => value is AppViewModel.Page.Login or AppViewModel.Page.Main
+                        value => value is AppViewModel.Page.Login or AppViewModel.Page.Main or AppViewModel.Page.Connect
                     )
                     .DisposeWith(disposables);
 

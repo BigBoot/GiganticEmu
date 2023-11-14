@@ -28,11 +28,13 @@ public partial class SettingsContainerView : ReactiveUserControl<SettingsContain
                 .DisposeWith(disposables);
 
             PageLinuxSettings.Parent!.IsVisible = PlatformUtils.IsLinux;
+            PageRushLoadoutSettings.Parent!.IsVisible = GameLauncher.GiganticBuild >= GameUtils.BUILD_THROWBACK_EVENT;
 
             ViewModel.Pages = new SettingsContainerViewModel.ISettingsPageViewModel[]
             {
                 PageMainSettings.ViewModel!,
                 PageLinuxSettings.ViewModel!,
+                PageRushLoadoutSettings.ViewModel!,
             }.ToList();
         });
     }

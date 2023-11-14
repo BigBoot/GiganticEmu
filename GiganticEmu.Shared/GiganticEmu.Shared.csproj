@@ -8,6 +8,7 @@
     <PackageReference Include="Flurl.Serialization.TextJson" Version="3.1.0" />
     <PackageReference Include="Polly.Caching.Memory" Version="3.0.2" />
     <PackageReference Include="Polly" Version="7.2.3" />
+    <PackageReference Include="Infrablack.UE4Config" Version="0.7.2.97" />
   </ItemGroup>
 
 </Project>

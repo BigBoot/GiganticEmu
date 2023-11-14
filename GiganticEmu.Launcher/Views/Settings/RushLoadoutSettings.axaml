@@ -1,0 +1,251 @@
+﻿<rxui:ReactiveUserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:GiganticEmu.Launcher"
+    xmlns:material="using:Material.Icons.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="GiganticEmu.Launcher.RushLoadoutSettings"
+    x:TypeArguments="local:RushLoadoutSettingsViewModel"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="600">
+
+    <ScrollViewer>
+        <ScrollViewer.Resources>
+         <local:UpgradeConverter x:Key="UpgradeConverter" />
+            <DataTemplate x:Key="UpgradeItemTemplate">
+                <TextBlock>
+                    <TextBlock.Text>
+                        <Binding Converter="{StaticResource UpgradeConverter}"/>
+                    </TextBlock.Text>
+                </TextBlock>
+            </DataTemplate>
+        </ScrollViewer.Resources>
+        
+        <Grid
+            KeyboardNavigation.TabNavigation="Cycle"
+        VerticalAlignment="Center"
+            ColumnDefinitions="* Auto *"
+            RowDefinitions="Auto Auto Auto Auto Auto Auto Auto Auto Auto Auto Auto Auto">
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="0">
+                Loadout
+            </TextBlock>
+            <ComboBox
+                Name="Loadout"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} [{1}]">
+                                    <Binding Path="Hero" />
+                                    <Binding Path="Index" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>    
+            </ComboBox>
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="1">
+                Upgrade 1
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade1"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="1"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" /> 
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="2">
+                Upgrade 2
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade2"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="2"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="3">
+                Upgrade 3
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade3"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="3"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="4">
+                Upgrade 4
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade4"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="4"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="5">
+                Upgrade 5
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade5"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="5"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="6">
+                Upgrade 6
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade6"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="6"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="7">
+                Upgrade 7
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade7"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="7"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="8">
+                Upgrade 8
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade8"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="8"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="9">
+                Upgrade 9
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade9"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="9"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="10">
+                Upgrade 10
+            </TextBlock>
+            <ComboBox
+                Name="Upgrade10"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="10"
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+
+            <TextBlock
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 10"
+                Grid.Column="0"
+                Grid.Row="11"
+                >
+                Talent
+            </TextBlock>
+            <ComboBox
+                Name="Talent"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Width="200"
+                Grid.Column="2"
+                Grid.Row="11" 
+                ItemTemplate="{StaticResource UpgradeItemTemplate}" />
+        </Grid>
+    </ScrollViewer>
+</rxui:ReactiveUserControl> 

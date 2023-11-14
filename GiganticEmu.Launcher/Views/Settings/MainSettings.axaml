@@ -14,7 +14,7 @@
 
     <Grid
         KeyboardNavigation.TabNavigation="Cycle"
-        VerticalAlignment="Top"
+        VerticalAlignment="Center"
         ColumnDefinitions="* Auto *"
         RowDefinitions="Auto Auto Auto Auto Auto">
 

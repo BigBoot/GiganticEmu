@@ -30,7 +30,6 @@
         <TabControl
             x:Name="ContentContainer"
             Background="#00000000"
-            Height="250"
             BorderThickness="0"
             Width="480">
             <TabItem>
@@ -40,6 +39,10 @@
             <TabItem>
                 <TabItem.Header>Linux</TabItem.Header>
                 <local:LinuxSettings x:Name="PageLinuxSettings" />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>Talent Loadout</TabItem.Header>
+                <local:RushLoadoutSettings x:Name="PageRushLoadoutSettings" />
             </TabItem>
         </TabControl>
     </DockPanel>
